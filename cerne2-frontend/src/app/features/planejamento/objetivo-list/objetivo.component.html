@@ -1,0 +1,30 @@
+<div class="container">
+  <button class="btn-back" (click)="voltar()">← Projetos</button>
+
+  <div class="page-header">
+    <h1 class="page-title">Objetivos{{ projetoNome ? ' — ' + projetoNome : '' }}</h1>
+    <button class="btn-primary" (click)="novo()">+ Novo Objetivo</button>
+  </div>
+
+  <div class="lista">
+    <div class="empty-state" *ngIf="erroCarregamento" style="color: #c0392b;">{{ erroCarregamento }}</div>
+
+    <div class="card" *ngFor="let o of objetivos">
+      <div class="card-body" (click)="abrirTarefas(o.objCod)">
+        <div>
+          <div class="card-title">{{ o.nome }}</div>
+          <div class="card-dates">{{ o.dataInicio | date:'dd/MM/yyyy' }} — {{ o.dataTermino | date:'dd/MM/yyyy' }}</div>
+        </div>
+        <span class="card-nav">Tarefas →</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn-action btn-edit" (click)="editar(o.objCod)">Editar</button>
+        <button class="btn-action btn-delete" (click)="deletar(o.objCod)">Excluir</button>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="objetivos.length === 0">
+      Nenhum objetivo cadastrado.
+    </div>
+  </div>
+</div>

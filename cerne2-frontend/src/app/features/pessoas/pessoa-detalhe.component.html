@@ -1,0 +1,85 @@
+<div class="toast" *ngIf="toast" [class.toast-sucesso]="toast.tipo === 'sucesso'" [class.toast-erro]="toast.tipo === 'erro'">
+  {{ toast.texto }}
+</div>
+
+<div class="container">
+  <header class="page-header">
+    <button type="button" class="btn-back" (click)="voltar()">← Voltar</button>
+    <h1>{{ isNovo ? 'Nova Pessoa' : 'Editar Pessoa' }}</h1>
+  </header>
+
+  <form class="form-card" (ngSubmit)="salvar()">
+    <div class="form-group">
+      <label for="nome">Nome</label>
+      <input
+        id="nome"
+        type="text"
+        [(ngModel)]="form.nome"
+        name="nome"
+        placeholder="Nome completo"
+        required
+      >
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input
+          id="email"
+          type="email"
+          [(ngModel)]="form.email"
+          name="email"
+          placeholder="email@dominio.com"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="cpf">CPF</label>
+        <input
+          id="cpf"
+          type="text"
+          [(ngModel)]="form.cpf"
+          name="cpf"
+          placeholder="000.000.000-00"
+        >
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="cargo">Cargo</label>
+      <input
+        id="cargo"
+        type="text"
+        [(ngModel)]="form.cargo"
+        name="cargo"
+        placeholder="Cargo na empresa"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="tipo">Tipo de Empreendimento</label>
+      <select
+        id="tipo"
+        [(ngModel)]="form.eTipoEmpreendimento"
+        name="tipo"
+      >
+        <option *ngFor="let t of tiposEmpreendimento" [ngValue]="t">{{ t }}</option>
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">
+        {{ isNovo ? 'Salvar' : 'Atualizar' }}
+      </button>
+
+      <button
+        *ngIf="!isNovo"
+        type="button"
+        class="btn btn-danger"
+        (click)="deletar()"
+      >
+        Excluir
+      </button>
+    </div>
+  </form>
+</div>

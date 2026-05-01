@@ -1,0 +1,30 @@
+<div class="container">
+  <header class="page-header">
+    <h1>Serviços de Valor Agregado</h1>
+    <button class="btn btn-primary" (click)="novo()">
+      <span class="btn-icon">+</span>
+      Novo Serviço
+    </button>
+  </header>
+
+  <div class="lista">
+    <div
+      class="card"
+      *ngFor="let s of servicos"
+      (click)="abrir(s.servCod)"
+    >
+      <div class="card-content">
+        <h3 class="card-title">{{ s.servTitulo }}</h3>
+        <p class="card-desc">{{ s.servDesc }}</p>
+      </div>
+      <div class="card-footer">
+        <span class="card-price">R$ {{ s.servCusto | number:'1.2-2' }}</span>
+        <span class="card-action">Ver detalhes →</span>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="servicos.length === 0">
+      <p>Nenhum serviço cadastrado</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+<div class="toast" *ngIf="toast" [class.toast-sucesso]="toast.tipo === 'sucesso'" [class.toast-erro]="toast.tipo === 'erro'">
+  {{ toast.texto }}
+</div>
+
+<div class="container">
+  <header class="page-header">
+    <button type="button" class="btn-back" (click)="voltar()">← Tarefas</button>
+    <h1>{{ isNovo ? 'Nova Tarefa' : 'Editar Tarefa' }}</h1>
+  </header>
+
+  <form class="form-card" (ngSubmit)="salvar()">
+    <div class="form-group">
+      <label for="nome">Nome</label>
+      <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" placeholder="Nome da tarefa" required>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="dataInicio">Data de Início</label>
+        <input id="dataInicio" type="date" [(ngModel)]="form.dataInicio" name="dataInicio" required>
+      </div>
+      <div class="form-group">
+        <label for="dataTermino">Data de Término</label>
+        <input id="dataTermino" type="date" [(ngModel)]="form.dataTermino" name="dataTermino" required>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="situacao">Situação</label>
+        <select id="situacao" [(ngModel)]="form.eSituacaoTarefa" name="situacao" required>
+          <option *ngFor="let s of situacoes" [value]="s">{{ situacaoLabel(s) }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="respCod">Responsável</label>
+        <select id="respCod" [(ngModel)]="form.respCod" name="respCod" required>
+          <option [ngValue]="0" disabled>Selecione um responsável</option>
+          <option *ngFor="let p of responsaveis" [ngValue]="p.pessoaCod">
+            {{ p.nome }}<ng-container *ngIf="p.cargo"> — {{ p.cargo }}</ng-container>
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">{{ isNovo ? 'Salvar' : 'Atualizar' }}</button>
+      <button *ngIf="!isNovo" type="button" class="btn btn-danger" (click)="deletar()">Excluir</button>
+    </div>
+  </form>
+</div>

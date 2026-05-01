@@ -1,0 +1,31 @@
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Planejamento Estratégico</h1>
+      <p class="page-subtitle">Planos anuais integrados</p>
+    </div>
+    <button class="btn-primary" (click)="novo()">+ Novo Planejamento</button>
+  </div>
+
+  <div class="lista">
+    <div class="empty-state" *ngIf="erroCarregamento" style="color: #c0392b;">{{ erroCarregamento }}</div>
+
+    <div class="card" *ngFor="let p of planejamentos">
+      <div class="card-body" (click)="abrirProjetos(p.pesCod)">
+        <div>
+          <div class="card-title">{{ p.nome }}</div>
+          <div class="card-dates">{{ p.dataInicio | date:'dd/MM/yyyy' }} — {{ p.dataTermino | date:'dd/MM/yyyy' }}</div>
+        </div>
+        <span class="card-nav">Projetos →</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn-action btn-edit" (click)="editar(p.pesCod)">Editar</button>
+        <button class="btn-action btn-delete" (click)="deletar(p.pesCod)">Excluir</button>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="planejamentos.length === 0">
+      Nenhum planejamento cadastrado.
+    </div>
+  </div>
+</div>

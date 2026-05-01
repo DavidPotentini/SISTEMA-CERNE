@@ -1,0 +1,87 @@
+<div class="toast" *ngIf="toast" [class.toast-sucesso]="toast.tipo === 'sucesso'" [class.toast-erro]="toast.tipo === 'erro'">
+  {{ toast.texto }}
+</div>
+
+<div class="container">
+  <header class="page-header">
+    <button type="button" class="btn-back" (click)="voltar()">← Voltar</button>
+    <h1>{{ isNovo ? 'Novo Serviço' : 'Editar Serviço' }}</h1>
+  </header>
+
+  <form class="form-card" (ngSubmit)="salvar()">
+    <div class="form-group">
+      <label for="titulo">Título</label>
+      <input
+        id="titulo"
+        type="text"
+        [(ngModel)]="form.servTitulo"
+        name="titulo"
+        placeholder="Nome do serviço"
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="desc">Descrição</label>
+      <textarea
+        id="desc"
+        [(ngModel)]="form.servDesc"
+        name="desc"
+        placeholder="Descreva o serviço..."
+        rows="4"
+      ></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="custo">Custo (R$)</label>
+        <input
+          id="custo"
+          type="number"
+          [(ngModel)]="form.servCusto"
+          name="custo"
+          placeholder="0,00"
+          step="0.01"
+          min="0"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="anexos">Anexos</label>
+        <input
+          id="anexos"
+          type="text"
+          [(ngModel)]="form.servAnexos"
+          name="anexos"
+          placeholder="Links ou referências"
+        >
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="cond">Condições de Contratação</label>
+      <textarea
+        id="cond"
+        [(ngModel)]="form.servCondContratacao"
+        name="cond"
+        placeholder="Termos e condições..."
+        rows="3"
+      ></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">
+        {{ isNovo ? 'Salvar' : 'Atualizar' }}
+      </button>
+
+      <button
+        *ngIf="!isNovo"
+        type="button"
+        class="btn btn-danger"
+        (click)="deletar()"
+      >
+        Excluir
+      </button>
+    </div>
+  </form>
+</div>

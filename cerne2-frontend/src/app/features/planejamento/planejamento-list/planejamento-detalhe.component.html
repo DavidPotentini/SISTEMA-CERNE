@@ -1,0 +1,33 @@
+<div class="toast" *ngIf="toast" [class.toast-sucesso]="toast.tipo === 'sucesso'" [class.toast-erro]="toast.tipo === 'erro'">
+  {{ toast.texto }}
+</div>
+
+<div class="container">
+  <header class="page-header">
+    <button type="button" class="btn-back" (click)="voltar()">← Planejamentos</button>
+    <h1>{{ isNovo ? 'Novo Planejamento' : 'Editar Planejamento' }}</h1>
+  </header>
+
+  <form class="form-card" (ngSubmit)="salvar()">
+    <div class="form-group">
+      <label for="nome">Nome</label>
+      <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" placeholder="Nome do planejamento" required>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="dataInicio">Data de Início</label>
+        <input id="dataInicio" type="date" [(ngModel)]="form.dataInicio" name="dataInicio" required>
+      </div>
+      <div class="form-group">
+        <label for="dataTermino">Data de Término</label>
+        <input id="dataTermino" type="date" [(ngModel)]="form.dataTermino" name="dataTermino" required>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">{{ isNovo ? 'Salvar' : 'Atualizar' }}</button>
+      <button *ngIf="!isNovo" type="button" class="btn btn-danger" (click)="deletar()">Excluir</button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,31 @@
+<div class="container">
+  <header class="page-header">
+    <h1>Pessoas</h1>
+    <button class="btn btn-primary" (click)="novo()">
+      <span class="btn-icon">+</span>
+      Nova Pessoa
+    </button>
+  </header>
+
+  <div class="lista">
+    <div
+      class="card"
+      *ngFor="let p of pessoas"
+      (click)="abrir(p.pessoaCod)"
+    >
+      <div class="card-content">
+        <h3 class="card-title">{{ p.nome }}</h3>
+        <p class="card-desc">{{ p.cargo }}</p>
+        <p class="card-meta">{{ p.email }}</p>
+      </div>
+      <div class="card-footer">
+        <span class="card-tag">{{ p.eTipoEmpreendimento }}</span>
+        <span class="card-action">Ver detalhes →</span>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!carregando && pessoas.length === 0">
+      <p>Nenhuma pessoa cadastrada</p>
+    </div>
+  </div>
+</div>
