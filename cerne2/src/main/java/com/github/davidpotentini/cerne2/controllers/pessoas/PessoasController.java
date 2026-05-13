@@ -30,6 +30,11 @@ public class PessoasController {
         return ResponseEntity.ok(pessoasService.findById(pessoaCod));
     }
 
+    @GetMapping("/incubada/{incCod}")
+    public ResponseEntity<List<PessoasDTOResponse>> findByIncubada(@PathVariable Long incCod){
+        return ResponseEntity.ok(pessoasService.findByIncubada(incCod));
+    }
+
     @PostMapping
     public ResponseEntity<PessoasDTOResponse> insert(@RequestBody PessoasDTORequest pessoasDTORequest){
         PessoasDTOResponse pessoasDTOResponse = pessoasService.save(pessoasDTORequest, null);

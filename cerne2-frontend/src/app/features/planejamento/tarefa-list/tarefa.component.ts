@@ -69,6 +69,7 @@ export class TarefaComponent implements OnInit {
   deletar(trfCod: number) {
     this.service.deleteTarefa(this.pesCod, this.prjCod, this.objCod, trfCod).subscribe(() => {
       this.tarefas = this.tarefas.filter(t => t.trfCod !== trfCod);
+      this.cdr.detectChanges();
     });
   }
 

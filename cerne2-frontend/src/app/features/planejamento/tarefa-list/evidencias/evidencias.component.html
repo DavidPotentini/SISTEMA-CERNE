@@ -1,0 +1,71 @@
+<section class="evidencias-card">
+  <header class="evidencias-header">
+    <h2>Evidências</h2>
+    <button type="button" class="btn btn-primary" (click)="abrirNova()">+ Nova evidência</button>
+  </header>
+
+  <p *ngIf="evidencias.length === 0" class="vazio">Nenhuma evidência cadastrada.</p>
+
+  <ul class="evidencias-list" *ngIf="evidencias.length > 0">
+    <li *ngFor="let e of evidencias" class="evidencia-item">
+      <div class="evidencia-info">
+        <strong class="descricao">{{ e.descricao || '(sem descrição)' }}</strong>
+        <span class="caminho" *ngIf="e.caminhoArquivo">{{ e.caminhoArquivo }}</span>
+      </div>
+      <div class="evidencia-acoes">
+        <button type="button" class="btn-link" (click)="abrirEditar(e)">Editar</button>
+        <button type="button" class="btn-link btn-link-danger" (click)="excluir(e)">Excluir</button>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<div class="modal-backdrop" *ngIf="modalAberto" (click)="fechar()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h3>{{ editandoCod === null ? 'Nova evidência' : 'Editar evidência' }}</h3>
+      <button type="button" class="btn-close" (click)="fechar()" aria-label="Fechar">×</button>
+    </header>
+
+    <form (ngSubmit)="salvar()" class="modal-body">
+      <div class="form-group">
+        <label for="evd-descricao">Descrição</label>
+        <input
+          id="evd-descricao"
+          type="text"
+          [(ngModel)]="form.descricao"
+          name="evd-descricao"
+          placeholder="Descrição da evidência"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="evd-caminho">Caminho do arquivo</label>
+        <input
+          id="evd-caminho"
+          type="text"
+          [(ngModel)]="form.caminhoArquivo"
+          name="evd-caminho"
+          placeholder="/caminho/para/arquivo.pdf"
+        >
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" (click)="fechar()">Cancelar</button>
+        <button type="submit" class="btn btn-success">
+          {{ editandoCod === null ? 'Criar' : 'Atualizar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div
+  class="toast"
+  *ngIf="toast"
+  [class.toast-sucesso]="toast.tipo === 'sucesso'"
+  [class.toast-erro]="toast.tipo === 'erro'"
+>
+  {{ toast.texto }}
+</div>

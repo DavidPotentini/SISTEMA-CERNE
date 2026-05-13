@@ -11,7 +11,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(name = "/gerenciaIncubadas")
+@RequestMapping("/gerenciaIncubadas")
 public class IncubadasController {
 
     private final IncubadasService incubadasService;
@@ -36,11 +36,11 @@ public class IncubadasController {
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .path("/incCod")
+                .path("/{incCod}")
                 .buildAndExpand(incubadasDTOResponse.incCod())
                 .toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(incubadasDTOResponse);
     }
 
     @PutMapping("/{incCod}")
@@ -50,7 +50,7 @@ public class IncubadasController {
         return ResponseEntity.ok(incubadasService.save(incubadasDTORequest, incCod));
     }
 
-    @DeleteMapping("/incCod")
+    @DeleteMapping("/{incCod}")
     public ResponseEntity<Void> delete(@PathVariable Long incCod){
         incubadasService.delete(incCod);
 

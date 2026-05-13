@@ -28,9 +28,9 @@ public class CadastroUsuarioController {
         UsersModel usersModel = cadastroUsuarioDTO.mapToUser();
 
         if (cadastroUsuarioDTO.tntCod() != null){
-            cadastroUsuarioService.cadastrarUsuarioEmpresaExistente(usersModel, cadastroUsuarioDTO.tntCod());
+            cadastroUsuarioService.cadastrarUsuarioIncubadoraExistente(usersModel, cadastroUsuarioDTO.tntCod());
         }else {
-            cadastroUsuarioService.cadastrarUsuarioEmpresaNaoExistente(usersModel, cadastroUsuarioDTO.mapToTenants());
+            cadastroUsuarioService.cadastrarUsuarioIncubadoraNaoExistente(usersModel, cadastroUsuarioDTO.mapToTenants());
         }
 
         URI location = ServletUriComponentsBuilder

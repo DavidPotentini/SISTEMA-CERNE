@@ -10,6 +10,7 @@ import { ObjetivoResponse } from '../../../models/planejamento/objetivo.model';
 import { ObjetivoRequest } from '../../../models/planejamento/objetivo.model';
 import { TarefaResponse } from '../../../models/planejamento/tarefa.model';
 import { TarefaRequest } from '../../../models/planejamento/tarefa.model';
+import { EvidenciaRequest, EvidenciaResponse } from '../../../models/planejamento/evidencia.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -85,5 +86,21 @@ export class PlanejamentoService {
   deleteTarefa(pesCod: number, prjCod: number, objCod: number,trfCod:number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas/${trfCod}`);
   }
-  
+
+  // Evidências
+  private evidenciasBase(pesCod: number, prjCod: number, objCod: number, trfCod: number): string {
+    return `${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas/${trfCod}/evidencias`;
+  }
+  findEvidencias(pesCod: number, prjCod: number, objCod: number, trfCod: number): Observable<EvidenciaResponse[]> {
+    return this.http.get<EvidenciaResponse[]>(this.evidenciasBase(pesCod, prjCod, objCod, trfCod));
+  }
+  saveEvidencia(pesCod: number, prjCod: number, objCod: number, trfCod: number, body: EvidenciaRequest): Observable<EvidenciaResponse> {
+    return this.http.post<EvidenciaResponse>(this.evidenciasBase(pesCod, prjCod, objCod, trfCod), body);
+  }
+  updateEvidencia(pesCod: number, prjCod: number, objCod: number, trfCod: number, evdCod: number, body: EvidenciaRequest): Observable<EvidenciaResponse> {
+    return this.http.post<EvidenciaResponse>(`${this.evidenciasBase(pesCod, prjCod, objCod, trfCod)}/${evdCod}`, body);
+  }
+  deleteEvidencia(pesCod: number, prjCod: number, objCod: number, trfCod: number, evdCod: number): Observable<void> {
+    return this.http.delete<void>(`${this.evidenciasBase(pesCod, prjCod, objCod, trfCod)}/${evdCod}`);
+  }
 }

@@ -1,0 +1,31 @@
+<div class="container">
+  <header class="page-header">
+    <h1>Formulários</h1>
+    <button class="btn btn-primary" (click)="novo()">
+      <span class="btn-icon">+</span>
+      Novo Formulário
+    </button>
+  </header>
+
+  <div class="lista">
+    <div
+      class="card"
+      *ngFor="let f of formularios"
+      (click)="abrir(f.frmCod)"
+    >
+      <div class="card-content">
+        <h3 class="card-title">{{ f.nome || 'Formulário sem nome' }}</h3>
+        <p class="card-desc">{{ f.proposito || 'Sem propósito definido' }}</p>
+        <p class="card-meta">{{ totalCampos(f) }} campo(s) configurado(s)</p>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">#{{ f.frmCod }}</span>
+        <span class="card-action">Ver detalhes →</span>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="formularios.length === 0">
+      <p>Nenhum formulário cadastrado</p>
+    </div>
+  </div>
+</div>

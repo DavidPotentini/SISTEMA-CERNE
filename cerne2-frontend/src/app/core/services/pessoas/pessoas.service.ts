@@ -12,6 +12,9 @@ export class PessoasService {
   findByIncubadora(): Observable<PessoaResponse[]> {
     return this.http.get<PessoaResponse[]>(this.base);
   }
+  findByIncubada(incCod: number): Observable<PessoaResponse[]> {
+    return this.http.get<PessoaResponse[]>(`${this.base}/incubada/${incCod}`);
+  }
   findById(pessoaCod: number): Observable<PessoaResponse> {
     return this.http.get<PessoaResponse>(`${this.base}/${pessoaCod}`);
   }

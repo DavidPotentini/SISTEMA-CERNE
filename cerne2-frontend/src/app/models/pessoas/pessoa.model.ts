@@ -6,7 +6,7 @@ export interface PessoaResponse {
   email: string;
   cpf: string;
   cargo: string;
-  incCod: number;
+  incCod: number | null;
   eTipoEmpreendimento: ETipoEmpreendimento;
 }
 
@@ -15,6 +15,6 @@ export interface PessoaRequest {
   email: string;
   cpf: string;
   cargo: string;
-  incCod: number;
+  incCod: number | null;
   eTipoEmpreendimento: ETipoEmpreendimento;
 }

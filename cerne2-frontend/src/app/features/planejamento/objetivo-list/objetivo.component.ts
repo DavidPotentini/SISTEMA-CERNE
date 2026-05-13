@@ -50,6 +50,7 @@ export class ObjetivoComponent implements OnInit {
   deletar(objCod: number) {
     this.service.deleteObjetivo(this.pesCod, this.prjCod, objCod).subscribe(() => {
       this.objetivos = this.objetivos.filter(o => o.objCod !== objCod);
+      this.cdr.detectChanges();
     });
   }
 

@@ -8,4 +8,5 @@ export interface EvidenciaResponse {
 export interface EvidenciaRequest {
   descricao:      string;
   caminhoArquivo: string;
+  trfCod:         number;
 }

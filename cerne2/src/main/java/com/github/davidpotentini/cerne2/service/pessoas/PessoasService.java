@@ -3,11 +3,13 @@ package com.github.davidpotentini.cerne2.service.pessoas;
 import com.github.davidpotentini.cerne2.dto.pessoas.request.PessoasDTORequest;
 import com.github.davidpotentini.cerne2.dto.pessoas.response.PessoasDTOResponse;
 import com.github.davidpotentini.cerne2.enums.ETipoEmpreendimento;
+import com.github.davidpotentini.cerne2.models.informacoesgeraisincubadas.IncubadasModel;
 import com.github.davidpotentini.cerne2.models.pessoas.PessoasModel;
 import com.github.davidpotentini.cerne2.repository.informacoesgeraisincubadas.IncubadasRepository;
 import com.github.davidpotentini.cerne2.repository.pessoas.PessoasRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -55,10 +57,12 @@ public class PessoasService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public PessoasDTOResponse save(PessoasDTORequest pessoasDTORequest, Long pessoaCod){
         return mapToPessoasDTO(pessoasRepository.save(mapToPessoasModel(pessoasDTORequest, pessoaCod)));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long pessoaCod){
         pessoasRepository.deleteById(pessoaCod);
     }
@@ -72,8 +76,10 @@ public class PessoasService {
         pessoasModel.setCpf(pessoasDTORequest.cpf());
         pessoasModel.setCargo(pessoasDTORequest.cargo());
 
-        incubadasRepository.findById(pessoasDTORequest.incCod())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (pessoasDTORequest.incCod() != null) {
+            incubadasRepository.findById(pessoasDTORequest.incCod())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        }
 
         pessoasModel.setTipoEmpreendimento(pessoasDTORequest.eTipoEmpreendimento());
 
@@ -81,13 +87,20 @@ public class PessoasService {
     }
 
     private PessoasDTOResponse mapToPessoasDTO(PessoasModel pessoasModel){
+        IncubadasModel incubadasModel = pessoasModel.getIncubadasModel();
+        Long incCod = null;
+
+        if (incubadasModel != null){
+            incCod = incubadasModel.getIncCod();
+        }
+
         return new PessoasDTOResponse(
                 pessoasModel.getPessoaCod(),
                 pessoasModel.getNome(),
                 pessoasModel.getEmail(),
                 pessoasModel.getCpf(),
                 pessoasModel.getCargo(),
-                pessoasModel.getIncubadasModel().getIncCod(),
+                incCod,
                 pessoasModel.getTipoEmpreendimento()
         );
     }

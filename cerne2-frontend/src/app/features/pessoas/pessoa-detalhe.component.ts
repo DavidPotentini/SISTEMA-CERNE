@@ -93,7 +93,7 @@ export class PessoaDetalheComponent implements OnInit, OnDestroy {
       email: '',
       cpf: '',
       cargo: '',
-      incCod: 0,
+      incCod: null,
       eTipoEmpreendimento: ETipoEmpreendimento.INCUBADORA,
     };
   }

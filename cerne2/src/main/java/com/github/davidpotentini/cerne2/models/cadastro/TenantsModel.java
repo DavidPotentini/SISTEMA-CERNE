@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "TENANTS")
+@Table(name = "TENANTS", schema = "public")
 @Getter
 @Setter
 public class TenantsModel {

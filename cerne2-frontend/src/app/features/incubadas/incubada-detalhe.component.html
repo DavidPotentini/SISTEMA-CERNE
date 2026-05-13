@@ -1,0 +1,216 @@
+<div
+  class="toast"
+  *ngIf="toast"
+  [class.toast-sucesso]="toast.tipo === 'sucesso'"
+  [class.toast-erro]="toast.tipo === 'erro'"
+>
+  {{ toast.texto }}
+</div>
+
+<div class="container">
+  <header class="page-header">
+    <button type="button" class="btn-back" (click)="voltar()">← Incubadas</button>
+    <h1>{{ isNovo ? 'Nova Incubada' : 'Editar Incubada' }}</h1>
+  </header>
+
+  <nav class="abas">
+    <button
+      type="button"
+      class="aba"
+      [class.ativa]="abaAtiva === 'geral'"
+      (click)="selecionarAba('geral')"
+    >Informações gerais</button>
+    <button
+      type="button"
+      class="aba"
+      [class.ativa]="abaAtiva === 'endereco'"
+      (click)="selecionarAba('endereco')"
+    >Endereço</button>
+    <button
+      type="button"
+      class="aba"
+      [class.ativa]="abaAtiva === 'pessoas'"
+      [disabled]="isNovo"
+      (click)="selecionarAba('pessoas')"
+      [title]="isNovo ? 'Salve a incubada para ver as pessoas' : ''"
+    >Pessoas</button>
+  </nav>
+
+  <form
+    *ngIf="abaAtiva !== 'pessoas'"
+    class="form-card"
+    (ngSubmit)="salvar()"
+  >
+    <ng-container *ngIf="abaAtiva === 'geral'">
+      <div class="form-group">
+        <label for="nome">Nome</label>
+        <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" [(ngModel)]="form.email" name="email">
+        </div>
+        <div class="form-group">
+          <label for="dataInicioIncubacao">Início da incubação</label>
+          <input
+            id="dataInicioIncubacao"
+            type="date"
+            [(ngModel)]="form.dataInicioIncubacao"
+            name="dataInicioIncubacao"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="eStatusIncubacao">Status</label>
+        <select
+          id="eStatusIncubacao"
+          [(ngModel)]="form.eStatusIncubacao"
+          name="eStatusIncubacao"
+          required
+        >
+          <option *ngFor="let s of statusOpcoes" [ngValue]="s">{{ statusLabel(s) }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="descricao">Descrição</label>
+        <textarea
+          id="descricao"
+          [(ngModel)]="form.descricao"
+          name="descricao"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="documentacao">Documentação</label>
+        <textarea
+          id="documentacao"
+          [(ngModel)]="form.documentacao"
+          name="documentacao"
+          rows="3"
+        ></textarea>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="abaAtiva === 'endereco'">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cep">CEP</label>
+          <div class="cep-row">
+            <input
+              id="cep"
+              type="text"
+              [(ngModel)]="cep"
+              name="cep"
+              maxlength="9"
+              placeholder="00000-000"
+              (blur)="buscarCep()"
+              (keydown.enter)="$event.preventDefault(); buscarCep()"
+              [disabled]="buscandoCep"
+            >
+            <button
+              type="button"
+              class="btn btn-ghost"
+              (click)="buscarCep()"
+              [disabled]="buscandoCep"
+            >{{ buscandoCep ? 'Buscando...' : 'Buscar' }}</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group flex-2">
+          <label for="rua">Rua</label>
+          <input
+            id="rua"
+            type="text"
+            [(ngModel)]="form.enderecoDTORequest.rua"
+            name="rua"
+          >
+        </div>
+        <div class="form-group">
+          <label for="numero">Número</label>
+          <input
+            id="numero"
+            type="text"
+            [(ngModel)]="form.enderecoDTORequest.numero"
+            name="numero"
+          >
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="bairro">Bairro</label>
+          <input
+            id="bairro"
+            type="text"
+            [(ngModel)]="form.enderecoDTORequest.bairro"
+            name="bairro"
+          >
+        </div>
+        <div class="form-group">
+          <label for="complemento">Complemento</label>
+          <input
+            id="complemento"
+            type="text"
+            [(ngModel)]="form.enderecoDTORequest.complemento"
+            name="complemento"
+          >
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group flex-2">
+          <label for="cidade">Cidade</label>
+          <input
+            id="cidade"
+            type="text"
+            [(ngModel)]="form.enderecoDTORequest.cidade"
+            name="cidade"
+          >
+        </div>
+        <div class="form-group">
+          <label for="estado">Estado</label>
+          <input
+            id="estado"
+            type="text"
+            [(ngModel)]="form.enderecoDTORequest.estado"
+            name="estado"
+          >
+        </div>
+        <div class="form-group">
+          <label for="uf">UF</label>
+          <input
+            id="uf"
+            type="text"
+            maxlength="2"
+            [(ngModel)]="form.enderecoDTORequest.uf"
+            name="uf"
+          >
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">
+        {{ isNovo ? 'Salvar' : 'Atualizar' }}
+      </button>
+      <button
+        *ngIf="!isNovo"
+        type="button"
+        class="btn btn-danger"
+        (click)="deletar()"
+      >Excluir</button>
+    </div>
+  </form>
+
+  <app-incubada-pessoas-aba
+    *ngIf="abaAtiva === 'pessoas' && !isNovo"
+    [incCod]="incCod"
+  />
+</div>

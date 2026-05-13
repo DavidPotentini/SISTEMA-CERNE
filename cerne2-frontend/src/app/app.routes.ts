@@ -11,10 +11,16 @@ import { ServicoValorAgregadoListComponent } from './features/servicos-valor-agr
 import { ServicoValorAgregadoDetalheComponent } from './features/servicos-valor-agregado/servico-valor-agregado-detalhe.component';
 import { PessoaListComponent } from './features/pessoas/pessoa-list.component';
 import { PessoaDetalheComponent } from './features/pessoas/pessoa-detalhe.component';
+import { IncubadaListComponent } from './features/incubadas/incubada-list.component';
+import { IncubadaDetalheComponent } from './features/incubadas/incubada-detalhe.component';
+import { MetricaDetalheComponent } from './features/metricas/metrica-detalhe.component';
+import { MetricaListComponent } from './features/metricas/metrica-list.component';
+import { FormularioListComponent } from './features/formularios/formulario-list.component';
+import { FormularioDetalheComponent } from './features/formularios/formulario-detalhe.component';
 
 export const routes: Routes = [
   // Planejamento
-  { path: '', component: PlanejamentoComponent },
+  { path: 'planejamento', component: PlanejamentoComponent },
   { path: 'planejamento/:pesCod', component: PlanejamentoDetalheComponent },
 
   // Projetos
@@ -36,4 +42,16 @@ export const routes: Routes = [
   // Pessoas
   { path: 'pessoas', component: PessoaListComponent },
   { path: 'pessoas/:pessoaCod', component: PessoaDetalheComponent },
+
+  // Incubadas
+  { path: 'incubadas', component: IncubadaListComponent },
+  { path: 'incubadas/:incCod', component: IncubadaDetalheComponent },
+
+  // Métricas
+  { path: 'metricas', component: MetricaListComponent },
+  { path: 'metricas/:metCod', component: MetricaDetalheComponent },
+
+  // Formulários
+  { path: 'formularios', component: FormularioListComponent },
+  { path: 'formularios/:frmCod', component: FormularioDetalheComponent },
 ];

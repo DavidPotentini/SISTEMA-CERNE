@@ -48,4 +48,12 @@
       <button *ngIf="!isNovo" type="button" class="btn btn-danger" (click)="deletar()">Excluir</button>
     </div>
   </form>
+
+  <app-evidencias
+    *ngIf="!isNovo"
+    [pesCod]="pesCod"
+    [prjCod]="prjCod"
+    [objCod]="objCod"
+    [trfCod]="trfCod"
+  />
 </div>

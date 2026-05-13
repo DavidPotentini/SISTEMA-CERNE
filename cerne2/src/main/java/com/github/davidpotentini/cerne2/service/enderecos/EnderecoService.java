@@ -5,6 +5,7 @@ import com.github.davidpotentini.cerne2.dto.endereco.response.EnderecoDTORespons
 import com.github.davidpotentini.cerne2.models.enderecos.EnderecosModel;
 import com.github.davidpotentini.cerne2.repository.enderecos.EnderecoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EnderecoService {
@@ -15,6 +16,7 @@ public class EnderecoService {
         this.enderecoRepository = enderecoRepository;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long endCod) {
         enderecoRepository.deleteById(endCod);
     }

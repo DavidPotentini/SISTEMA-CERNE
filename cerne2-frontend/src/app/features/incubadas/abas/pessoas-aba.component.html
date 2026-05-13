@@ -1,0 +1,22 @@
+<div class="pessoas-card">
+  <p *ngIf="carregando" class="estado">Carregando...</p>
+
+  <p *ngIf="!carregando && pessoas.length === 0" class="estado">
+    Nenhuma pessoa associada a esta incubada.
+  </p>
+
+  <ul *ngIf="!carregando && pessoas.length > 0" class="pessoas-list">
+    <li
+      *ngFor="let p of pessoas"
+      class="pessoa-item"
+      (click)="abrir(p.pessoaCod)"
+    >
+      <div class="pessoa-info">
+        <strong class="nome">{{ p.nome }}</strong>
+        <span class="cargo" *ngIf="p.cargo">{{ p.cargo }}</span>
+        <span class="email" *ngIf="p.email">{{ p.email }}</span>
+      </div>
+      <span class="acao">Ver →</span>
+    </li>
+  </ul>
+</div>

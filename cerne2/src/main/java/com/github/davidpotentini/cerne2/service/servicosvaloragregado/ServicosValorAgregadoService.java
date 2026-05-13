@@ -6,6 +6,7 @@ import com.github.davidpotentini.cerne2.models.servicosvaloragregado.ServicosVal
 import com.github.davidpotentini.cerne2.repository.servicosvaloragregado.ServicosValorAgregadoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -37,10 +38,12 @@ public class ServicosValorAgregadoService {
         return mapToServicosValorAgregadoModelDTO(servicosValorAgregadoRepository.findById(pesCod).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public ServicosValorAgregadoDTOResponse save(ServicosValorAgregadoDTORequest servicosValorAgregadoDTORequest, Long servCod){
         return mapToServicosValorAgregadoModelDTO(servicosValorAgregadoRepository.save(mapToServicoValorAgregadoModel(servicosValorAgregadoDTORequest, servCod)));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long pesCod){
         ServicosValorAgregadoModel servicosValorAgregadoModel = servicosValorAgregadoRepository.findById(pesCod).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 

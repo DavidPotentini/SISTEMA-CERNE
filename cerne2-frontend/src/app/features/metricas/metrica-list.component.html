@@ -1,0 +1,32 @@
+<div class="container">
+  <header class="page-header">
+    <h1>Quadros de Métricas</h1>
+    <button class="btn btn-primary" (click)="novo()">
+      <span class="btn-icon">+</span>
+      Novo Quadro
+    </button>
+  </header>
+
+  <div class="lista">
+    <div
+      class="card"
+      *ngFor="let m of metricas"
+      (click)="abrir(m.metCod)"
+    >
+      <div class="card-content">
+        <h3 class="card-title">{{ m.descricao || 'Quadro sem descrição' }}</h3>
+        <p class="card-desc">
+          {{ totalIndicadores(m) }} indicador(es)
+        </p>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">#{{ m.metCod }}</span>
+        <span class="card-action">Ver detalhes →</span>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="metricas.length === 0">
+      <p>Nenhum quadro cadastrado</p>
+    </div>
+  </div>
+</div>

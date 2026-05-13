@@ -1,14 +1,9 @@
 package com.github.davidpotentini.cerne2.controllers.planejamentoestrategico;
 
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.request.ObjetivosDTORequest;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.request.PlanejamentoEstrategicoDTORequest;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.request.ProjetosDTORequest;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.request.TarefasDTORequest;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.response.ObjetivosDTOResponse;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.response.PlanejamentoEstrategicoDTOResponse;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.response.ProjetosDTOResponse;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.response.TarefasDTOResponse;
+import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.request.*;
+import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.response.*;
 import com.github.davidpotentini.cerne2.service.planejamentoestrategico.PlanejamentoEstrategicoService;
+import jakarta.persistence.Lob;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -158,7 +153,7 @@ public class PlanejamentoEstrategicoController {
                 .buildAndExpand(objetivosDTOResponse.objCod())
                 .toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(objetivosDTOResponse);
     }
 
     @PutMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}")
@@ -212,7 +207,7 @@ public class PlanejamentoEstrategicoController {
                 .buildAndExpand(tarefasDTOResponse.trfCod())
                 .toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(tarefasDTOResponse);
     }
 
     @PutMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}")
@@ -240,9 +235,35 @@ public class PlanejamentoEstrategicoController {
     *
     */
 
-//    @GetMapping("{pesCod}/projeto/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}")
-//    public ResponseEntity<EvidenciasModel> findEvidenciasByTarefas(Long trfCod){
-//
-//    }
+    @GetMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias")
+    public ResponseEntity<List<EvidenciasDTOResponse>> findEvidenciasByTarefas(@PathVariable Long trfCod){
+        return ResponseEntity.ok(planejamentoEstrategicoService.findEvidenciasByTarefas(trfCod));
+    }
+
+    @PostMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias")
+    public ResponseEntity<EvidenciasDTOResponse> insertEvidencias(@RequestBody EvidenciasDTORequest evidenciasDTORequest){
+        EvidenciasDTOResponse evidenciasDTOResponse = planejamentoEstrategicoService.saveEvidencia(evidenciasDTORequest, null);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{evdCod}")
+                .buildAndExpand(evidenciasDTOResponse.evdCod())
+                .toUri();
+
+        return ResponseEntity.created(location).body(evidenciasDTOResponse);
+    }
+
+    @PostMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}")
+    public ResponseEntity<EvidenciasDTOResponse> updateEvidencias(@RequestBody EvidenciasDTORequest evidenciasDTORequest,
+                                                                  @PathVariable Long evdCod){
+        return ResponseEntity.ok(planejamentoEstrategicoService.saveEvidencia(evidenciasDTORequest, evdCod));
+    }
+
+    @DeleteMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}")
+    public ResponseEntity<Void> deleteEvidencias(@PathVariable Long evdCod){
+        planejamentoEstrategicoService.deleteEvidencia(evdCod);
+
+        return ResponseEntity.noContent().build();
+    }
 }
 

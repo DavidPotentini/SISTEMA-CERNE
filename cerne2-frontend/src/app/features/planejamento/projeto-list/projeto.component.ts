@@ -48,6 +48,7 @@ export class ProjetoComponent implements OnInit {
   deletar(prjCod: number) {
     this.service.deleteProjeto(this.pesCod, prjCod).subscribe(() => {
       this.projetos = this.projetos.filter(p => p.prjCod !== prjCod);
+      this.cdr.detectChanges();
     });
   }
 

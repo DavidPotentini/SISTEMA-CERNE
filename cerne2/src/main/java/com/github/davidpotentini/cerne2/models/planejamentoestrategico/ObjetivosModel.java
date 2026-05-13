@@ -1,6 +1,7 @@
 package com.github.davidpotentini.cerne2.models.planejamentoestrategico;
 
 
+import com.github.davidpotentini.cerne2.models.metricas.IndicadoresMetricasModel;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,4 +35,7 @@ public class ObjetivosModel {
 
     @OneToMany (mappedBy = "objetivosModel")
     private List<TarefasModel> tarefasModelList;
+
+    @OneToMany (mappedBy = "objetivosModel")
+    private List<IndicadoresMetricasModel> indicadoresMetricasModelList;
 }

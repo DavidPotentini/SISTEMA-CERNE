@@ -1,0 +1,31 @@
+<div class="container">
+  <header class="page-header">
+    <h1>Incubadas</h1>
+    <button class="btn btn-primary" (click)="novo()">
+      <span class="btn-icon">+</span>
+      Nova Incubada
+    </button>
+  </header>
+
+  <div class="lista">
+    <div
+      class="card"
+      *ngFor="let i of incubadas"
+      (click)="abrir(i.incCod)"
+    >
+      <div class="card-content">
+        <h3 class="card-title">{{ i.nome }}</h3>
+        <p class="card-desc" *ngIf="i.descricao">{{ i.descricao }}</p>
+        <p class="card-meta" *ngIf="i.email">{{ i.email }}</p>
+      </div>
+      <div class="card-footer">
+        <span class="card-tag">{{ statusLabel(i.eStatusIncubacao) }}</span>
+        <span class="card-action">Ver detalhes →</span>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!carregando && incubadas.length === 0">
+      <p>Nenhuma incubada cadastrada</p>
+    </div>
+  </div>
+</div>

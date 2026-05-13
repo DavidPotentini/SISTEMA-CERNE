@@ -1,13 +1,7 @@
 package com.github.davidpotentini.cerne2.service.planejamentoestrategico;
 
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.request.ObjetivosDTORequest;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.request.PlanejamentoEstrategicoDTORequest;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.request.ProjetosDTORequest;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.request.TarefasDTORequest;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.response.ObjetivosDTOResponse;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.response.PlanejamentoEstrategicoDTOResponse;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.response.ProjetosDTOResponse;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.response.TarefasDTOResponse;
+import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.request.*;
+import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.response.*;
 import com.github.davidpotentini.cerne2.models.planejamentoestrategico.*;
 import com.github.davidpotentini.cerne2.repository.pessoas.PessoasRepository;
 import com.github.davidpotentini.cerne2.repository.planejamentoestrategico.*;
@@ -26,21 +20,21 @@ public class PlanejamentoEstrategicoService {
     private final ProjetosRepository projetosRepository;
     private final ObjetivosRepository objetivosRepository;
     private final TarefasRepository tarefasRepository;
-    //private final EvidenciasRepository evidenciasRepository;
+    private final EvidenciasRepository evidenciasRepository;
     private final PessoasRepository pessoasRepository;
 
     public PlanejamentoEstrategicoService(PlanejamentoEstrategicoRepository planejamentoEstrategicoRepository,
                                           ProjetosRepository projetosRepository,
                                           ObjetivosRepository objetivosRepository,
                                           TarefasRepository tarefasRepository,
-                                          //EvidenciasRepository evidenciasRepository,
+                                          EvidenciasRepository evidenciasRepository,
                                           PessoasRepository pessoasRepository) {
 
         this.planejamentoEstrategicoRepository = planejamentoEstrategicoRepository;
         this.projetosRepository = projetosRepository;
         this.objetivosRepository = objetivosRepository;
         this.tarefasRepository = tarefasRepository;
-        //this.evidenciasRepository = evidenciasRepository;
+        this.evidenciasRepository = evidenciasRepository;
         this.pessoasRepository = pessoasRepository;
     }
 
@@ -196,11 +190,11 @@ public class PlanejamentoEstrategicoService {
     *
     */
 
-    /*public List<EvidenciasDTO> findEvidenciasByTarefas(Long trfCod){
+    public List<EvidenciasDTOResponse> findEvidenciasByTarefas(Long trfCod){
         List<EvidenciasModel> evidenciasModelList = evidenciasRepository.findByTarefasModel_TrfCod(trfCod)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        List<EvidenciasDTO> evidenciasDTOS = new ArrayList<>();
+        List<EvidenciasDTOResponse> evidenciasDTOS = new ArrayList<>();
 
         for (EvidenciasModel e : evidenciasModelList){
             evidenciasDTOS.add(mapToEvidenciasDTO(e));
@@ -209,21 +203,20 @@ public class PlanejamentoEstrategicoService {
         return evidenciasDTOS;
     }
 
-    public EvidenciasDTO findByEvidenciaId(Long evdCod){
+    public EvidenciasDTOResponse findByEvidenciaId(Long evdCod){
         EvidenciasModel evidenciasModel = evidenciasRepository.findById(evdCod)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return mapToEvidenciasDTO(evidenciasModel);
     }
 
-    public EvidenciasDTO saveEvidencia(EvidenciasDTO evidenciasDTO){
-        return mapToEvidenciasDTO(evidenciasRepository.save(mapToEvidenciasModel(evidenciasDTO)));
+    public EvidenciasDTOResponse saveEvidencia(EvidenciasDTORequest evidenciasDTORequest, Long evdCod){
+        return mapToEvidenciasDTO(evidenciasRepository.save(mapToEvidenciasModel(evidenciasDTORequest, evdCod)));
     }
 
     public void deleteEvidencia(Long evdCod){
-        evidenciasRepository.delete(evidenciasRepository.findById(evdCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-    }*/
+        evidenciasRepository.deleteById(evdCod);
+    }
 
     /*
     *
@@ -321,23 +314,23 @@ public class PlanejamentoEstrategicoService {
         return tarefasModel;
     }
 
-    /*public EvidenciasDTO mapToEvidenciasDTO (EvidenciasModel evidenciasModel){
-        return new EvidenciasDTO(evidenciasModel.getEvdCod(),
+        public EvidenciasDTOResponse mapToEvidenciasDTO (EvidenciasModel evidenciasModel){
+        return new EvidenciasDTOResponse(evidenciasModel.getEvdCod(),
                                  evidenciasModel.getDescricao(),
                                  evidenciasModel.getCaminhoArquivo(),
                                  evidenciasModel.getTarefasModel().getTrfCod());
     }
 
-    public EvidenciasModel mapToEvidenciasModel (EvidenciasDTO evidenciasDTO){
+    public EvidenciasModel mapToEvidenciasModel (EvidenciasDTORequest evidenciasDTORequest, Long evdCod){
         EvidenciasModel evidenciasModel = new EvidenciasModel();
 
-        evidenciasModel.setEvdCod(evidenciasDTO.evdCod());
-        evidenciasModel.setDescricao(evidenciasDTO.descricao());
-        evidenciasModel.setCaminhoArquivo(evidenciasDTO.caminhoArquivo());
+        evidenciasModel.setEvdCod(evdCod);
+        evidenciasModel.setDescricao(evidenciasDTORequest.descricao());
+        evidenciasModel.setCaminhoArquivo(evidenciasDTORequest.caminhoArquivo());
 
-        evidenciasModel.setTarefasModel(tarefasRepository.findById(evidenciasDTO.trfCod())
+        evidenciasModel.setTarefasModel(tarefasRepository.findById(evidenciasDTORequest.trfCod())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
 
         return evidenciasModel;
-    }*/
+    }
 }

@@ -1,0 +1,147 @@
+<div class="toast" *ngIf="toast" [class.toast-sucesso]="toast.tipo === 'sucesso'" [class.toast-erro]="toast.tipo === 'erro'">
+  {{ toast.texto }}
+</div>
+
+<div class="container">
+  <header class="page-header">
+    <button type="button" class="btn-back" (click)="voltar()">← Voltar</button>
+    <h1>{{ isNovo ? 'Novo Quadro de Métricas' : 'Editar Quadro de Métricas' }}</h1>
+  </header>
+
+  <form class="form-card" (ngSubmit)="salvar()">
+    <div class="form-group">
+      <label for="descricao">Descrição do quadro</label>
+      <input
+        id="descricao"
+        type="text"
+        [(ngModel)]="form.descricao"
+        name="descricao"
+        placeholder="Ex.: Quadro CERNE 4 — 2026"
+        required
+      >
+    </div>
+
+    <section class="indicadores-section">
+      <div class="section-header">
+        <h2>Indicadores</h2>
+        <button type="button" class="btn btn-secondary" (click)="adicionarIndicador()">
+          + Adicionar indicador
+        </button>
+      </div>
+
+      <div class="empty-state" *ngIf="form.indicadoresMetricasDTOList.length === 0">
+        <p>Nenhum indicador. Clique em "+ Adicionar indicador" para começar.</p>
+      </div>
+
+      <div class="indicador-card" *ngFor="let ind of form.indicadoresMetricasDTOList; let i = index">
+        <div class="indicador-header">
+          <span class="indicador-num">#{{ i + 1 }}</span>
+          <button type="button" class="btn-remove" (click)="removerIndicador(i)">Remover</button>
+        </div>
+
+        <div class="form-row form-row-desc">
+          <div class="form-group">
+            <label>Descrição do indicador</label>
+            <input
+              type="text"
+              [(ngModel)]="ind.descricao"
+              [name]="'ind-desc-' + i"
+              placeholder="Ex.: Nº de pessoas sensibilizadas"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Meta</label>
+            <input
+              type="number"
+              [(ngModel)]="ind.meta"
+              [name]="'ind-meta-' + i"
+              step="0.01"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="form-row form-row-escopo">
+          <div class="form-group">
+            <label>Planejamento</label>
+            <select
+              [ngModel]="escopos[i].pesCod"
+              (ngModelChange)="onPlanoChange(i, $event)"
+              [name]="'ind-pes-' + i"
+              required
+            >
+              <option [ngValue]="null" disabled>Selecione um planejamento…</option>
+              <option *ngFor="let p of planos" [ngValue]="p.pesCod">{{ p.nome }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Projeto</label>
+            <select
+              [ngModel]="escopos[i].prjCod"
+              (ngModelChange)="onProjetoChange(i, $event)"
+              [name]="'ind-prj-' + i"
+              [disabled]="escopos[i].pesCod == null"
+              required
+            >
+              <option [ngValue]="null" disabled>
+                {{ escopos[i].pesCod == null ? 'Selecione um planejamento antes' : 'Selecione um projeto…' }}
+              </option>
+              <option *ngFor="let p of projetosDoPlano(escopos[i].pesCod)" [ngValue]="p.prjCod">
+                {{ p.nome }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Objetivo</label>
+            <select
+              [ngModel]="ind.objetivosDTOResponse.objCod"
+              (ngModelChange)="onObjetivoChange(i, $event)"
+              [name]="'ind-obj-' + i"
+              [disabled]="escopos[i].prjCod == null"
+              required
+            >
+              <option [ngValue]="0" disabled>
+                {{ escopos[i].prjCod == null ? 'Selecione um projeto antes' : 'Selecione um objetivo…' }}
+              </option>
+              <option *ngFor="let o of objetivosDoProjeto(escopos[i].prjCod)" [ngValue]="o.objCod">
+                {{ o.nome }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="meses-grid">
+          <div class="mes-input" *ngFor="let mes of meses">
+            <label>Mês {{ mes }}</label>
+            <input
+              type="number"
+              [ngModel]="quantidadeMes(ind, mes).quantidade"
+              (ngModelChange)="quantidadeMes(ind, mes).quantidade = $event"
+              [name]="'ind-' + i + '-mes-' + mes"
+              step="0.01"
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">
+        {{ isNovo ? 'Salvar' : 'Atualizar' }}
+      </button>
+
+      <button
+        *ngIf="!isNovo"
+        type="button"
+        class="btn btn-danger"
+        (click)="deletar()"
+      >
+        Excluir quadro
+      </button>
+    </div>
+  </form>
+</div>

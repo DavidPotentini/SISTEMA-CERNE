@@ -7,13 +7,14 @@ import { PlanejamentoService } from '../../../core/services/planejamento/planaja
 import { ESituacaoTarefa } from '../../../enums/situacao-tarefa.enum';
 import { PessoasService } from '../../../core/services/pessoas/pessoas.service';
 import { PessoaResponse } from '../../../models/pessoas/pessoa.model';
+import { EvidenciasComponent } from './evidencias/evidencias.component';
 
 @Component({
   selector: 'app-tarefa-detalhe',
   templateUrl: 'tarefa-detalhe.component.html',
   styleUrls: ['tarefa-detalhe.component.css'],
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, EvidenciasComponent],
 })
 export class TarefaDetalheComponent implements OnInit, OnDestroy {
   form: TarefaRequest = this.formVazio();

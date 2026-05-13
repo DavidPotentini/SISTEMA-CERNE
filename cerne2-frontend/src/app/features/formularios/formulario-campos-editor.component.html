@@ -1,0 +1,87 @@
+<div class="campos-editor">
+  <div class="campos-editor-header">
+    <h3>Campos do formulário</h3>
+    <button type="button" class="btn-add" (click)="adicionarCampo()">
+      + Adicionar campo
+    </button>
+  </div>
+
+  <p *ngIf="campos.length === 0" class="empty">
+    Nenhum campo adicionado ainda.
+  </p>
+
+  <div class="campo" *ngFor="let campo of campos; let i = index; trackBy: trackByIndex">
+    <div class="campo-linha">
+      <div class="campo-grupo flex-2">
+        <label>Nome</label>
+        <input
+          type="text"
+          [(ngModel)]="campo.nome"
+          name="campo-nome-{{ i }}"
+          placeholder="Ex.: Nome completo"
+          required
+        >
+      </div>
+
+      <div class="campo-grupo flex-1">
+        <label>Tipo</label>
+        <select
+          [ngModel]="campo.tipo"
+          (ngModelChange)="trocarTipo(campo, $event)"
+          name="campo-tipo-{{ i }}"
+        >
+          <option *ngFor="let t of tipos" [value]="t.valor">{{ t.rotulo }}</option>
+        </select>
+      </div>
+
+      <div class="campo-obrigatorio">
+        <label>
+          <input
+            type="checkbox"
+            [(ngModel)]="campo.obrigatorio"
+            name="campo-obrigatorio-{{ i }}"
+          >
+          Obrigatório
+        </label>
+      </div>
+
+      <button
+        type="button"
+        class="btn-remover"
+        (click)="removerCampo(i)"
+        title="Remover campo"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="opcoes" *ngIf="precisaOpcoes(campo.tipo) && campo.opcoes">
+      <label class="opcoes-titulo">Opções</label>
+
+      <div
+        class="opcao"
+        *ngFor="let opcao of campo.opcoes; let j = index; trackBy: trackByIndex"
+      >
+        <input
+          type="text"
+          [ngModel]="opcao"
+          (ngModelChange)="atualizarOpcao(campo, j, $event)"
+          name="campo-opcao-{{ i }}-{{ j }}"
+          placeholder="Texto da opção"
+        >
+        <button
+          type="button"
+          class="btn-remover-opcao"
+          (click)="removerOpcao(campo, j)"
+          title="Remover opção"
+        >
+          ✕
+        </button>
+      </div>
+
+      <button type="button" class="btn-add-opcao" (click)="adicionarOpcao(campo)">
+        + adicionar opção
+      </button>
+    </div>
+  </div>
+</div>

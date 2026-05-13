@@ -9,6 +9,7 @@ import com.github.davidpotentini.cerne2.repository.informacoesgeraisincubadas.In
 import com.github.davidpotentini.cerne2.service.enderecos.EnderecoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -18,12 +19,10 @@ import java.util.List;
 public class IncubadasService {
 
     private final IncubadasRepository incubadasRepository;
-    private final EnderecoRepository enderecoRepository;
     private final EnderecoService enderecoService;
 
-    public IncubadasService(IncubadasRepository incubadasRepository, EnderecoRepository enderecoRepository, EnderecoService enderecoService) {
+    public IncubadasService(IncubadasRepository incubadasRepository, EnderecoService enderecoService) {
         this.incubadasRepository = incubadasRepository;
-        this.enderecoRepository = enderecoRepository;
         this.enderecoService = enderecoService;
     }
 
@@ -46,10 +45,12 @@ public class IncubadasService {
 
 
     //VERIFICAR SE QUANDO ATUALIZA O ENDEREÇO UM NOVO REGISTRO É CRIADO
+    @Transactional(rollbackFor = Exception.class)
     public IncubadasDTOResponse save(IncubadasDTORequest incubadasDTORequest, Long incCod){
         return mapToIncubadasDTO(incubadasRepository.save(mapToIncubadasModel(incubadasDTORequest, incCod)));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long incCod){
         IncubadasModel incubadasModel = incubadasRepository.findById(incCod)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));

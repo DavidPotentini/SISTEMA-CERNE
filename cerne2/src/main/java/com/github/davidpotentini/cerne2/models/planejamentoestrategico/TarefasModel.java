@@ -6,8 +6,11 @@ import com.github.davidpotentini.cerne2.models.pessoas.PessoasModel;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity (name = "TAREFAS")
 @Table
@@ -30,6 +33,7 @@ public class TarefasModel {
     private LocalDate dataTermino;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column (name = "SITUACAO_TAREFA")
     private ESituacaoTarefa eSituacaoTarefa;
 
@@ -44,6 +48,6 @@ public class TarefasModel {
 //    @OneToMany (mappedBy = "tarefas")
 //    private List<AgrupamentosTarefasModel> tarefasList;
 //
-//    @OneToMany (mappedBy = "tarefas")
-//    private List<EvidenciasModel> evidenciasModelList;
+    @OneToMany (mappedBy = "tarefasModel")
+    private List<EvidenciasModel> evidenciasModelList;
 }
