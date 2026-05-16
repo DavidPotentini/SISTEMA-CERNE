@@ -2,7 +2,8 @@ package com.github.davidpotentini.cerne2.dto.canvas;
 
 import java.util.Map;
 
-public record BusinessModelCanvasDTO(Long ambcCod,
+public record BusinessModelCanvasDTO(Long bmcCod,
+                                     Long ambcCod,
                                      Map<String, Object> parceirosChave,
                                      Map<String, Object> atividadesChave,
                                      Map<String, Object> propostasValor,

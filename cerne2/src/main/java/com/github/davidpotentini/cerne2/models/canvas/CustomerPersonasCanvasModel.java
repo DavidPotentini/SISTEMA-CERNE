@@ -9,7 +9,7 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.Map;
 
-@Entity(name = "CUSTOMER_PERSONAS_CANVAS")
+@Entity(name = "CUSTOMER_PERSONA_CANVAS")
 @Table
 @Getter
 @Setter

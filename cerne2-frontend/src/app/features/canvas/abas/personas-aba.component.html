@@ -1,0 +1,53 @@
+<div class="personas-wrapper">
+  <header class="header">
+    <p class="hint">Cadastre múltiplas personas para este ambiente. Cada persona pode ter atributos livres (cargo, dados demográficos, motivações etc).</p>
+    <button class="btn btn-primary" (click)="adicionar()">+ Nova Persona</button>
+  </header>
+
+  <p *ngIf="carregando" class="loading">Carregando…</p>
+
+  <div class="grid" *ngIf="!carregando">
+    <article class="persona-card" *ngFor="let p of personas">
+      <header class="persona-header">
+        <input
+          type="text"
+          [(ngModel)]="p.atributos.nome"
+          placeholder="Nome da persona (ex: Maria, 32, Empreendedora)"
+          class="input-nome"
+        />
+        <span class="badge" *ngIf="p.personaCod != null">#{{ p.personaCod }}</span>
+        <span class="badge badge-novo" *ngIf="p.personaCod == null">novo</span>
+      </header>
+
+      <textarea
+        [(ngModel)]="p.atributos.descricao"
+        placeholder="Descrição em uma linha: cargo, dados demográficos, contexto..."
+        class="input-descricao"
+        rows="2"
+      ></textarea>
+
+      <div class="atributos">
+        <h5>Atributos</h5>
+        <div class="atributo-linha" *ngFor="let atr of p.atributos.itens; let i = index">
+          <input type="text" [(ngModel)]="atr.rotulo" placeholder="Rótulo (ex: Motivação)" />
+          <input type="text" [(ngModel)]="atr.valor" placeholder="Valor" />
+          <button class="btn-icon-x" (click)="removerAtributo(p, i)" title="Remover">×</button>
+        </div>
+        <button class="btn-link" (click)="adicionarAtributo(p)">+ Adicionar atributo</button>
+      </div>
+
+      <footer class="persona-footer">
+        <button class="btn btn-secondary" (click)="excluir(p)">Excluir</button>
+        <button class="btn btn-primary" (click)="salvar(p)">Salvar</button>
+      </footer>
+    </article>
+
+    <div class="empty" *ngIf="personas.length === 0">
+      <p>Nenhuma persona cadastrada.</p>
+    </div>
+  </div>
+
+  <div class="toast" *ngIf="toast" [class.sucesso]="toast.tipo === 'sucesso'" [class.erro]="toast.tipo === 'erro'">
+    {{ toast.texto }}
+  </div>
+</div>

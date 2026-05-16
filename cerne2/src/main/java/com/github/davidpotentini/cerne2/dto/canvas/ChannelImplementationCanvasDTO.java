@@ -4,6 +4,7 @@ import java.util.Map;
 
 public record ChannelImplementationCanvasDTO(Long ambcCod,
                                              Long segCod,
+                                             String nomeSegmento,
                                              Map<String, Object> atividadeConhecimento,
                                              Map<String, Object> atividadeAvaliacao,
                                              Map<String, Object> atividadeCompra,

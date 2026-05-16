@@ -15,7 +15,9 @@ import java.util.Map;
 public class LeanCanvasModel {
 
     @Id
-    private Long ambcCod;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "LEAN_COD")
+    private Long leanCod;
 
     @Column(name = "PROBLEMA")
     @JdbcTypeCode(SqlTypes.JSON)
@@ -53,8 +55,7 @@ public class LeanCanvasModel {
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> modeloReceita;
 
+    @ManyToOne(optional = false)
     @JoinColumn(name = "AMBC_COD")
-    @MapsId("ambcCod")
-    @OneToOne
     private AmbienteCanvasModel ambienteCanvasModel;
 }

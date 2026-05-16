@@ -11,6 +11,9 @@ import java.util.List;
 
 public interface ChannelImplementationCanvasRepository extends JpaRepository<ChannelImplementationCanvasModel, Long> {
 
-    @Query(value = "SELECT * FROM CHANNEL_IMPLEMENTATION_CANVAS WHERE AMBC_COD = :AMBC_COD", nativeQuery = true)
-    List<ChannelImplementationCanvasModel> findChannelImplementationByAmbcCod(@Param("AMBC_COD") Long ambcCod);
+
+    List<ChannelImplementationCanvasModel> findByAmbienteCanvasModel_AmbcCod(Long ambcCod);
+
+    void deleteByAmbienteCanvasModel_AmbcCod(Long ambcCod);
+
 }

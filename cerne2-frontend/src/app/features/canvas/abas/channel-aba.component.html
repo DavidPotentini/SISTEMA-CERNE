@@ -1,0 +1,69 @@
+<div class="channel-wrapper">
+  <header class="header">
+    <p class="hint">Cada segmento possui sua própria matriz de atividades, recursos e parceiros para cada fase do canal.</p>
+    <button class="btn btn-primary" (click)="adicionar()">+ Novo Segmento</button>
+  </header>
+
+  <p *ngIf="carregando" class="loading">Carregando…</p>
+
+  <div class="layout" *ngIf="!carregando && segmentos.length > 0">
+    <aside class="tabs">
+      <button
+        *ngFor="let s of segmentos; let i = index"
+        class="tab"
+        [class.active]="s === segSelecionado"
+        (click)="selecionar(s)"
+      >
+        {{ rotuloSegmento(s, i) }}
+      </button>
+    </aside>
+
+    <section class="conteudo" *ngIf="segSelecionado">
+      <input
+        type="text"
+        class="input-nome-segmento"
+        [(ngModel)]="segSelecionado.nomeSegmento"
+        placeholder="Nome do segmento (ex: Pequenas empresas)"
+      />
+
+      <table class="matriz">
+        <thead>
+          <tr>
+            <th class="canto">Canal</th>
+            <th>Atividades-Chave</th>
+            <th>Recursos-Chave</th>
+            <th>Parceiros-Chave</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let f of fases">
+            <th class="fase">{{ f.chave }}</th>
+            <td>
+              <textarea [(ngModel)]="campo(segSelecionado, f.ativ).texto" placeholder="Atividades..."></textarea>
+            </td>
+            <td>
+              <textarea [(ngModel)]="campo(segSelecionado, f.rec).texto" placeholder="Recursos..."></textarea>
+            </td>
+            <td>
+              <textarea [(ngModel)]="campo(segSelecionado, f.par).texto" placeholder="Parceiros..."></textarea>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="actions">
+        <button class="btn btn-secondary" (click)="excluir()">Excluir segmento</button>
+        <button class="btn btn-primary" (click)="salvar()">Salvar segmento</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="empty" *ngIf="!carregando && segmentos.length === 0">
+    <p>Nenhum segmento cadastrado.</p>
+    <p class="hint-small">Clique em <strong>+ Novo Segmento</strong> para criar um.</p>
+  </div>
+
+  <div class="toast" *ngIf="toast" [class.sucesso]="toast.tipo === 'sucesso'" [class.erro]="toast.tipo === 'erro'">
+    {{ toast.texto }}
+  </div>
+</div>

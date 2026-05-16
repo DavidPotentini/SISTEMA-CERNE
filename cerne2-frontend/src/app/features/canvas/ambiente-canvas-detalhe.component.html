@@ -1,0 +1,42 @@
+<div class="container">
+  <header class="page-header">
+    <button class="btn-link" (click)="voltar()">← Voltar para ambientes</button>
+
+    <div class="titulo" *ngIf="ambiente">
+      <ng-container *ngIf="!editandoDescricao">
+        <h1>{{ ambiente.descricao }}</h1>
+        <button class="btn-link" (click)="editarDescricao()">Editar</button>
+      </ng-container>
+      <ng-container *ngIf="editandoDescricao">
+        <input type="text" [(ngModel)]="novaDescricao" class="input-titulo" />
+        <button class="btn btn-primary" (click)="salvarDescricao()">Salvar</button>
+        <button class="btn-link" (click)="editandoDescricao = false">Cancelar</button>
+      </ng-container>
+    </div>
+    <p class="meta" *ngIf="ambiente">Ambiente #{{ ambiente.ambcCod }} · Incubada #{{ incCod }}</p>
+  </header>
+
+  <nav class="abas">
+    <button class="aba" [class.active]="abaAtiva === 'bmc'" (click)="selecionarAba('bmc')">Business Model Canvas</button>
+    <button class="aba" [class.active]="abaAtiva === 'lean'" (click)="selecionarAba('lean')">Lean Canvas</button>
+    <button class="aba" [class.active]="abaAtiva === 'vpc'" (click)="selecionarAba('vpc')">Proposta de Valor</button>
+    <button class="aba" [class.active]="abaAtiva === 'personas'" (click)="selecionarAba('personas')">Customer Personas</button>
+    <button class="aba" [class.active]="abaAtiva === 'channel'" (click)="selecionarAba('channel')">Channel Implementation</button>
+  </nav>
+
+  <main class="conteudo">
+    <app-bmc-aba *ngIf="abaAtiva === 'bmc' && ambcCod" [incCod]="incCod" [ambcCod]="ambcCod"></app-bmc-aba>
+    <app-lean-aba *ngIf="abaAtiva === 'lean' && ambcCod" [incCod]="incCod" [ambcCod]="ambcCod"></app-lean-aba>
+    <app-vpc-aba *ngIf="abaAtiva === 'vpc' && ambcCod" [incCod]="incCod" [ambcCod]="ambcCod"></app-vpc-aba>
+    <app-personas-aba *ngIf="abaAtiva === 'personas' && ambcCod" [incCod]="incCod" [ambcCod]="ambcCod"></app-personas-aba>
+    <app-channel-aba *ngIf="abaAtiva === 'channel' && ambcCod" [incCod]="incCod" [ambcCod]="ambcCod"></app-channel-aba>
+  </main>
+
+  <footer class="rodape">
+    <button class="btn btn-secondary" (click)="excluir()">Excluir ambiente</button>
+  </footer>
+
+  <div class="toast" *ngIf="toast" [class.sucesso]="toast.tipo === 'sucesso'" [class.erro]="toast.tipo === 'erro'">
+    {{ toast.texto }}
+  </div>
+</div>

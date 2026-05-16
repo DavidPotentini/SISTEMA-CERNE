@@ -1,0 +1,100 @@
+<div class="container">
+  <header class="page-header">
+    <button class="btn-link" (click)="voltar()">← Voltar para os quadros</button>
+    <div class="titulo">
+      <input
+        type="text"
+        [(ngModel)]="quadro.tituloQuadro"
+        placeholder="Título do quadro"
+        class="input-titulo"
+      />
+      <span class="meta" *ngIf="quadro.qvhCod != null">Quadro #{{ quadro.qvhCod }} · Incubada #{{ incCod }}</span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn btn-secondary" (click)="adicionarHipotese()">+ Adicionar hipótese</button>
+    <button class="btn btn-primary" (click)="salvar()">Salvar quadro</button>
+  </div>
+
+  <div class="grid-hipoteses" *ngIf="quadro.hipoteseDTOList.length > 0">
+    <article class="hipotese-card" *ngFor="let h of quadro.hipoteseDTOList; let i = index">
+      <header class="card-header">
+        <span class="card-num">Hipótese {{ i + 1 }}</span>
+        <span class="badge" *ngIf="h.hipCod != null">#{{ h.hipCod }}</span>
+        <span class="badge badge-novo" *ngIf="h.hipCod == null">não salva</span>
+        <button class="btn-x" (click)="removerHipotese(h)" title="Remover">×</button>
+      </header>
+
+      <div class="row">
+        <label>
+          <span>Bloco do Lean Canvas</span>
+          <select [(ngModel)]="h.vldBlocoLeanCanvas">
+            <option [ngValue]="null">— selecione —</option>
+            <option *ngFor="let b of blocosLean" [ngValue]="b">{{ blocoLabel(b) }}</option>
+          </select>
+        </label>
+      </div>
+
+      <label class="campo-bloco">
+        <span>Hipótese</span>
+        <textarea [(ngModel)]="h.hipotese" rows="2" placeholder="Acreditamos que..."></textarea>
+      </label>
+
+      <label class="campo-bloco">
+        <span>Experimento</span>
+        <textarea [(ngModel)]="h.experimento" rows="2" placeholder="Para validar, faremos..."></textarea>
+      </label>
+
+      <label class="campo-bloco">
+        <span>Métrica de sucesso</span>
+        <input type="text" [(ngModel)]="h.metrica" placeholder="Saberemos que deu certo se..." />
+      </label>
+
+      <div class="row row-3">
+        <label>
+          <span>Status</span>
+          <select [(ngModel)]="h.vldStatusHipotese">
+            <option [ngValue]="null">— selecione —</option>
+            <option *ngFor="let s of statusOpcoes" [ngValue]="s">{{ statusLabel(s) }}</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Resultado</span>
+          <select [(ngModel)]="h.vldResultadoHipotese">
+            <option [ngValue]="null">— selecione —</option>
+            <option *ngFor="let r of resultadoOpcoes" [ngValue]="r">{{ resultadoLabel(r) }}</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Decisão</span>
+          <select [(ngModel)]="h.vldDecisaoHipotese">
+            <option [ngValue]="null">— selecione —</option>
+            <option *ngFor="let d of decisaoOpcoes" [ngValue]="d">{{ decisaoLabel(d) }}</option>
+          </select>
+        </label>
+      </div>
+
+      <label class="campo-bloco">
+        <span>Detalhamento do resultado</span>
+        <textarea [(ngModel)]="h.resultadoDetalhamento" rows="2" placeholder="O que aprendemos?"></textarea>
+      </label>
+
+      <label class="campo-bloco">
+        <span>Detalhamento da decisão</span>
+        <textarea [(ngModel)]="h.decisaoDetalhamento" rows="2" placeholder="Próximos passos / razões"></textarea>
+      </label>
+    </article>
+  </div>
+
+  <div class="empty" *ngIf="quadro.hipoteseDTOList.length === 0">
+    <p>Nenhuma hipótese neste quadro.</p>
+    <p class="hint">Clique em <strong>+ Adicionar hipótese</strong> para começar.</p>
+  </div>
+
+  <div class="toast" *ngIf="toast" [class.sucesso]="toast.tipo === 'sucesso'" [class.erro]="toast.tipo === 'erro'">
+    {{ toast.texto }}
+  </div>
+</div>

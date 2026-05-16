@@ -17,6 +17,10 @@ import { MetricaDetalheComponent } from './features/metricas/metrica-detalhe.com
 import { MetricaListComponent } from './features/metricas/metrica-list.component';
 import { FormularioListComponent } from './features/formularios/formulario-list.component';
 import { FormularioDetalheComponent } from './features/formularios/formulario-detalhe.component';
+import { AmbienteCanvasListComponent } from './features/canvas/ambiente-canvas-list.component';
+import { AmbienteCanvasDetalheComponent } from './features/canvas/ambiente-canvas-detalhe.component';
+import { QuadroListComponent } from './features/validacao-hipotese/quadro-list.component';
+import { QuadroDetalheComponent } from './features/validacao-hipotese/quadro-detalhe.component';
 
 export const routes: Routes = [
   // Planejamento
@@ -54,4 +58,15 @@ export const routes: Routes = [
   // Formulários
   { path: 'formularios', component: FormularioListComponent },
   { path: 'formularios/:frmCod', component: FormularioDetalheComponent },
+
+  // Canvas (por incubada/ambiente)
+  { path: 'incubadas/:incCod/ambientesCanvas', component: AmbienteCanvasListComponent },
+  {
+    path: 'incubadas/:incCod/ambientesCanvas/:ambcCod',
+    component: AmbienteCanvasDetalheComponent,
+  },
+
+  // Validação de Hipóteses (por incubada/quadro)
+  { path: 'incubadas/:incCod/quadrosValidacao', component: QuadroListComponent },
+  { path: 'incubadas/:incCod/quadrosValidacao/:qvhCod', component: QuadroDetalheComponent },
 ];

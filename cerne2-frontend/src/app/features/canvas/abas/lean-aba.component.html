@@ -1,0 +1,63 @@
+<div class="lean-wrapper">
+  <div class="lean-grid" *ngIf="!carregando">
+    <section class="bloco bloco-tall area-problema">
+      <h4>Problema</h4>
+      <textarea [(ngModel)]="form.problema.texto" placeholder="Top 3 problemas a serem resolvidos"></textarea>
+    </section>
+
+    <section class="bloco area-solucao">
+      <h4>Solução</h4>
+      <textarea [(ngModel)]="form.solucao.texto" placeholder="Top 3 recursos / funcionalidades"></textarea>
+    </section>
+
+    <section class="bloco area-metrica">
+      <h4>Métricas-Chave</h4>
+      <textarea [(ngModel)]="form.metrica.texto" placeholder="Atividades-chave que você mede"></textarea>
+    </section>
+
+    <section class="bloco bloco-tall area-uvp">
+      <h4>Proposta de Valor Única</h4>
+      <textarea [(ngModel)]="form.propostaValor.texto" placeholder="Mensagem única, clara e convincente que afirma por que você é diferente"></textarea>
+    </section>
+
+    <section class="bloco area-competencia">
+      <h4>Competência Essencial</h4>
+      <textarea [(ngModel)]="form.competenciaEssencial.texto" placeholder="Não pode ser facilmente copiada ou comprada"></textarea>
+    </section>
+
+    <section class="bloco area-canais">
+      <h4>Canais</h4>
+      <textarea [(ngModel)]="form.canais.texto" placeholder="Acesso dos clientes"></textarea>
+    </section>
+
+    <section class="bloco bloco-tall area-segmento">
+      <h4>Segmento de Cliente</h4>
+      <textarea [(ngModel)]="form.segmentoCliente.texto" placeholder="Cliente-alvo e usuário-alvo. Liste suas características."></textarea>
+    </section>
+
+    <section class="bloco area-custos">
+      <h4>Estrutura de Custos</h4>
+      <textarea [(ngModel)]="form.estruturaCustos.texto" placeholder="Custos fixos e variáveis: aquisição, distribuição, hospedagem, pessoas..."></textarea>
+    </section>
+
+    <section class="bloco area-receita">
+      <h4>Modelo de Receita</h4>
+      <textarea [(ngModel)]="form.modeloReceita.texto" placeholder="Liste suas fontes de receita: valor, vitalício, margem bruta..."></textarea>
+    </section>
+  </div>
+
+  <div class="rodape">
+    <span>PRODUTO</span>
+    <span>MERCADO</span>
+  </div>
+
+  <div class="actions" *ngIf="!carregando">
+    <button class="btn btn-primary" (click)="salvar()">Salvar Lean Canvas</button>
+  </div>
+
+  <p *ngIf="carregando" class="loading">Carregando…</p>
+
+  <div class="toast" *ngIf="toast" [class.sucesso]="toast.tipo === 'sucesso'" [class.erro]="toast.tipo === 'erro'">
+    {{ toast.texto }}
+  </div>
+</div>

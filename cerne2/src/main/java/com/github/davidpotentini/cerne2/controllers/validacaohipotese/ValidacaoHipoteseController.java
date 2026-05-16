@@ -47,7 +47,7 @@ public class ValidacaoHipoteseController {
         return ResponseEntity.created(location).body(quadroValidacaoHipoteseDTO2);
     }
 
-    @PutMapping("/qvhCod")
+    @PutMapping("/{qvhCod}")
     public ResponseEntity<QuadroValidacaoHipoteseDTO> updateQuadroValidacaoHipotese(@RequestBody QuadroValidacaoHipoteseDTO quadroValidacaoHipoteseDTO, @PathVariable Long qvhCod){
         return ResponseEntity.ok(validacaoHipoteseService.saveQuadroValidacaoHipotese(quadroValidacaoHipoteseDTO, qvhCod));
     }

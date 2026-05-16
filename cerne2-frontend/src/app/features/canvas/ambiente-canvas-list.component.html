@@ -1,0 +1,41 @@
+<div class="container">
+  <header class="page-header">
+    <div>
+      <button class="btn-link" (click)="voltar()">← Voltar para a incubada</button>
+      <h1>Ambientes de Canvas</h1>
+      <p class="subtitle">Cada ambiente reúne um BMC, Lean Canvas, Proposta de Valor, Personas e Canais.</p>
+    </div>
+  </header>
+
+  <div class="novo-ambiente">
+    <input
+      type="text"
+      [(ngModel)]="novoNome"
+      placeholder="Descrição do novo ambiente (ex: MVP Q1 2026)"
+      (keyup.enter)="criar()"
+    />
+    <button class="btn btn-primary" (click)="criar()" [disabled]="!novoNome.trim()">
+      <span class="btn-icon">+</span> Criar ambiente
+    </button>
+  </div>
+
+  <div class="lista">
+    <div class="card" *ngFor="let a of ambientes" (click)="abrir(a.ambcCod)">
+      <div class="card-content">
+        <h3 class="card-title">{{ a.descricao || 'Ambiente sem nome' }}</h3>
+        <p class="card-meta">Identificador #{{ a.ambcCod }}</p>
+      </div>
+      <div class="card-footer">
+        <span class="card-action">Abrir →</span>
+        <button class="btn-delete" (click)="excluir(a, $event)" title="Excluir ambiente">
+          Excluir
+        </button>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!carregando && ambientes.length === 0">
+      <p>Nenhum ambiente de canvas cadastrado nessa incubada.</p>
+      <p class="hint">Crie um ambiente acima para começar.</p>
+    </div>
+  </div>
+</div>

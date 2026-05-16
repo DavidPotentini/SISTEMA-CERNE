@@ -1,0 +1,58 @@
+<div class="bmc-wrapper">
+  <div class="bmc-grid" *ngIf="!carregando">
+    <section class="bloco bloco-tall area-parceiros">
+      <h4>Parceiros-Chave</h4>
+      <textarea [(ngModel)]="form.parceirosChave.texto" placeholder="Quem são nossos parceiros-chave? Quem são nossos principais fornecedores?"></textarea>
+    </section>
+
+    <section class="bloco area-atividades">
+      <h4>Atividades-Chave</h4>
+      <textarea [(ngModel)]="form.atividadesChave.texto" placeholder="Quais atividades-chave nossas propostas de valor exigem?"></textarea>
+    </section>
+
+    <section class="bloco area-recursos">
+      <h4>Recursos-Chave</h4>
+      <textarea [(ngModel)]="form.recursosChave.texto" placeholder="Quais recursos-chave nossas propostas de valor exigem?"></textarea>
+    </section>
+
+    <section class="bloco bloco-tall area-propostas">
+      <h4>Propostas de Valor</h4>
+      <textarea [(ngModel)]="form.propostasValor.texto" placeholder="Que valor entregamos ao cliente? Qual problema estamos ajudando a resolver?"></textarea>
+    </section>
+
+    <section class="bloco area-relacionamento">
+      <h4>Relacionamento com Clientes</h4>
+      <textarea [(ngModel)]="form.relacionamentoCliente.texto" placeholder="Que tipo de relacionamento cada segmento de cliente espera?"></textarea>
+    </section>
+
+    <section class="bloco area-canais">
+      <h4>Canais</h4>
+      <textarea [(ngModel)]="form.canais.texto" placeholder="Por quais canais nossos segmentos querem ser alcançados?"></textarea>
+    </section>
+
+    <section class="bloco bloco-tall area-segmentos">
+      <h4>Segmentos de Clientes</h4>
+      <textarea [(ngModel)]="form.segmentoCliente.texto" placeholder="Para quem estamos criando valor? Quem são nossos clientes mais importantes?"></textarea>
+    </section>
+
+    <section class="bloco area-custos">
+      <h4>Estrutura de Custos</h4>
+      <textarea [(ngModel)]="form.estruturaCustos.texto" placeholder="Quais são os custos mais importantes no nosso modelo de negócio?"></textarea>
+    </section>
+
+    <section class="bloco area-receitas">
+      <h4>Fontes de Receita</h4>
+      <textarea [(ngModel)]="form.fontesReceitas.texto" placeholder="Por qual valor nossos clientes realmente estão dispostos a pagar?"></textarea>
+    </section>
+  </div>
+
+  <div class="actions" *ngIf="!carregando">
+    <button class="btn btn-primary" (click)="salvar()">Salvar BMC</button>
+  </div>
+
+  <p *ngIf="carregando" class="loading">Carregando…</p>
+
+  <div class="toast" *ngIf="toast" [class.sucesso]="toast.tipo === 'sucesso'" [class.erro]="toast.tipo === 'erro'">
+    {{ toast.texto }}
+  </div>
+</div>

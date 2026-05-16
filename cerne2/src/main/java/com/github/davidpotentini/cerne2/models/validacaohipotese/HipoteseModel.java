@@ -21,8 +21,8 @@ public class HipoteseModel {
     @Column(name = "HIP_COD")
     private Long hipCod;
 
-    @Column(name = "TITULO_QUADRO")
-    private String tituloQuadro;
+    @Column(name = "TITULO_HIPOTESE")
+    private String tituloHipotese;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
@@ -48,7 +48,7 @@ public class HipoteseModel {
     @Column(name = "VLD_RESULTADO_HIPOTESE")
     private EResultadoHipotese vldResultadoHipotese;
 
-    @Column(name = "RESULTADO_DETALHAMENTO")
+    @Column(name = "RESULTADOS_DETALHAMENTO")
     private String resultadoDetalhamento;
 
     @Enumerated(EnumType.STRING)

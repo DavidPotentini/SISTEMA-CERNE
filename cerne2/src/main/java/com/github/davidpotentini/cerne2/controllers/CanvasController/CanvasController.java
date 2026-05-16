@@ -55,21 +55,22 @@ public class CanvasController {
     }
 
     @DeleteMapping("/{ambcCod}")
-    public ResponseEntity<Void> deleteAmbienteCanvas(Long ambcCod){
+    public ResponseEntity<Void> deleteAmbienteCanvas(@PathVariable Long ambcCod){
         canvasService.deleteAmbienteCanvas(ambcCod);
 
         return ResponseEntity.noContent().build();
     }
 
     /*
-    *
+    *❯ POST
+  http://localhost:8080/1/ambienteCanvas/6/businessModelCanvas 
     * Business Model Canvas
     *
     */
 
     @GetMapping("/{ambcCod}/businessModelCanvas")
-    public ResponseEntity<BusinessModelCanvasDTO> findByBusinessModelCanvasById(Long ambcCod){
-        return ResponseEntity.ok(canvasService.findByBusinessModelCanvasById(ambcCod));
+    public ResponseEntity<BusinessModelCanvasDTO> findByBusinessModelCanvasByAmbcCod(@PathVariable Long ambcCod){
+        return ResponseEntity.ok(canvasService.findByBusinessModelCanvasByAmbcCod(ambcCod));
     }
 
     @PostMapping("/{ambcCod}/businessModelCanvas")
@@ -152,12 +153,12 @@ public class CanvasController {
     */
 
     @GetMapping("/{ambcCod}/customerPersonasCanvas")
-    public ResponseEntity<List<CustomerPersonasCanvasDTO>> findCustomerPersonasByAmbcCod(Long ambcCod){
+    public ResponseEntity<List<CustomerPersonasCanvasDTO>> findCustomerPersonasByAmbcCod(@PathVariable Long ambcCod){
         return ResponseEntity.ok(canvasService.findCustomerPersonasByAmbcCod(ambcCod));
     }
 
     @GetMapping("/{ambcCod}/customerPersonasCanvas/{personaCod}")
-    public ResponseEntity<CustomerPersonasCanvasDTO> findCustomerPersonasCanvasById(Long personaCod){
+    public ResponseEntity<CustomerPersonasCanvasDTO> findCustomerPersonasCanvasById(@PathVariable Long personaCod){
         return ResponseEntity.ok(canvasService.findCustomerPersonasCanvasById(personaCod));
     }
 
@@ -199,12 +200,12 @@ public class CanvasController {
     */
 
     @GetMapping("/{ambcCod}/leanCanvas")
-    public ResponseEntity<LeanCanvasDTO> findLeanCanvasById(@PathVariable Long ambcCod){
-        return ResponseEntity.ok(canvasService.findLeanCanvasById(ambcCod));
+    public ResponseEntity<LeanCanvasDTO> findLeanCanvasByAmbcCod(@PathVariable Long ambcCod){
+        return ResponseEntity.ok(canvasService.findLeanCanvasByAmbcCod(ambcCod));
     }
 
     @PostMapping("/{ambcCod}/leanCanvas")
-    public ResponseEntity<LeanCanvasDTO> insertLeanCanvas(@PathVariable LeanCanvasDTO leanCanvasDTO,
+    public ResponseEntity<LeanCanvasDTO> insertLeanCanvas(@RequestBody LeanCanvasDTO leanCanvasDTO,
                                                           @PathVariable Long ambcCod){
         LeanCanvasDTO leanCanvasDTO2 = canvasService.saveLeanCanvas(leanCanvasDTO, ambcCod);
 
@@ -239,12 +240,12 @@ public class CanvasController {
     */
 
     @GetMapping("/{ambcCod}/valuePropositionCanvas")
-    public ResponseEntity<ValuePropositionCanvasDTO> findValuePropositionCanvasById(@PathVariable Long ambcCod){
-        return ResponseEntity.ok(canvasService.findValuePropositionCanvasById(ambcCod));
+    public ResponseEntity<ValuePropositionCanvasDTO> findValuePropositionCanvasByAmbcCod(@PathVariable Long ambcCod){
+        return ResponseEntity.ok(canvasService.findValuePropositionCanvasByAmbcCod(ambcCod));
     }
 
     @PostMapping("/{ambcCod}/valuePropositionCanvas")
-    public ResponseEntity<ValuePropositionCanvasDTO> insertValuePropositionCanvas(@PathVariable ValuePropositionCanvasDTO valuePropositionCanvasDTO,
+    public ResponseEntity<ValuePropositionCanvasDTO> insertValuePropositionCanvas(@RequestBody ValuePropositionCanvasDTO valuePropositionCanvasDTO,
                                                           @PathVariable Long ambcCod){
         ValuePropositionCanvasDTO valuePropositionCanvasDTO2 = canvasService.saveValuePropositionCanvas(valuePropositionCanvasDTO, ambcCod);
 

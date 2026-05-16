@@ -47,11 +47,26 @@ public class ValidacaoHipoteseService {
     public QuadroValidacaoHipoteseDTO saveQuadroValidacaoHipotese(QuadroValidacaoHipoteseDTO quadroValidacaoHipoteseDTO, Long qvhCod){
         QuadroValidacaoHipoteseModel quadroValidacaoHipoteseModel = quadroValidacaoHipoteseRepository.save(quadroValidacaoHipoteseMapper.toModel(quadroValidacaoHipoteseDTO, qvhCod));
 
-        hipoteseRepository.saveAll(hipoteseMapper.toModelList(quadroValidacaoHipoteseDTO.hipoteseDTOList()));
+        List<HipoteseModel> hipoteseModelList = hipoteseMapper.toModelList(quadroValidacaoHipoteseDTO.hipoteseDTOList());
+        if (hipoteseModelList != null) {
+            // Liga cada hipótese ao quadro recém-salvo (cobre o caso de quadro novo,
+            // em que o front ainda não conhece o qvhCod).
+            hipoteseModelList.forEach(h -> h.setQuadroValidacaoHipoteseModel(quadroValidacaoHipoteseModel));
+            hipoteseRepository.saveAllAndFlush(hipoteseModelList);
+        }
 
-        return quadroValidacaoHipoteseMapper.toDTO(quadroValidacaoHipoteseRepository
-                .findById(quadroValidacaoHipoteseModel.getQvhCod())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        // Reconsulta as hipóteses no banco em vez de usar a coleção inversa
+        // (@OneToMany mappedBy) do quadro, que fica defasada nesta mesma transação.
+        List<HipoteseDTO> hipoteseDTOList = hipoteseMapper.toDTOList(
+                hipoteseRepository.findHipoteseByQvhCod(quadroValidacaoHipoteseModel.getQvhCod()));
+
+        return new QuadroValidacaoHipoteseDTO(
+                quadroValidacaoHipoteseModel.getQvhCod(),
+                quadroValidacaoHipoteseModel.getTituloQuadro(),
+                quadroValidacaoHipoteseModel.getIncubadasModel() == null
+                        ? quadroValidacaoHipoteseDTO.incCod()
+                        : quadroValidacaoHipoteseModel.getIncubadasModel().getIncCod(),
+                hipoteseDTOList);
     }
 
     @Transactional(rollbackFor = Exception.class)

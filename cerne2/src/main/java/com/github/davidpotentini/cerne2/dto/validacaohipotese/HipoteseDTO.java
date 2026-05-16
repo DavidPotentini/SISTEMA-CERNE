@@ -6,7 +6,7 @@ import com.github.davidpotentini.cerne2.enums.EResultadoHipotese;
 import com.github.davidpotentini.cerne2.enums.EStatusHipotese;
 
 public record HipoteseDTO(Long hipCod,
-                          String tituloQuadro,
+                          String tituloHipotese,
                           EBlocoLeanCanvas vldBlocoLeanCanvas,
                           String hipotese,
                           String experimento,

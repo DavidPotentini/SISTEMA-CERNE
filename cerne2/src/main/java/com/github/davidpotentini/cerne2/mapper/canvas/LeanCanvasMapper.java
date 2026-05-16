@@ -17,6 +17,7 @@ public interface LeanCanvasMapper {
 
     List<LeanCanvasDTO> toDTOList(List<LeanCanvasModel> leanCanvasModelList);
 
-    @Mapping(source = "ambcCod", target = "ambienteCanvasModel")
-    LeanCanvasModel toModel(LeanCanvasDTO leanCanvasDTO, Long ambcCod);
+    @Mapping(target = "leanCod", source = "leanCod")
+    @Mapping(target = "ambienteCanvasModel", source = "ambcCod")
+    LeanCanvasModel toModel(LeanCanvasDTO leanCanvasDTO, Long leanCod, Long ambcCod);
 }

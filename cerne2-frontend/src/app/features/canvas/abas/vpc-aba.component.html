@@ -1,0 +1,45 @@
+<div class="vpc-wrapper">
+  <div class="vpc-grid" *ngIf="!carregando">
+    <div class="lado lado-produto">
+      <h3>Proposta de Valor (Produto)</h3>
+      <section class="bloco">
+        <h4>Produtos &amp; Serviços</h4>
+        <textarea [(ngModel)]="form.produtosServicos.texto" placeholder="Principais produtos e serviços que você oferece para o cliente"></textarea>
+      </section>
+      <section class="bloco">
+        <h4>Criadores de Ganho</h4>
+        <textarea [(ngModel)]="form.criadoresGanho.texto" placeholder="Como seu produto melhora a vida do cliente?"></textarea>
+      </section>
+      <section class="bloco">
+        <h4>Alívio de Dores</h4>
+        <textarea [(ngModel)]="form.alivioDores.texto" placeholder="Como seu produto reduz ou elimina as dores do cliente?"></textarea>
+      </section>
+    </div>
+
+    <div class="lado lado-cliente">
+      <h3>Segmento de Cliente</h3>
+      <section class="bloco">
+        <h4>Tarefas do Cliente</h4>
+        <textarea [(ngModel)]="form.tarefasClientes.texto" placeholder="Tarefas, problemas ou objetivos que o cliente precisa resolver"></textarea>
+      </section>
+      <section class="bloco">
+        <h4>Ganhos</h4>
+        <textarea [(ngModel)]="form.ganhos.texto" placeholder="Desejos, aspirações e motivações positivas do cliente"></textarea>
+      </section>
+      <section class="bloco">
+        <h4>Dores</h4>
+        <textarea [(ngModel)]="form.dores.texto" placeholder="Problemas, medos, frustrações, riscos e obstáculos do cliente"></textarea>
+      </section>
+    </div>
+  </div>
+
+  <div class="actions" *ngIf="!carregando">
+    <button class="btn btn-primary" (click)="salvar()">Salvar Canvas de Proposta de Valor</button>
+  </div>
+
+  <p *ngIf="carregando" class="loading">Carregando…</p>
+
+  <div class="toast" *ngIf="toast" [class.sucesso]="toast.tipo === 'sucesso'" [class.erro]="toast.tipo === 'erro'">
+    {{ toast.texto }}
+  </div>
+</div>

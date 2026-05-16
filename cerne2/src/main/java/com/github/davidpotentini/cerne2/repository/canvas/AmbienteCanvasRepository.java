@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface AmbienteCanvasRepository extends JpaRepository<AmbienteCanvasModel, Long> {
 
-    @Query(value = "SELECT * FROM AMBIENTE CANVAS WHERE INC_COD = :INC_COD", nativeQuery = true)
-    List<AmbienteCanvasModel> findAmbienteCanvasByIncCod(@Param(":INC_COD") Long incCod);
+    @Query(value = "SELECT * FROM AMBIENTE_CANVAS WHERE INC_COD = :INC_COD", nativeQuery = true)
+    List<AmbienteCanvasModel> findAmbienteCanvasByIncCod(@Param("INC_COD") Long incCod);
 }

@@ -10,6 +10,9 @@ import java.util.List;
 
 public interface CustomerPersonasCanvasRepository extends JpaRepository<CustomerPersonasCanvasModel, Long> {
 
-    @Query(value = "SELECT * FROM CUSTOMER_PERSONAS_CANVAS WHERE AMBC_COD = :AMBC_COD", nativeQuery = true)
-    List<CustomerPersonasCanvasModel> findCustomerPersonasByAmbcCod(@Param("AMBC_COD") Long ambcCod);
+
+    List<CustomerPersonasCanvasModel> findByAmbienteCanvasModel_AmbcCod(Long ambcCod);
+
+    void deleteByAmbienteCanvasModel_AmbcCod(Long ambcCod);
+
 }

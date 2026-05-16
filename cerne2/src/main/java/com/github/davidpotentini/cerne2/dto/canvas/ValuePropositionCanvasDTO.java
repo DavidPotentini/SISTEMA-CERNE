@@ -2,7 +2,8 @@ package com.github.davidpotentini.cerne2.dto.canvas;
 
 import java.util.Map;
 
-public record ValuePropositionCanvasDTO(Long ambcCod,
+public record ValuePropositionCanvasDTO(Long vpcCod,
+                                        Long ambcCod,
                                         Map<String, Object> criadoresGanho,
                                         Map<String, Object> produtosServicos,
                                         Map<String, Object> alivioDores,

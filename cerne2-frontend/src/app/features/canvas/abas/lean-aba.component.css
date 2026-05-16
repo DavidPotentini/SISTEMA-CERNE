@@ -1,0 +1,119 @@
+.lean-wrapper { position: relative; }
+
+.lean-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-areas:
+    'problema solucao    uvp competencia segmento'
+    'problema metrica    uvp canais      segmento'
+    'custos   custos     custos receita  receita';
+  gap: 8px;
+}
+
+.area-problema { grid-area: problema; }
+.area-solucao { grid-area: solucao; }
+.area-metrica { grid-area: metrica; }
+.area-uvp { grid-area: uvp; }
+.area-competencia { grid-area: competencia; }
+.area-canais { grid-area: canais; }
+.area-segmento { grid-area: segmento; }
+.area-custos { grid-area: custos; }
+.area-receita { grid-area: receita; }
+
+.bloco {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 140px;
+}
+
+.bloco.bloco-tall { min-height: 290px; }
+
+.bloco h4 {
+  margin: 0 0 6px 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #059669;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bloco textarea {
+  flex: 1;
+  width: 100%;
+  border: none;
+  resize: none;
+  font: inherit;
+  font-size: 0.85rem;
+  color: #1a1a2e;
+  background: transparent;
+  outline: none;
+}
+
+.bloco textarea::placeholder {
+  color: #cbd5e1;
+  font-size: 0.78rem;
+}
+
+.rodape {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.actions { margin-top: 16px; display: flex; justify-content: flex-end; }
+
+.btn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn-primary { background: #059669; color: white; }
+.btn-primary:hover { background: #047857; }
+
+.loading { text-align: center; color: #9ca3af; padding: 24px; }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+.toast.sucesso { background: #10b981; }
+.toast.erro { background: #dc2626; }
+
+@media (max-width: 1024px) {
+  .lean-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'problema solucao'
+      'metrica uvp'
+      'competencia canais'
+      'segmento segmento'
+      'custos receita';
+  }
+  .bloco.bloco-tall { min-height: 160px; }
+}
+
+@media (max-width: 640px) {
+  .lean-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'problema' 'solucao' 'metrica' 'uvp' 'competencia' 'canais' 'segmento' 'custos' 'receita';
+  }
+}

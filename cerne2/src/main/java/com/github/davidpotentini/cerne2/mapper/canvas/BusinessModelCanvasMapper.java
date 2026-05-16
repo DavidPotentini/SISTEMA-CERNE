@@ -12,10 +12,12 @@ import java.util.List;
         uses = EntityReferenceResolver.class)
 public interface BusinessModelCanvasMapper {
 
+    @Mapping(source = "ambienteCanvasModel.ambcCod", target = "ambcCod")
     BusinessModelCanvasDTO toDTO(BusinessModelCanvasModel businessModelCanvasModel);
 
     List<BusinessModelCanvasDTO> toDTOList(List<BusinessModelCanvasModel> businessModelCanvasModelList);
 
-    @Mapping(source = "ambcCod", target = "ambienteCanvasModel")
-    BusinessModelCanvasModel toModel(BusinessModelCanvasDTO businessModelCanvasDTO, Long ambcCod);
+    @Mapping(target = "bmcCod", source = "bmcCod")
+    @Mapping(target = "ambienteCanvasModel", source = "ambcCod")
+    BusinessModelCanvasModel toModel(BusinessModelCanvasDTO businessModelCanvasDTO, Long bmcCod, Long ambcCod);
 }

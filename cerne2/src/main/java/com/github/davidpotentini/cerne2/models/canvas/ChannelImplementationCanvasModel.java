@@ -24,6 +24,9 @@ public class ChannelImplementationCanvasModel {
 //    @EmbeddedId
 //    private ChannelImplementationCanvasId channelImplementationCanvasId;
 
+    @Column(name = "NOME_SEGMENTO")
+    private String nomeSegmento;
+
     @Column(name = "ATIVIDADE_CONHECIMENTO")
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> atividadeConhecimento;

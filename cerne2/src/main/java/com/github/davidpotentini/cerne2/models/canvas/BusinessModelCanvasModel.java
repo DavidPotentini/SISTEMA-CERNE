@@ -15,7 +15,9 @@ import java.util.Map;
 public class BusinessModelCanvasModel {
 
     @Id
-    private Long ambcCod;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "BMC_COD")
+    private Long bmcCod;
 
     @Column(name = "PARCEIROS_CHAVE")
     @JdbcTypeCode(SqlTypes.JSON)
@@ -33,7 +35,7 @@ public class BusinessModelCanvasModel {
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> relacionamentoCliente;
 
-    @Column(name = "SEGMENTO_CLIENTE")
+    @Column(name = "SEGMENTOS_CLIENTE")
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> segmentoCliente;
 
@@ -53,8 +55,7 @@ public class BusinessModelCanvasModel {
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> fontesReceitas;
 
+    @ManyToOne(optional = false)
     @JoinColumn(name = "AMBC_COD")
-    @MapsId("ambcCod")
-    @OneToOne
     private AmbienteCanvasModel ambienteCanvasModel;
 }

@@ -17,6 +17,7 @@ public interface ValuePropositionCanvasMapper {
 
     List<ValuePropositionCanvasDTO> toDTOList(List<ValuePropostionCanvasModel> valuePropostionCanvasModelList);
 
-    @Mapping(source = "ambcCod", target = "ambienteCanvasModel.ambcCod")
-    ValuePropostionCanvasModel toModel(ValuePropositionCanvasDTO valuePropositionCanvasDTO, Long ambcCod);
+    @Mapping(target = "vpcCod", source = "vpcCod")
+    @Mapping(target = "ambienteCanvasModel", source = "ambcCod")
+    ValuePropostionCanvasModel toModel(ValuePropositionCanvasDTO valuePropositionCanvasDTO, Long vpcCod, Long ambcCod);
 }

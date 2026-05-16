@@ -1,0 +1,99 @@
+.vpc-wrapper { position: relative; }
+
+.vpc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.lado {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+}
+
+.lado-produto { border-left: 4px solid #4f46e5; }
+.lado-cliente { border-left: 4px solid #f59e0b; }
+
+.lado h3 {
+  margin: 0 0 14px 0;
+  font-size: 1rem;
+  color: #374151;
+  font-weight: 600;
+}
+
+.bloco {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  min-height: 110px;
+}
+
+.bloco:last-child { margin-bottom: 0; }
+
+.bloco h4 {
+  margin: 0 0 6px 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #4f46e5;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lado-cliente .bloco h4 { color: #d97706; }
+
+.bloco textarea {
+  flex: 1;
+  width: 100%;
+  border: none;
+  resize: none;
+  font: inherit;
+  font-size: 0.85rem;
+  color: #1a1a2e;
+  background: transparent;
+  outline: none;
+}
+
+.bloco textarea::placeholder {
+  color: #cbd5e1;
+  font-size: 0.78rem;
+}
+
+.actions { margin-top: 18px; display: flex; justify-content: flex-end; }
+
+.btn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-primary { background: #4f46e5; color: white; }
+.btn-primary:hover { background: #4338ca; }
+
+.loading { text-align: center; color: #9ca3af; padding: 24px; }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+.toast.sucesso { background: #10b981; }
+.toast.erro { background: #dc2626; }
+
+@media (max-width: 768px) {
+  .vpc-grid { grid-template-columns: 1fr; }
+}

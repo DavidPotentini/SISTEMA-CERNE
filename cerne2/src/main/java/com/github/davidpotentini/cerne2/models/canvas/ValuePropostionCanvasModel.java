@@ -15,7 +15,9 @@ import java.util.Map;
 public class ValuePropostionCanvasModel {
 
     @Id
-    private Long ambcCod;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "VPC_COD")
+    private Long vpcCod;
 
     @Column(name = "CRIADORES_GANHO")
     @JdbcTypeCode(SqlTypes.JSON)
@@ -41,9 +43,7 @@ public class ValuePropostionCanvasModel {
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> tarefasClientes;
 
+    @ManyToOne(optional = false)
     @JoinColumn(name = "AMBC_COD")
-    @MapsId("ambcCod")
-    @OneToOne
     private AmbienteCanvasModel ambienteCanvasModel;
-
 }

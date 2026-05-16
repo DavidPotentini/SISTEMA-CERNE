@@ -2,7 +2,8 @@ package com.github.davidpotentini.cerne2.dto.canvas;
 
 import java.util.Map;
 
-public record LeanCanvasDTO(Long ambcCod,
+public record LeanCanvasDTO(Long leanCod,
+                            Long ambcCod,
                             Map<String, Object> problema,
                             Map<String, Object> solucao,
                             Map<String, Object> metrica,

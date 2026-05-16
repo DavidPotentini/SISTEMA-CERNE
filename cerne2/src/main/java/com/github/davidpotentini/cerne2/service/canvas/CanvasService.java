@@ -2,6 +2,9 @@ package com.github.davidpotentini.cerne2.service.canvas;
 
 import com.github.davidpotentini.cerne2.dto.canvas.*;
 import com.github.davidpotentini.cerne2.mapper.canvas.*;
+import com.github.davidpotentini.cerne2.models.canvas.BusinessModelCanvasModel;
+import com.github.davidpotentini.cerne2.models.canvas.LeanCanvasModel;
+import com.github.davidpotentini.cerne2.models.canvas.ValuePropostionCanvasModel;
 import com.github.davidpotentini.cerne2.models.canvas.ids.ChannelImplementationCanvasId;
 import com.github.davidpotentini.cerne2.models.canvas.ids.CustomerPersonasCanvasId;
 import com.github.davidpotentini.cerne2.repository.canvas.*;
@@ -75,6 +78,13 @@ public class CanvasService {
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteAmbienteCanvas(Long ambcCod){
+
+        businessModelCanvasRepository.deleteByAmbienteCanvasModel_AmbcCod(ambcCod);
+        channelImplementationCanvasRepository.deleteByAmbienteCanvasModel_AmbcCod(ambcCod);
+        customerPersonasCanvasRepository.deleteByAmbienteCanvasModel_AmbcCod(ambcCod);
+        leanCanvasRepository.deleteByAmbienteCanvasModel_AmbcCod(ambcCod);
+        valuePropositionCanvasRepository.deleteByAmbienteCanvasModel_AmbcCod(ambcCod);
+
         ambienteCanvasRepository.deleteById(ambcCod);
     }
 
@@ -84,20 +94,25 @@ public class CanvasService {
     *
     */
 
-    public BusinessModelCanvasDTO findByBusinessModelCanvasById(Long ambcCod){
+    public BusinessModelCanvasDTO findByBusinessModelCanvasByAmbcCod(Long ambcCod){
         return businessModelCanvasMapper.toDTO(businessModelCanvasRepository
-                .findById(ambcCod).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+                .findByAmbienteCanvasModel_AmbcCod(ambcCod).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public BusinessModelCanvasDTO saveBusinessModelCanvas(BusinessModelCanvasDTO businessModelCanvasDTO, Long ambcCod){
+        Long bmcCod = businessModelCanvasDTO.bmcCod() != null
+                ? businessModelCanvasDTO.bmcCod()
+                : businessModelCanvasRepository.findByAmbienteCanvasModel_AmbcCod(ambcCod)
+                    .map(BusinessModelCanvasModel::getBmcCod).orElse(null);
         return businessModelCanvasMapper.toDTO(businessModelCanvasRepository.
-                save(businessModelCanvasMapper.toModel(businessModelCanvasDTO, ambcCod)));
+                save(businessModelCanvasMapper.toModel(businessModelCanvasDTO, bmcCod, ambcCod)));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteBusinessModelCanvas(Long ambcCod){
-        businessModelCanvasRepository.deleteById(ambcCod);
+        businessModelCanvasRepository.findByAmbienteCanvasModel_AmbcCod(ambcCod)
+                .ifPresent(businessModelCanvasRepository::delete);
     }
 
     /*
@@ -107,7 +122,7 @@ public class CanvasService {
     */
 
     public List<ChannelImplementationCanvasDTO> findChannelImplementationCanvasByAmbcCod(Long ambcCod){
-        return channelImplementationCanvasMapper.toDTOList(channelImplementationCanvasRepository.findChannelImplementationByAmbcCod(ambcCod));
+        return channelImplementationCanvasMapper.toDTOList(channelImplementationCanvasRepository.findByAmbienteCanvasModel_AmbcCod(ambcCod));
     }
 
     public ChannelImplementationCanvasDTO findChannelImplementationCanvasById(Long segCod){
@@ -132,7 +147,7 @@ public class CanvasService {
     */
 
     public List<CustomerPersonasCanvasDTO> findCustomerPersonasByAmbcCod(Long ambcCod){
-        return customerPersonasCanvasMapper.toDTOList(customerPersonasCanvasRepository.findCustomerPersonasByAmbcCod(ambcCod));
+        return customerPersonasCanvasMapper.toDTOList(customerPersonasCanvasRepository.findByAmbienteCanvasModel_AmbcCod(ambcCod));
     }
 
     public CustomerPersonasCanvasDTO findCustomerPersonasCanvasById(Long personaCod){
@@ -156,19 +171,24 @@ public class CanvasService {
     *
     */
 
-    public LeanCanvasDTO findLeanCanvasById(Long ambcCod){
+    public LeanCanvasDTO findLeanCanvasByAmbcCod(Long ambcCod){
         return leanCanvasMapper.toDTO(leanCanvasRepository
-                .findById(ambcCod).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+                .findByAmbienteCanvasModel_AmbcCod(ambcCod).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public LeanCanvasDTO saveLeanCanvas(LeanCanvasDTO leanCanvasDTO, Long ambcCod){
-        return leanCanvasMapper.toDTO(leanCanvasRepository.save(leanCanvasMapper.toModel(leanCanvasDTO, ambcCod)));
+        Long leanCod = leanCanvasDTO.leanCod() != null
+                ? leanCanvasDTO.leanCod()
+                : leanCanvasRepository.findByAmbienteCanvasModel_AmbcCod(ambcCod)
+                    .map(LeanCanvasModel::getLeanCod).orElse(null);
+        return leanCanvasMapper.toDTO(leanCanvasRepository.save(leanCanvasMapper.toModel(leanCanvasDTO, leanCod, ambcCod)));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteLeanCanvas(Long ambcCod){
-        leanCanvasRepository.deleteById(ambcCod);
+        leanCanvasRepository.findByAmbienteCanvasModel_AmbcCod(ambcCod)
+                .ifPresent(leanCanvasRepository::delete);
     }
 
     /*
@@ -177,20 +197,25 @@ public class CanvasService {
     *
     */
 
-    public ValuePropositionCanvasDTO findValuePropositionCanvasById(Long ambcCod){
-        return valuePropositionCanvasMapper.toDTO(valuePropositionCanvasRepository.findById(ambcCod)
+    public ValuePropositionCanvasDTO findValuePropositionCanvasByAmbcCod(Long ambcCod){
+        return valuePropositionCanvasMapper.toDTO(valuePropositionCanvasRepository.findByAmbienteCanvasModel_AmbcCod(ambcCod)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public ValuePropositionCanvasDTO saveValuePropositionCanvas(ValuePropositionCanvasDTO valuePropositionCanvasDTO, Long ambcCod){
+        Long vpcCod = valuePropositionCanvasDTO.vpcCod() != null
+                ? valuePropositionCanvasDTO.vpcCod()
+                : valuePropositionCanvasRepository.findByAmbienteCanvasModel_AmbcCod(ambcCod)
+                    .map(ValuePropostionCanvasModel::getVpcCod).orElse(null);
         return valuePropositionCanvasMapper.toDTO(valuePropositionCanvasRepository
-                .save(valuePropositionCanvasMapper.toModel(valuePropositionCanvasDTO, ambcCod)));
+                .save(valuePropositionCanvasMapper.toModel(valuePropositionCanvasDTO, vpcCod, ambcCod)));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteValuePropositionCanvas(Long ambcCod){
-        valuePropositionCanvasRepository.deleteById(ambcCod);
+        valuePropositionCanvasRepository.findByAmbienteCanvasModel_AmbcCod(ambcCod)
+                .ifPresent(valuePropositionCanvasRepository::delete);
     }
 }
 

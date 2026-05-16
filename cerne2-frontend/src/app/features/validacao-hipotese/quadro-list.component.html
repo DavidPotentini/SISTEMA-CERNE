@@ -1,0 +1,36 @@
+<div class="container">
+  <header class="page-header">
+    <button class="btn-link" (click)="voltar()">← Voltar para a incubada</button>
+    <h1>Quadros de Validação de Hipóteses</h1>
+    <p class="subtitle">Cada quadro reúne hipóteses sobre blocos do Lean Canvas, com experimento, métrica, resultado e decisão.</p>
+  </header>
+
+  <div class="novo-quadro">
+    <input
+      type="text"
+      [(ngModel)]="novoTitulo"
+      placeholder="Título do novo quadro (ex: Sprint validação Q1 2026)"
+      (keyup.enter)="criar()"
+    />
+    <button class="btn btn-primary" (click)="criar()" [disabled]="!novoTitulo.trim()">
+      + Criar quadro
+    </button>
+  </div>
+
+  <div class="lista">
+    <div class="card" *ngFor="let q of quadros" (click)="abrir(q.qvhCod)">
+      <div class="card-content">
+        <h3 class="card-title">{{ q.tituloQuadro || 'Quadro sem título' }}</h3>
+        <p class="card-meta">{{ totalHipoteses(q) }} hipótese(s)</p>
+      </div>
+      <div class="card-footer">
+        <span class="card-id">#{{ q.qvhCod }}</span>
+        <span class="card-action">Abrir →</span>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!carregando && quadros.length === 0">
+      <p>Nenhum quadro cadastrado nessa incubada.</p>
+    </div>
+  </div>
+</div>

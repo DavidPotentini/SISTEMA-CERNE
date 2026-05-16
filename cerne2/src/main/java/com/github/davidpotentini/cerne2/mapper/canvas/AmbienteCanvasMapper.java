@@ -17,8 +17,8 @@ public interface AmbienteCanvasMapper {
 
     List<AmbienteCanvasDTO> toDTOList(List<AmbienteCanvasModel> ambienteCanvasModelList);
 
-    @Mapping(source = "incCod", target = "incubadasModel")
+    @Mapping(source = "ambienteCanvasDTO.incCod", target = "incubadasModel")
     @Mapping(target = "customerPersonasCanvasModelList", ignore = true)
     @Mapping(target = "channelImplementationCanvasModelList", ignore = true)
-    AmbienteCanvasModel toModel(AmbienteCanvasDTO ambienteCanvasDTO, Long incCod);
+    AmbienteCanvasModel toModel(AmbienteCanvasDTO ambienteCanvasDTO, Long ambcCod);
 }
