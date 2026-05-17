@@ -1,7 +1,6 @@
 package com.github.davidpotentini.cerne2.controllers.pessoas;
 
-import com.github.davidpotentini.cerne2.dto.pessoas.request.PessoasDTORequest;
-import com.github.davidpotentini.cerne2.dto.pessoas.response.PessoasDTOResponse;
+import com.github.davidpotentini.cerne2.dto.pessoas.PessoasDTO;
 import com.github.davidpotentini.cerne2.service.pessoas.PessoasService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,40 +20,40 @@ public class PessoasController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PessoasDTOResponse>> findByIncubadora(){
+    public ResponseEntity<List<PessoasDTO>> findByIncubadora(){
         return ResponseEntity.ok(pessoasService.findByIncubadora());
     }
 
     @GetMapping("/{pessoaCod}")
-    public ResponseEntity<PessoasDTOResponse> findById(@PathVariable Long pessoaCod){
+    public ResponseEntity<PessoasDTO> findById(@PathVariable Long pessoaCod){
         return ResponseEntity.ok(pessoasService.findById(pessoaCod));
     }
 
     @GetMapping("/incubada/{incCod}")
-    public ResponseEntity<List<PessoasDTOResponse>> findByIncubada(@PathVariable Long incCod){
+    public ResponseEntity<List<PessoasDTO>> findByIncubada(@PathVariable Long incCod){
         return ResponseEntity.ok(pessoasService.findByIncubada(incCod));
     }
 
     @PostMapping
-    public ResponseEntity<PessoasDTOResponse> insert(@RequestBody PessoasDTORequest pessoasDTORequest){
-        PessoasDTOResponse pessoasDTOResponse = pessoasService.save(pessoasDTORequest, null);
-
+    public ResponseEntity<PessoasDTO> insert(@RequestBody PessoasDTO pessoasDTO){
+        PessoasDTO pessoaSalva = pessoasService.save(pessoasDTO, null);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .path("{/{pessoaCod}")
-                .buildAndExpand(pessoasDTOResponse.pessoaCod())
+                .path("/{pessoaCod}")
+                .buildAndExpand(pessoaSalva.pessoaCod())
                 .toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(pessoaSalva);
     }
 
     @PutMapping("/{pessoaCod}")
-    public ResponseEntity<PessoasDTOResponse> update (@RequestBody PessoasDTORequest pessoasDTORequest,
-                                                      @PathVariable Long pessoaCod){
-        return ResponseEntity.ok(pessoasService.save(pessoasDTORequest, pessoaCod));
+    public ResponseEntity<PessoasDTO> update (@RequestBody PessoasDTO pessoasDTO,
+                                              @PathVariable Long pessoaCod){
+        return ResponseEntity.ok(pessoasService.save(pessoasDTO, pessoaCod));
     }
 
+    @DeleteMapping("/{pessoaCod}")
     public ResponseEntity<Void> delete(@PathVariable Long pessoaCod){
         pessoasService.delete(pessoaCod);
 

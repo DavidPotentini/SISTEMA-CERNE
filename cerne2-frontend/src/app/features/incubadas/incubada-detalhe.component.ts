@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IncubadasService } from '../../core/services/incubadas/incubadas.service';
-import { IncubadaRequest } from '../../models/incubadas/incubada.model';
+import { IncubadaDTO } from '../../models/incubadas/incubada.model';
 import { EStatusIncubacao } from '../../enums/status-incubacao.enum';
 import { PessoasAbaComponent } from './abas/pessoas-aba.component';
 import { CepService } from '../../core/services/cep/cep.service';
@@ -18,7 +18,7 @@ type Aba = 'geral' | 'endereco' | 'pessoas';
   imports: [CommonModule, FormsModule, PessoasAbaComponent],
 })
 export class IncubadaDetalheComponent implements OnInit, OnDestroy {
-  form: IncubadaRequest = this.formVazio();
+  form: IncubadaDTO = this.formVazio();
   incCod = 0;
   isNovo = true;
   abaAtiva: Aba = 'geral';
@@ -52,20 +52,22 @@ export class IncubadaDetalheComponent implements OnInit, OnDestroy {
         this.incCod = Number(cod);
         this.service.findById(this.incCod).subscribe(data => {
           this.form = {
+            incCod: data.incCod,
             nome: data.nome,
             dataInicioIncubacao: data.dataInicioIncubacao,
             email: data.email,
             eStatusIncubacao: data.eStatusIncubacao,
             descricao: data.descricao,
             documentacao: data.documentacao,
-            enderecoDTORequest: {
-              cidade: data.enderecoDTOResponse?.cidade ?? '',
-              rua: data.enderecoDTOResponse?.rua ?? '',
-              bairro: data.enderecoDTOResponse?.bairro ?? '',
-              numero: data.enderecoDTOResponse?.numero ?? '',
-              complemento: data.enderecoDTOResponse?.complemento ?? '',
-              estado: data.enderecoDTOResponse?.estado ?? '',
-              uf: data.enderecoDTOResponse?.uf ?? '',
+            enderecoDTO: {
+              endCod: data.enderecoDTO?.endCod ?? null,
+              cidade: data.enderecoDTO?.cidade ?? '',
+              rua: data.enderecoDTO?.rua ?? '',
+              bairro: data.enderecoDTO?.bairro ?? '',
+              numero: data.enderecoDTO?.numero ?? '',
+              complemento: data.enderecoDTO?.complemento ?? '',
+              estado: data.enderecoDTO?.estado ?? '',
+              uf: data.enderecoDTO?.uf ?? '',
             },
           };
           this.cdr.detectChanges();
@@ -125,14 +127,14 @@ export class IncubadaDetalheComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
           return;
         }
-        this.form.enderecoDTORequest = {
-          ...this.form.enderecoDTORequest,
+        this.form.enderecoDTO = {
+          ...this.form.enderecoDTO,
           rua: data.logradouro ?? '',
           bairro: data.bairro ?? '',
           cidade: data.localidade ?? '',
           estado: data.estado ?? '',
           uf: data.uf ?? '',
-          complemento: data.complemento || this.form.enderecoDTORequest.complemento,
+          complemento: data.complemento || this.form.enderecoDTO.complemento,
         };
         this.cdr.detectChanges();
       },
@@ -163,15 +165,17 @@ export class IncubadaDetalheComponent implements OnInit, OnDestroy {
     }, 3000);
   }
 
-  private formVazio(): IncubadaRequest {
+  private formVazio(): IncubadaDTO {
     return {
+      incCod: null,
       nome: '',
       dataInicioIncubacao: '',
       email: '',
       eStatusIncubacao: EStatusIncubacao.PRE_INCUBADA,
       descricao: '',
       documentacao: '',
-      enderecoDTORequest: {
+      enderecoDTO: {
+        endCod: null,
         cidade: '',
         rua: '',
         bairro: '',

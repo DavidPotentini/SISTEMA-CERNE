@@ -2,11 +2,11 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { TarefaRequest } from '../../../models/planejamento/tarefa.model';
+import { TarefaDTO } from '../../../models/planejamento/tarefa.model';
 import { PlanejamentoService } from '../../../core/services/planejamento/planajamento.service';
 import { ESituacaoTarefa } from '../../../enums/situacao-tarefa.enum';
 import { PessoasService } from '../../../core/services/pessoas/pessoas.service';
-import { PessoaResponse } from '../../../models/pessoas/pessoa.model';
+import { PessoaDTO } from '../../../models/pessoas/pessoa.model';
 import { EvidenciasComponent } from './evidencias/evidencias.component';
 
 @Component({
@@ -17,7 +17,7 @@ import { EvidenciasComponent } from './evidencias/evidencias.component';
   imports: [FormsModule, CommonModule, EvidenciasComponent],
 })
 export class TarefaDetalheComponent implements OnInit, OnDestroy {
-  form: TarefaRequest = this.formVazio();
+  form: TarefaDTO = this.formVazio();
   pesCod = 0;
   prjCod = 0;
   objCod = 0;
@@ -26,7 +26,7 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
   toast: { texto: string; tipo: 'sucesso' | 'erro' } | null = null;
 
   readonly situacoes = Object.values(ESituacaoTarefa);
-  responsaveis: PessoaResponse[] = [];
+  responsaveis: PessoaDTO[] = [];
 
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -57,8 +57,7 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
       } else {
         this.trfCod = Number(cod);
         this.service.findByTarefaId(this.pesCod, this.prjCod, this.objCod, this.trfCod).subscribe(data => {
-          const { trfCod, objCod, ...request } = data;
-          this.form = request;
+          this.form = data;
           this.cdr.detectChanges();
         });
       }
@@ -74,7 +73,7 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
       this.service.saveTarefa(this.pesCod, this.prjCod, this.objCod, this.form).subscribe({
         next: data => {
           this.isNovo = false;
-          this.trfCod = data.trfCod;
+          this.trfCod = data.trfCod!;
           this.mostrarToast('Tarefa criada com sucesso!', 'sucesso');
           this.router.navigate(
             ['/', this.pesCod, 'projetos', this.prjCod, 'objetivos', this.objCod, 'tarefas', data.trfCod],
@@ -120,13 +119,15 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
     }, 3000);
   }
 
-  private formVazio(): TarefaRequest {
+  private formVazio(): TarefaDTO {
     return {
+      trfCod: null,
       nome: '',
       dataInicio: '',
       dataTermino: '',
       eSituacaoTarefa: ESituacaoTarefa.PENDENTE,
-      respCod: 0,
+      objCod: null,
+      respCod: null,
     };
   }
 }

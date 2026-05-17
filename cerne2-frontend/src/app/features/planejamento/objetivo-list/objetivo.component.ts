@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PlanejamentoService } from '../../../core/services/planejamento/planajamento.service';
-import { ObjetivoResponse } from '../../../models/planejamento/objetivo.model';
+import { ObjetivoDTO } from '../../../models/planejamento/objetivo.model';
 
 @Component({
   selector: 'app-objetivo',
@@ -12,7 +12,7 @@ import { ObjetivoResponse } from '../../../models/planejamento/objetivo.model';
   imports: [CommonModule],
 })
 export class ObjetivoComponent implements OnInit {
-  objetivos: ObjetivoResponse[] = [];
+  objetivos: ObjetivoDTO[] = [];
   projetoNome = '';
   pesCod = 0;
   prjCod = 0;

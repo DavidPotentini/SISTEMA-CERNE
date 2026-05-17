@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ProjetoRequest } from '../../../models/planejamento/projeto.model';
+import { ProjetoDTO } from '../../../models/planejamento/projeto.model';
 import { PlanejamentoService } from '../../../core/services/planejamento/planajamento.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { PlanejamentoService } from '../../../core/services/planejamento/planaja
   imports: [FormsModule, CommonModule],
 })
 export class ProjetoDetalheComponent implements OnInit, OnDestroy {
-  form: ProjetoRequest = this.formVazio();
+  form: ProjetoDTO = this.formVazio();
   pesCod = 0;
   prjCod = 0;
   isNovo = true;
@@ -40,8 +40,7 @@ export class ProjetoDetalheComponent implements OnInit, OnDestroy {
       } else {
         this.prjCod = Number(cod);
         this.service.findByProjetoId(this.pesCod, this.prjCod).subscribe(data => {
-          const { prjCod, pesCod, ...request } = data;
-          this.form = request;
+          this.form = data;
           this.cdr.detectChanges();
         });
       }
@@ -57,7 +56,7 @@ export class ProjetoDetalheComponent implements OnInit, OnDestroy {
       this.service.saveProjeto(this.pesCod, this.form).subscribe({
         next: data => {
           this.isNovo = false;
-          this.prjCod = data.prjCod;
+          this.prjCod = data.prjCod!;
           this.mostrarToast('Projeto criado com sucesso!', 'sucesso');
           this.router.navigate(['/', this.pesCod, 'projetos', data.prjCod], { replaceUrl: true });
         },
@@ -89,7 +88,7 @@ export class ProjetoDetalheComponent implements OnInit, OnDestroy {
     }, 3000);
   }
 
-  private formVazio(): ProjetoRequest {
-    return { nome: '', dataInicio: '', dataTermino: '' };
+  private formVazio(): ProjetoDTO {
+    return { prjCod: null, nome: '', dataInicio: '', dataTermino: '', pesCod: null };
   }
 }

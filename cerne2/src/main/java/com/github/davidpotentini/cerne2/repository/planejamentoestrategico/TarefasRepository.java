@@ -8,5 +8,7 @@ import java.util.Optional;
 
 public interface TarefasRepository extends JpaRepository<TarefasModel, Long> {
 
-    Optional<List<TarefasModel>> findByObjetivosModel_ObjCod(Long objCod);
+    List<TarefasModel> findByObjetivosModel_ObjCod(Long objCod);
+
+    void deleteByObjetivosModel_ObjCod(Long objCod);
 }

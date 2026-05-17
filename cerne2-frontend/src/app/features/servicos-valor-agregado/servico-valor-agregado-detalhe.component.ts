@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ServicoValorAgregadoRequest } from '../../models/servico-valor-agregado/servico-valor-agregado.model';
+import { ServicoValorAgregadoDTO } from '../../models/servico-valor-agregado/servico-valor-agregado.model';
 import { ServicoValorAgregadoService } from '../../core/services/servico-valor-agregado/servico-valor-agregado.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { ServicoValorAgregadoService } from '../../core/services/servico-valor-a
   imports: [FormsModule, CommonModule]
 })
 export class ServicoValorAgregadoDetalheComponent implements OnInit, OnDestroy {
-  form: ServicoValorAgregadoRequest = this.formVazio();
+  form: ServicoValorAgregadoDTO = this.formVazio();
   servCod = 0;
   isNovo = true;
   toast: { texto: string; tipo: 'sucesso' | 'erro' } | null = null;
@@ -38,8 +38,7 @@ export class ServicoValorAgregadoDetalheComponent implements OnInit, OnDestroy {
       } else {
         this.servCod = Number(cod);
         this.service.findById(this.servCod).subscribe(data => {
-          const { servCod, ...request } = data;
-          this.form = request;
+          this.form = data;
           this.cdr.detectChanges();
         });
       }
@@ -85,7 +84,7 @@ export class ServicoValorAgregadoDetalheComponent implements OnInit, OnDestroy {
     }, 3000);
   }
 
-  private formVazio(): ServicoValorAgregadoRequest {
-    return { servTitulo: '', servDesc: '', servCusto: 0, servCondContratacao: '', servAnexos: '' };
+  private formVazio(): ServicoValorAgregadoDTO {
+    return { servCod: null, servTitulo: '', servDesc: '', servCusto: 0, servCondContratacao: '', servAnexos: '' };
   }
 }

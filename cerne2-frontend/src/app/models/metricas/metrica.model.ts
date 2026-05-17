@@ -1,4 +1,4 @@
-import { ObjetivoResponse } from '../planejamento/objetivo.model';
+import { ObjetivoDTO } from '../planejamento/objetivo.model';
 
 export interface QuantidadeMensalMetricaDTO {
   mesCod: number;
@@ -10,7 +10,7 @@ export interface IndicadorMetricaDTO {
   descricao: string;
   meta: number;
   metCod: number | null;
-  objetivosDTOResponse: ObjetivoResponse;
+  objetivosDTOResponse: ObjetivoDTO;
   quantidadeMensalMetricasDTOList: QuantidadeMensalMetricaDTO[];
 }
 

@@ -1,7 +1,6 @@
 package com.github.davidpotentini.cerne2.controllers.servicosvaloragregado;
 
-import com.github.davidpotentini.cerne2.dto.servicosvaloragregado.request.ServicosValorAgregadoDTORequest;
-import com.github.davidpotentini.cerne2.dto.servicosvaloragregado.response.ServicosValorAgregadoDTOResponse;
+import com.github.davidpotentini.cerne2.dto.servicosvaloragregado.ServicosValorAgregadoDTO;
 import com.github.davidpotentini.cerne2.service.servicosvaloragregado.ServicosValorAgregadoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,22 +20,22 @@ public class ServicosValorAgregadoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ServicosValorAgregadoDTOResponse>> findList(){
-        List<ServicosValorAgregadoDTOResponse> servicosValorAgregadoDTOResponse = servicosValorAgregadoService.findList();
+    public ResponseEntity<List<ServicosValorAgregadoDTO>> findList(){
+        List<ServicosValorAgregadoDTO> servicosValorAgregadoDTO = servicosValorAgregadoService.findList();
 
-        return ResponseEntity.ok(servicosValorAgregadoDTOResponse);
+        return ResponseEntity.ok(servicosValorAgregadoDTO);
     }
 
     @GetMapping("/{servCod}")
-    public ResponseEntity<ServicosValorAgregadoDTOResponse> findById(@PathVariable Long servCod){
-        ServicosValorAgregadoDTOResponse servicosValorAgregadoDTOResponse = servicosValorAgregadoService.findById(servCod);
+    public ResponseEntity<ServicosValorAgregadoDTO> findById(@PathVariable Long servCod){
+        ServicosValorAgregadoDTO servicosValorAgregadoDTO = servicosValorAgregadoService.findById(servCod);
 
-        return ResponseEntity.ok(servicosValorAgregadoDTOResponse);
+        return ResponseEntity.ok(servicosValorAgregadoDTO);
     }
 
     @PostMapping
-    public ResponseEntity<ServicosValorAgregadoDTOResponse> insert(@RequestBody ServicosValorAgregadoDTORequest servicosValorAgregadoDTORequest){
-        ServicosValorAgregadoDTOResponse servicosDTO = servicosValorAgregadoService.save(servicosValorAgregadoDTORequest, null);
+    public ResponseEntity<ServicosValorAgregadoDTO> insert(@RequestBody ServicosValorAgregadoDTO servicosValorAgregadoDTO){
+        ServicosValorAgregadoDTO servicosDTO = servicosValorAgregadoService.save(servicosValorAgregadoDTO, null);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -48,10 +47,10 @@ public class ServicosValorAgregadoController {
     }
 
     @PutMapping("/{servCod}")
-    public ResponseEntity<ServicosValorAgregadoDTOResponse> update(@RequestBody ServicosValorAgregadoDTORequest servicosValorAgregadoDTORequest,
-                                                                   @PathVariable Long servCod) {
+    public ResponseEntity<ServicosValorAgregadoDTO> update(@RequestBody ServicosValorAgregadoDTO servicosValorAgregadoDTO,
+                                                           @PathVariable Long servCod) {
 
-        ServicosValorAgregadoDTOResponse servicosDTO = servicosValorAgregadoService.save(servicosValorAgregadoDTORequest, servCod);
+        ServicosValorAgregadoDTO servicosDTO = servicosValorAgregadoService.save(servicosValorAgregadoDTO, servCod);
 
         return ResponseEntity.ok(servicosDTO);
     }

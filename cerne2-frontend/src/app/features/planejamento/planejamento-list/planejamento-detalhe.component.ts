@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { PlanejamentoRequest } from '../../../models/planejamento/planejamento.model';
+import { PlanejamentoDTO } from '../../../models/planejamento/planejamento.model';
 import { PlanejamentoService } from '../../../core/services/planejamento/planajamento.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { PlanejamentoService } from '../../../core/services/planejamento/planaja
   imports: [FormsModule, CommonModule],
 })
 export class PlanejamentoDetalheComponent implements OnInit, OnDestroy {
-  form: PlanejamentoRequest = this.formVazio();
+  form: PlanejamentoDTO = this.formVazio();
   pesCod = 0;
   isNovo = true;
   toast: { texto: string; tipo: 'sucesso' | 'erro' } | null = null;
@@ -38,8 +38,7 @@ export class PlanejamentoDetalheComponent implements OnInit, OnDestroy {
       } else {
         this.pesCod = Number(cod);
         this.service.findById(this.pesCod).subscribe(data => {
-          const { pesCod, ...request } = data;
-          this.form = request;
+          this.form = data;
           this.cdr.detectChanges();
         });
       }
@@ -85,7 +84,7 @@ export class PlanejamentoDetalheComponent implements OnInit, OnDestroy {
     }, 3000);
   }
 
-  private formVazio(): PlanejamentoRequest {
-    return { nome: '', dataInicio: '', dataTermino: '' };
+  private formVazio(): PlanejamentoDTO {
+    return { pesCod: null, nome: '', dataInicio: '', dataTermino: '' };
   }
 }

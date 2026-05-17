@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { PessoaResponse } from '../../models/pessoas/pessoa.model';
+import { PessoaDTO } from '../../models/pessoas/pessoa.model';
 import { PessoasService } from '../../core/services/pessoas/pessoas.service';
 
 @Component({
@@ -12,7 +12,7 @@ import { PessoasService } from '../../core/services/pessoas/pessoas.service';
   imports: [CommonModule],
 })
 export class PessoaListComponent implements OnInit {
-  pessoas: PessoaResponse[] = [];
+  pessoas: PessoaDTO[] = [];
   carregando = true;
 
   constructor(

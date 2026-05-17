@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PlanejamentoService } from '../../../core/services/planejamento/planajamento.service';
-import { ProjetoResponse } from '../../../models/planejamento/projeto.model';
+import { ProjetoDTO } from '../../../models/planejamento/projeto.model';
 
 @Component({
   selector: 'app-projeto',
@@ -12,7 +12,7 @@ import { ProjetoResponse } from '../../../models/planejamento/projeto.model';
   imports: [CommonModule],
 })
 export class ProjetoComponent implements OnInit {
-  projetos: ProjetoResponse[] = [];
+  projetos: ProjetoDTO[] = [];
   planejamentoNome = '';
   pesCod = 0;
   erroCarregamento: string | null = null;

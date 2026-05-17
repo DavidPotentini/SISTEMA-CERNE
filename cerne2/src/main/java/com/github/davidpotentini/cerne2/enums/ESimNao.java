@@ -1,6 +1,6 @@
 package com.github.davidpotentini.cerne2.enums;
 
-public enum EPessoaExterna {
+public enum ESimNao {
     SIM,
     NAO
 }

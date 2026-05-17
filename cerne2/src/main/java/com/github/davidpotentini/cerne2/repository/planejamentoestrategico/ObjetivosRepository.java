@@ -8,5 +8,7 @@ import java.util.Optional;
 
 public interface ObjetivosRepository extends JpaRepository<ObjetivosModel, Long> {
 
-    Optional<List<ObjetivosModel>> findByProjetosModel_PrjCod (Long prjCod);
+    List<ObjetivosModel> findByProjetosModel_PrjCod (Long prjCod);
+
+    void deleteByProjetosModel_PrjCod (Long prjCod);
 }

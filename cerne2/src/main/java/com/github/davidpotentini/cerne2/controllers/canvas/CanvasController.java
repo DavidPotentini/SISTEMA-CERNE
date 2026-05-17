@@ -1,4 +1,4 @@
-package com.github.davidpotentini.cerne2.controllers.CanvasController;
+package com.github.davidpotentini.cerne2.controllers.canvas;
 
 import com.github.davidpotentini.cerne2.dto.canvas.*;
 import com.github.davidpotentini.cerne2.service.canvas.CanvasService;

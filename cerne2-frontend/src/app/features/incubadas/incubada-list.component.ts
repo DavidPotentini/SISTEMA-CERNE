@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { IncubadasService } from '../../core/services/incubadas/incubadas.service';
-import { IncubadaResponse } from '../../models/incubadas/incubada.model';
+import { IncubadaDTO } from '../../models/incubadas/incubada.model';
 
 @Component({
   selector: 'app-incubada-list',
@@ -12,7 +12,7 @@ import { IncubadaResponse } from '../../models/incubadas/incubada.model';
   imports: [CommonModule],
 })
 export class IncubadaListComponent implements OnInit {
-  incubadas: IncubadaResponse[] = [];
+  incubadas: IncubadaDTO[] = [];
   carregando = true;
 
   constructor(

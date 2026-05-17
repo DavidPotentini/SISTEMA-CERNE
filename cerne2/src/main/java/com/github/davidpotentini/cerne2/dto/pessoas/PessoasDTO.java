@@ -1,9 +1,8 @@
-package com.github.davidpotentini.cerne2.dto.pessoas.response;
-
+package com.github.davidpotentini.cerne2.dto.pessoas;
 
 import com.github.davidpotentini.cerne2.enums.ETipoEmpreendimento;
 
-public record PessoasDTOResponse(
+public record PessoasDTO(
         Long pessoaCod,
         String nome,
         String email,

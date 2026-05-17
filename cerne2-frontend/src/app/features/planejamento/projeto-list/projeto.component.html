@@ -10,7 +10,7 @@
     <div class="empty-state" *ngIf="erroCarregamento" style="color: #c0392b;">{{ erroCarregamento }}</div>
 
     <div class="card" *ngFor="let p of projetos">
-      <div class="card-body" (click)="abrirObjetivos(p.prjCod)">
+      <div class="card-body" (click)="abrirObjetivos(p.prjCod!)">
         <div>
           <div class="card-title">{{ p.nome }}</div>
           <div class="card-dates">{{ p.dataInicio | date:'dd/MM/yyyy' }} — {{ p.dataTermino | date:'dd/MM/yyyy' }}</div>
@@ -18,8 +18,8 @@
         <span class="card-nav">Objetivos →</span>
       </div>
       <div class="card-actions">
-        <button class="btn-action btn-edit" (click)="editar(p.prjCod)">Editar</button>
-        <button class="btn-action btn-delete" (click)="deletar(p.prjCod)">Excluir</button>
+        <button class="btn-action btn-edit" (click)="editar(p.prjCod!)">Editar</button>
+        <button class="btn-action btn-delete" (click)="deletar(p.prjCod!)">Excluir</button>
       </div>
     </div>
 

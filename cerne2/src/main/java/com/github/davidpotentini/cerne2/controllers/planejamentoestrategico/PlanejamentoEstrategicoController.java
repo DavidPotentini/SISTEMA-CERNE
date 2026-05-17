@@ -1,9 +1,7 @@
 package com.github.davidpotentini.cerne2.controllers.planejamentoestrategico;
 
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.request.*;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.response.*;
+import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.*;
 import com.github.davidpotentini.cerne2.service.planejamentoestrategico.PlanejamentoEstrategicoService;
-import jakarta.persistence.Lob;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -28,22 +26,22 @@ public class PlanejamentoEstrategicoController {
     */
 
     @GetMapping
-    public ResponseEntity<List<PlanejamentoEstrategicoDTOResponse>> findList(){
-        List<PlanejamentoEstrategicoDTOResponse> planejamentoEstrategicoDTORespons = planejamentoEstrategicoService.findList();
+    public ResponseEntity<List<PlanejamentoEstrategicoDTO>> findList(){
+        List<PlanejamentoEstrategicoDTO> planejamentoEstrategicoDTORespons = planejamentoEstrategicoService.findList();
 
         return ResponseEntity.ok(planejamentoEstrategicoDTORespons);
     }
 
     @GetMapping("/{pesCod}")
-    public ResponseEntity<PlanejamentoEstrategicoDTOResponse> findById(@PathVariable Long pesCod){
-        PlanejamentoEstrategicoDTOResponse planejamentoEstrategicoDTOResponse = planejamentoEstrategicoService.findById(pesCod);
+    public ResponseEntity<PlanejamentoEstrategicoDTO> findById(@PathVariable Long pesCod){
+        PlanejamentoEstrategicoDTO planejamentoEstrategicoDTOResponse = planejamentoEstrategicoService.findById(pesCod);
 
         return ResponseEntity.ok(planejamentoEstrategicoDTOResponse);
     }
 
     @PostMapping
-    public ResponseEntity<PlanejamentoEstrategicoDTOResponse> insert(@RequestBody PlanejamentoEstrategicoDTORequest planejamentoEstrategicoDTORequest){
-        PlanejamentoEstrategicoDTOResponse planosDTO = planejamentoEstrategicoService.save(planejamentoEstrategicoDTORequest, null);
+    public ResponseEntity<PlanejamentoEstrategicoDTO> insert(@RequestBody PlanejamentoEstrategicoDTO planejamentoEstrategicoDTORequest){
+        PlanejamentoEstrategicoDTO planosDTO = planejamentoEstrategicoService.save(planejamentoEstrategicoDTORequest, null);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -55,10 +53,10 @@ public class PlanejamentoEstrategicoController {
     }
 
     @PutMapping("/{pesCod}")
-    public ResponseEntity<PlanejamentoEstrategicoDTOResponse> update(@RequestBody PlanejamentoEstrategicoDTORequest planejamentoEstrategicoDTORequest,
+    public ResponseEntity<PlanejamentoEstrategicoDTO> update(@RequestBody PlanejamentoEstrategicoDTO planejamentoEstrategicoDTORequest,
                                                                      @PathVariable Long pesCod) {
 
-        PlanejamentoEstrategicoDTOResponse planosDTO = planejamentoEstrategicoService.save(planejamentoEstrategicoDTORequest, pesCod);
+        PlanejamentoEstrategicoDTO planosDTO = planejamentoEstrategicoService.save(planejamentoEstrategicoDTORequest, pesCod);
 
         return ResponseEntity.ok(planosDTO);
     }
@@ -77,23 +75,23 @@ public class PlanejamentoEstrategicoController {
      */
 
     @GetMapping("{pesCod}/projetos")
-    public ResponseEntity<List<ProjetosDTOResponse>> findProjetoByPlano (@PathVariable Long pesCod) {
-        List<ProjetosDTOResponse> projetosDTOResponseList = planejamentoEstrategicoService.findProjetoByPlano(pesCod);
+    public ResponseEntity<List<ProjetosDTO>> findProjetoByPlano (@PathVariable Long pesCod) {
+        List<ProjetosDTO> projetosDTOResponseList = planejamentoEstrategicoService.findProjetoByPlano(pesCod);
 
         return ResponseEntity.ok(projetosDTOResponseList);
     }
 
     @GetMapping("{pesCod}/projetos/{prjCod}")
-    public ResponseEntity<ProjetosDTOResponse> findByProjetoId(@PathVariable Long prjCod){
-        ProjetosDTOResponse projetosDTOResponse = planejamentoEstrategicoService.findByProjetoId(prjCod);
+    public ResponseEntity<ProjetosDTO> findByProjetoId(@PathVariable Long prjCod){
+        ProjetosDTO projetosDTOResponse = planejamentoEstrategicoService.findByProjetoId(prjCod);
 
         return ResponseEntity.ok(projetosDTOResponse);
     }
 
     @PostMapping("{pesCod}/projetos")
-    public ResponseEntity<ProjetosDTOResponse> insertProjetos(@RequestBody ProjetosDTORequest projetosDTORequest,
+    public ResponseEntity<ProjetosDTO> insertProjetos(@RequestBody ProjetosDTO projetosDTORequest,
                                                               @PathVariable Long pesCod){
-        ProjetosDTOResponse projetosDTOResponse = planejamentoEstrategicoService.saveProjetos(projetosDTORequest, pesCod, null);
+        ProjetosDTO projetosDTOResponse = planejamentoEstrategicoService.saveProjetos(projetosDTORequest, pesCod, null);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -105,10 +103,10 @@ public class PlanejamentoEstrategicoController {
     }
 
     @PutMapping("{pesCod}/projetos/{prjCod}")
-    public ResponseEntity<ProjetosDTOResponse> updateProjetos(@RequestBody ProjetosDTORequest projetosDTORequest,
+    public ResponseEntity<ProjetosDTO> updateProjetos(@RequestBody ProjetosDTO projetosDTORequest,
                                                               @PathVariable Long pesCod,
                                                               @PathVariable Long prjCod){
-        ProjetosDTOResponse projetosDTOResponse = planejamentoEstrategicoService.saveProjetos(projetosDTORequest, pesCod, prjCod);
+        ProjetosDTO projetosDTOResponse = planejamentoEstrategicoService.saveProjetos(projetosDTORequest, pesCod, prjCod);
 
         return ResponseEntity.ok(projetosDTOResponse);
     }
@@ -127,23 +125,23 @@ public class PlanejamentoEstrategicoController {
      */
 
     @GetMapping("{pesCod}/projetos/{prjCod}/objetivos")
-    public ResponseEntity<List<ObjetivosDTOResponse>> findObjetivosByProjetos(@PathVariable Long prjCod){
-        List<ObjetivosDTOResponse> objetivosDTOResponse = planejamentoEstrategicoService.findObjetivosByProjetos(prjCod);
+    public ResponseEntity<List<ObjetivosDTO>> findObjetivosByProjetos(@PathVariable Long prjCod){
+        List<ObjetivosDTO> objetivosDTOResponse = planejamentoEstrategicoService.findObjetivosByProjetos(prjCod);
 
         return ResponseEntity.ok(objetivosDTOResponse);
     }
 
     @GetMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}")
-    public ResponseEntity<ObjetivosDTOResponse> findByObjetivosId(@PathVariable Long objCod){
-        ObjetivosDTOResponse objetivosDTOResponse = planejamentoEstrategicoService.findByObjetivosId(objCod);
+    public ResponseEntity<ObjetivosDTO> findByObjetivosId(@PathVariable Long objCod){
+        ObjetivosDTO objetivosDTOResponse = planejamentoEstrategicoService.findByObjetivosId(objCod);
 
         return ResponseEntity.ok(objetivosDTOResponse);
     }
 
     @PostMapping("{pesCod}/projetos/{prjCod}/objetivos")
-    public ResponseEntity<ObjetivosDTOResponse> insertObjetivos(@RequestBody ObjetivosDTORequest ObjetivosDTORequest,
+    public ResponseEntity<ObjetivosDTO> insertObjetivos(@RequestBody ObjetivosDTO ObjetivosDTO,
                                                                 @PathVariable Long prjCod){
-        ObjetivosDTOResponse objetivosDTOResponse = planejamentoEstrategicoService.saveObjetivos(ObjetivosDTORequest,
+        ObjetivosDTO objetivosDTOResponse = planejamentoEstrategicoService.saveObjetivos(ObjetivosDTO,
                                                                                                 prjCod,
                                                                                                 null);
 
@@ -157,10 +155,10 @@ public class PlanejamentoEstrategicoController {
     }
 
     @PutMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}")
-    public ResponseEntity<ObjetivosDTOResponse> updateObjetivos(@RequestBody ObjetivosDTORequest objetivosDTORequest,
+    public ResponseEntity<ObjetivosDTO> updateObjetivos(@RequestBody ObjetivosDTO objetivosDTORequest,
                                                                 @PathVariable Long prjCod,
                                                                 @PathVariable Long objCod){
-        ObjetivosDTOResponse objetivosDTOResponse = planejamentoEstrategicoService.saveObjetivos(objetivosDTORequest,
+        ObjetivosDTO objetivosDTOResponse = planejamentoEstrategicoService.saveObjetivos(objetivosDTORequest,
                                                                                                  prjCod,
                                                                                                  objCod);
 
@@ -181,23 +179,23 @@ public class PlanejamentoEstrategicoController {
     */
 
     @GetMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas")
-    public ResponseEntity<List<TarefasDTOResponse>> findTarefasByObjetivos(@PathVariable Long objCod){
-        List<TarefasDTOResponse> tarefasDTOResponse = planejamentoEstrategicoService.findTarefasByObjetivos(objCod);
+    public ResponseEntity<List<TarefasDTO>> findTarefasByObjetivos(@PathVariable Long objCod){
+        List<TarefasDTO> tarefasDTOResponse = planejamentoEstrategicoService.findTarefasByObjetivos(objCod);
 
         return ResponseEntity.ok(tarefasDTOResponse);
     }
 
     @GetMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}")
-    public ResponseEntity<TarefasDTOResponse> findByTarefaId(@PathVariable Long trfCod){
-        TarefasDTOResponse tarefasDTOResponse = planejamentoEstrategicoService.findByTarefaId(trfCod);
+    public ResponseEntity<TarefasDTO> findByTarefaId(@PathVariable Long trfCod){
+        TarefasDTO tarefasDTOResponse = planejamentoEstrategicoService.findByTarefaId(trfCod);
 
         return ResponseEntity.ok(tarefasDTOResponse);
     }
 
     @PostMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas")
-    public ResponseEntity<TarefasDTOResponse> insertTarefas(@RequestBody TarefasDTORequest tarefasDTORequest,
+    public ResponseEntity<TarefasDTO> insertTarefas(@RequestBody TarefasDTO tarefasDTORequest,
                                                             @PathVariable Long objCod){
-        TarefasDTOResponse tarefasDTOResponse = planejamentoEstrategicoService.saveTarefas(tarefasDTORequest,
+        TarefasDTO tarefasDTOResponse = planejamentoEstrategicoService.saveTarefas(tarefasDTORequest,
                                                                                            objCod,
                                                                                            null);
 
@@ -211,11 +209,11 @@ public class PlanejamentoEstrategicoController {
     }
 
     @PutMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}")
-    public ResponseEntity<TarefasDTOResponse> updateTarefas(@RequestBody TarefasDTORequest tarefasDTORequest,
+    public ResponseEntity<TarefasDTO> updateTarefas(@RequestBody TarefasDTO tarefasDTORequest,
                                                             @PathVariable Long objCod,
                                                             @PathVariable Long trfCod){
 
-        TarefasDTOResponse tarefasDTOResponse = planejamentoEstrategicoService.saveTarefas(tarefasDTORequest,
+        TarefasDTO tarefasDTOResponse = planejamentoEstrategicoService.saveTarefas(tarefasDTORequest,
                                                                                            objCod,
                                                                                            trfCod);
 
@@ -236,13 +234,13 @@ public class PlanejamentoEstrategicoController {
     */
 
     @GetMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias")
-    public ResponseEntity<List<EvidenciasDTOResponse>> findEvidenciasByTarefas(@PathVariable Long trfCod){
+    public ResponseEntity<List<EvidenciasDTO>> findEvidenciasByTarefas(@PathVariable Long trfCod){
         return ResponseEntity.ok(planejamentoEstrategicoService.findEvidenciasByTarefas(trfCod));
     }
 
     @PostMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias")
-    public ResponseEntity<EvidenciasDTOResponse> insertEvidencias(@RequestBody EvidenciasDTORequest evidenciasDTORequest){
-        EvidenciasDTOResponse evidenciasDTOResponse = planejamentoEstrategicoService.saveEvidencia(evidenciasDTORequest, null);
+    public ResponseEntity<EvidenciasDTO> insertEvidencias(@RequestBody EvidenciasDTO evidenciasDTORequest){
+        EvidenciasDTO evidenciasDTOResponse = planejamentoEstrategicoService.saveEvidencia(evidenciasDTORequest, null);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -254,7 +252,7 @@ public class PlanejamentoEstrategicoController {
     }
 
     @PostMapping("{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}")
-    public ResponseEntity<EvidenciasDTOResponse> updateEvidencias(@RequestBody EvidenciasDTORequest evidenciasDTORequest,
+    public ResponseEntity<EvidenciasDTO> updateEvidencias(@RequestBody EvidenciasDTO evidenciasDTORequest,
                                                                   @PathVariable Long evdCod){
         return ResponseEntity.ok(planejamentoEstrategicoService.saveEvidencia(evidenciasDTORequest, evdCod));
     }

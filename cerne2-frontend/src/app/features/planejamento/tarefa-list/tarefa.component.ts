@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PlanejamentoService } from '../../../core/services/planejamento/planajamento.service';
-import { TarefaResponse } from '../../../models/planejamento/tarefa.model';
+import { TarefaDTO } from '../../../models/planejamento/tarefa.model';
 import { ESituacaoTarefa } from '../../../enums/situacao-tarefa.enum';
 
 @Component({
@@ -13,7 +13,7 @@ import { ESituacaoTarefa } from '../../../enums/situacao-tarefa.enum';
   imports: [CommonModule],
 })
 export class TarefaComponent implements OnInit {
-  tarefas: TarefaResponse[] = [];
+  tarefas: TarefaDTO[] = [];
   objetivoNome = '';
   pesCod = 0;
   prjCod = 0;

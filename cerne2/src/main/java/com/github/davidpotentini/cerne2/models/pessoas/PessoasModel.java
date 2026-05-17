@@ -1,6 +1,6 @@
 package com.github.davidpotentini.cerne2.models.pessoas;
 
-import com.github.davidpotentini.cerne2.enums.EPessoaExterna;
+import com.github.davidpotentini.cerne2.enums.ESimNao;
 import com.github.davidpotentini.cerne2.enums.ETipoEmpreendimento;
 import com.github.davidpotentini.cerne2.models.formularios.FormularioRespostasModel;
 import com.github.davidpotentini.cerne2.models.informacoesgeraisincubadas.IncubadasModel;
@@ -39,7 +39,7 @@ public class PessoasModel {
     @Column (name = "VLD_PESSOA_EXTERNA")
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    private EPessoaExterna ePessoaExterna;
+    private ESimNao ePessoaExterna;
 
     @ManyToOne
     @JoinColumn(name = "INC_COD")

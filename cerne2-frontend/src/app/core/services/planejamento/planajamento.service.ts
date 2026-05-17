@@ -2,15 +2,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { PlanejamentoResponse } from '../../../models/planejamento/planejamento.model';
-import { PlanejamentoRequest } from '../../../models/planejamento/planejamento.model';
-import { ProjetoResponse } from '../../../models/planejamento/projeto.model';
-import { ProjetoRequest } from '../../../models/planejamento/projeto.model';
-import { ObjetivoResponse } from '../../../models/planejamento/objetivo.model';
-import { ObjetivoRequest } from '../../../models/planejamento/objetivo.model';
-import { TarefaResponse } from '../../../models/planejamento/tarefa.model';
-import { TarefaRequest } from '../../../models/planejamento/tarefa.model';
-import { EvidenciaRequest, EvidenciaResponse } from '../../../models/planejamento/evidencia.model';
+import { PlanejamentoDTO } from '../../../models/planejamento/planejamento.model';
+import { ProjetoDTO } from '../../../models/planejamento/projeto.model';
+import { ObjetivoDTO } from '../../../models/planejamento/objetivo.model';
+import { TarefaDTO } from '../../../models/planejamento/tarefa.model';
+import { EvidenciaDTO } from '../../../models/planejamento/evidencia.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -20,68 +16,68 @@ export class PlanejamentoService {
   constructor(private http: HttpClient) {}
 
   // Planos
-  findAll(): Observable<PlanejamentoResponse[]> {
-    return this.http.get<PlanejamentoResponse[]>(this.base);
+  findAll(): Observable<PlanejamentoDTO[]> {
+    return this.http.get<PlanejamentoDTO[]>(this.base);
   }
-  findById(pesCod: number): Observable<PlanejamentoResponse> {
-    return this.http.get<PlanejamentoResponse>(`${this.base}/${pesCod}`);
+  findById(pesCod: number): Observable<PlanejamentoDTO> {
+    return this.http.get<PlanejamentoDTO>(`${this.base}/${pesCod}`);
   }
-  save(body: PlanejamentoRequest): Observable<PlanejamentoResponse> {
-    return this.http.post<PlanejamentoResponse>(this.base, body);
+  save(body: PlanejamentoDTO): Observable<PlanejamentoDTO> {
+    return this.http.post<PlanejamentoDTO>(this.base, body);
   }
-  update(pesCod: number, body: PlanejamentoRequest): Observable<PlanejamentoResponse> {
-    return this.http.put<PlanejamentoResponse>(`${this.base}/${pesCod}`, body);
+  update(pesCod: number, body: PlanejamentoDTO): Observable<PlanejamentoDTO> {
+    return this.http.put<PlanejamentoDTO>(`${this.base}/${pesCod}`, body);
   }
   delete(pesCod: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${pesCod}`);
   }
 
   // Projetos
-  findProjetos(pesCod: number): Observable<ProjetoResponse[]> {
-    return this.http.get<ProjetoResponse[]>(`${this.base}/${pesCod}/projetos`);
+  findProjetos(pesCod: number): Observable<ProjetoDTO[]> {
+    return this.http.get<ProjetoDTO[]>(`${this.base}/${pesCod}/projetos`);
   }
-  findByProjetoId(pesCod: number, prjCod:number): Observable<ProjetoResponse> {
-    return this.http.get<ProjetoResponse>(`${this.base}/${pesCod}/projetos/${prjCod}`);
+  findByProjetoId(pesCod: number, prjCod:number): Observable<ProjetoDTO> {
+    return this.http.get<ProjetoDTO>(`${this.base}/${pesCod}/projetos/${prjCod}`);
   }
-  saveProjeto(pesCod: number, body: ProjetoRequest): Observable<ProjetoResponse> {
-    return this.http.post<ProjetoResponse>(`${this.base}/${pesCod}/projetos`, body);
+  saveProjeto(pesCod: number, body: ProjetoDTO): Observable<ProjetoDTO> {
+    return this.http.post<ProjetoDTO>(`${this.base}/${pesCod}/projetos`, body);
   }
-  updateProjeto(pesCod: number, prjCod: number, body: ProjetoRequest): Observable<ProjetoResponse> {
-    return this.http.put<ProjetoResponse>(`${this.base}/${pesCod}/projetos/${prjCod}`, body);
+  updateProjeto(pesCod: number, prjCod: number, body: ProjetoDTO): Observable<ProjetoDTO> {
+    return this.http.put<ProjetoDTO>(`${this.base}/${pesCod}/projetos/${prjCod}`, body);
   }
   deleteProjeto(pesCod: number, prjCod: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${pesCod}/projetos/${prjCod}`);
   }
 
   // Objetivos
-  findObjetivos(pesCod: number, prjCod: number): Observable<ObjetivoResponse[]> {
-    return this.http.get<ObjetivoResponse[]>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos`);
+  findObjetivos(pesCod: number, prjCod: number): Observable<ObjetivoDTO[]> {
+    return this.http.get<ObjetivoDTO[]>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos`);
   }
-  findByObjetivoId(pesCod: number, prjCod: number, objCod:number): Observable<ObjetivoResponse>{
-    return this.http.get<ObjetivoResponse>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}`);
+  findByObjetivoId(pesCod: number, prjCod: number, objCod:number): Observable<ObjetivoDTO>{
+    return this.http.get<ObjetivoDTO>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}`);
   }
-  saveObjetivo(pesCod: number, prjCod: number, body: ObjetivoRequest): Observable<ObjetivoResponse> {
-    return this.http.post<ObjetivoResponse>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos`, body);
+  saveObjetivo(pesCod: number, prjCod: number, body: ObjetivoDTO): Observable<ObjetivoDTO> {
+    return this.http.post<ObjetivoDTO>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos`, body);
   }
-  updateObjetivo(pesCod: number, prjCod: number, objCod: number, body: ObjetivoRequest):Observable<ObjetivoResponse>{
-    return this.http.put<ObjetivoResponse>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}`, body);
+  updateObjetivo(pesCod: number, prjCod: number, objCod: number, body: ObjetivoDTO):Observable<ObjetivoDTO>{
+    return this.http.put<ObjetivoDTO>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}`, body);
   }
   deleteObjetivo(pesCod: number, prjCod: number, objCod: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}`);
   }
 
   // Tarefas
-  findTarefas(pesCod: number, prjCod: number, objCod: number): Observable<TarefaResponse[]> {
-    return this.http.get<TarefaResponse[]>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas`);
+  findTarefas(pesCod: number, prjCod: number, objCod: number): Observable<TarefaDTO[]> {
+    return this.http.get<TarefaDTO[]>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas`);
   }
-  findByTarefaId(pesCod: number, prjCod: number, objCod: number, trfCod: number): Observable<TarefaResponse> {
-    return this.http.get<TarefaResponse>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas/${trfCod}`);
+  findByTarefaId(pesCod: number, prjCod: number, objCod: number, trfCod: number): Observable<TarefaDTO> {
+    return this.http.get<TarefaDTO>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas/${trfCod}`);
   }
-  saveTarefa(pesCod: number, prjCod: number, objCod: number, body: TarefaRequest): Observable<TarefaResponse> {
-    return this.http.post<TarefaResponse>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas`, body);
+  saveTarefa(pesCod: number, prjCod: number, objCod: number, body: TarefaDTO): Observable<TarefaDTO> {
+    return this.http.post<TarefaDTO>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas`, body);
   }
-  updateTarefa(pesCod: number, prjCod: number, objCod: number,trfCod:number, body: TarefaRequest): Observable<TarefaResponse> {
-    return this.http.put<TarefaResponse>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas/${trfCod}`, body);
+  updateTarefa(pesCod: number, prjCod: number, objCod: number,trfCod:number, body: TarefaDTO): Observable<TarefaDTO> {
+    return this.http.put<TarefaDTO>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas/${trfCod}`, body);
   }
   deleteTarefa(pesCod: number, prjCod: number, objCod: number,trfCod:number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas/${trfCod}`);
@@ -91,14 +87,14 @@ export class PlanejamentoService {
   private evidenciasBase(pesCod: number, prjCod: number, objCod: number, trfCod: number): string {
     return `${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas/${trfCod}/evidencias`;
   }
-  findEvidencias(pesCod: number, prjCod: number, objCod: number, trfCod: number): Observable<EvidenciaResponse[]> {
-    return this.http.get<EvidenciaResponse[]>(this.evidenciasBase(pesCod, prjCod, objCod, trfCod));
+  findEvidencias(pesCod: number, prjCod: number, objCod: number, trfCod: number): Observable<EvidenciaDTO[]> {
+    return this.http.get<EvidenciaDTO[]>(this.evidenciasBase(pesCod, prjCod, objCod, trfCod));
   }
-  saveEvidencia(pesCod: number, prjCod: number, objCod: number, trfCod: number, body: EvidenciaRequest): Observable<EvidenciaResponse> {
-    return this.http.post<EvidenciaResponse>(this.evidenciasBase(pesCod, prjCod, objCod, trfCod), body);
+  saveEvidencia(pesCod: number, prjCod: number, objCod: number, trfCod: number, body: EvidenciaDTO): Observable<EvidenciaDTO> {
+    return this.http.post<EvidenciaDTO>(this.evidenciasBase(pesCod, prjCod, objCod, trfCod), body);
   }
-  updateEvidencia(pesCod: number, prjCod: number, objCod: number, trfCod: number, evdCod: number, body: EvidenciaRequest): Observable<EvidenciaResponse> {
-    return this.http.post<EvidenciaResponse>(`${this.evidenciasBase(pesCod, prjCod, objCod, trfCod)}/${evdCod}`, body);
+  updateEvidencia(pesCod: number, prjCod: number, objCod: number, trfCod: number, evdCod: number, body: EvidenciaDTO): Observable<EvidenciaDTO> {
+    return this.http.post<EvidenciaDTO>(`${this.evidenciasBase(pesCod, prjCod, objCod, trfCod)}/${evdCod}`, body);
   }
   deleteEvidencia(pesCod: number, prjCod: number, objCod: number, trfCod: number, evdCod: number): Observable<void> {
     return this.http.delete<void>(`${this.evidenciasBase(pesCod, prjCod, objCod, trfCod)}/${evdCod}`);

@@ -9,9 +9,9 @@ import {
   MetricaDTO,
   QuantidadeMensalMetricaDTO,
 } from '../../models/metricas/metrica.model';
-import { ObjetivoResponse } from '../../models/planejamento/objetivo.model';
-import { PlanejamentoResponse } from '../../models/planejamento/planejamento.model';
-import { ProjetoResponse } from '../../models/planejamento/projeto.model';
+import { ObjetivoDTO } from '../../models/planejamento/objetivo.model';
+import { PlanejamentoDTO } from '../../models/planejamento/planejamento.model';
+import { ProjetoDTO } from '../../models/planejamento/projeto.model';
 import { MetricasService } from '../../core/services/metricas/metricas.service';
 import { PlanejamentoService } from '../../core/services/planejamento/planajamento.service';
 
@@ -35,9 +35,9 @@ export class MetricaDetalheComponent implements OnInit, OnDestroy {
   isNovo = true;
   toast: { texto: string; tipo: 'sucesso' | 'erro' } | null = null;
 
-  planos: PlanejamentoResponse[] = [];
-  projetosPorPlano = new Map<number, ProjetoResponse[]>();
-  objetivosPorProjeto = new Map<number, ObjetivoResponse[]>();
+  planos: PlanejamentoDTO[] = [];
+  projetosPorPlano = new Map<number, ProjetoDTO[]>();
+  objetivosPorProjeto = new Map<number, ObjetivoDTO[]>();
   escopos: EscopoIndicador[] = [];
 
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
@@ -141,11 +141,11 @@ export class MetricaDetalheComponent implements OnInit, OnDestroy {
     }
   }
 
-  projetosDoPlano(pesCod: number | null): ProjetoResponse[] {
+  projetosDoPlano(pesCod: number | null): ProjetoDTO[] {
     return pesCod != null ? this.projetosPorPlano.get(pesCod) ?? [] : [];
   }
 
-  objetivosDoProjeto(prjCod: number | null): ObjetivoResponse[] {
+  objetivosDoProjeto(prjCod: number | null): ObjetivoDTO[] {
     return prjCod != null ? this.objetivosPorProjeto.get(prjCod) ?? [] : [];
   }
 
@@ -202,8 +202,8 @@ export class MetricaDetalheComponent implements OnInit, OnDestroy {
 
       const requests = planos.map((p) =>
         this.planejamentoService
-          .findProjetos(p.pesCod)
-          .pipe(map((projetos) => ({ pesCod: p.pesCod, projetos }))),
+          .findProjetos(p.pesCod!)
+          .pipe(map((projetos) => ({ pesCod: p.pesCod!, projetos }))),
       );
 
       forkJoin(requests).subscribe((resultados) => {
@@ -214,7 +214,7 @@ export class MetricaDetalheComponent implements OnInit, OnDestroy {
         const projetosObsParaCarregar = new Set<number>();
 
         indicadores.forEach((ind, idx) => {
-          const prjCod = ind.objetivosDTOResponse.prjCod;
+          const prjCod = ind.objetivosDTOResponse.prjCod!;
           const planoEncontrado = resultados.find((r) =>
             r.projetos.some((p) => p.prjCod === prjCod),
           );

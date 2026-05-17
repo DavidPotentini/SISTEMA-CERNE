@@ -9,7 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { PessoasService } from '../../../core/services/pessoas/pessoas.service';
-import { PessoaResponse } from '../../../models/pessoas/pessoa.model';
+import { PessoaDTO } from '../../../models/pessoas/pessoa.model';
 
 @Component({
   selector: 'app-incubada-pessoas-aba',
@@ -21,7 +21,7 @@ import { PessoaResponse } from '../../../models/pessoas/pessoa.model';
 export class PessoasAbaComponent implements OnInit, OnChanges {
   @Input() incCod = 0;
 
-  pessoas: PessoaResponse[] = [];
+  pessoas: PessoaDTO[] = [];
   carregando = true;
 
   constructor(

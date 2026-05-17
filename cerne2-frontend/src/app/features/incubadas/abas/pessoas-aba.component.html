@@ -9,7 +9,7 @@
     <li
       *ngFor="let p of pessoas"
       class="pessoa-item"
-      (click)="abrir(p.pessoaCod)"
+      (click)="abrir(p.pessoaCod!)"
     >
       <div class="pessoa-info">
         <strong class="nome">{{ p.nome }}</strong>

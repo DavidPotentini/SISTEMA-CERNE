@@ -11,7 +11,7 @@
     <div
       class="card"
       *ngFor="let p of pessoas"
-      (click)="abrir(p.pessoaCod)"
+      (click)="abrir(p.pessoaCod!)"
     >
       <div class="card-content">
         <h3 class="card-title">{{ p.nome }}</h3>

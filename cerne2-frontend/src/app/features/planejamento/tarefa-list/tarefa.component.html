@@ -18,8 +18,8 @@
         <span class="badge" [ngClass]="'badge-' + t.eSituacaoTarefa">{{ situacaoLabel(t.eSituacaoTarefa) }}</span>
       </div>
       <div class="card-actions">
-        <button class="btn-action btn-edit" (click)="editar(t.trfCod)">Editar</button>
-        <button class="btn-action btn-delete" (click)="deletar(t.trfCod)">Excluir</button>
+        <button class="btn-action btn-edit" (click)="editar(t.trfCod!)">Editar</button>
+        <button class="btn-action btn-delete" (click)="deletar(t.trfCod!)">Excluir</button>
       </div>
     </div>
 

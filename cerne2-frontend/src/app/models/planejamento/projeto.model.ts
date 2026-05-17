@@ -1,14 +1,7 @@
-export interface ProjetoResponse {
-  prjCod:      number;
-  nome:        string;
-  dataInicio:  string;
+export interface ProjetoDTO {
+  prjCod: number | null;
+  nome: string;
+  dataInicio: string;
   dataTermino: string;
-  pesCod:      number;
-}
-
-export interface ProjetoRequest {
-  prjCod?:     number;
-  nome:        string;
-  dataInicio:  string;
-  dataTermino: string;
+  pesCod: number | null;
 }

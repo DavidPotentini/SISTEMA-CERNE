@@ -1,6 +1,6 @@
-package com.github.davidpotentini.cerne2.dto.endereco.response;
+package com.github.davidpotentini.cerne2.dto.endereco;
 
-public record EnderecoDTOResponse(
+public record EnderecoDTO(
         Long endCod,
         String cidade,
         String rua,

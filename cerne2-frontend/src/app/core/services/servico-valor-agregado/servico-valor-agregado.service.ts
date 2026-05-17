@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ServicoValorAgregadoRequest, ServicoValorAgregadoResponse } from '../../../models/servico-valor-agregado/servico-valor-agregado.model';
+import { ServicoValorAgregadoDTO } from '../../../models/servico-valor-agregado/servico-valor-agregado.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -11,17 +11,17 @@ export class ServicoValorAgregadoService {
 
   constructor(private http: HttpClient) {}
 
-  findAll(): Observable<ServicoValorAgregadoResponse[]> {
-    return this.http.get<ServicoValorAgregadoResponse[]>(this.base);
+  findAll(): Observable<ServicoValorAgregadoDTO[]> {
+    return this.http.get<ServicoValorAgregadoDTO[]>(this.base);
   }
-  findById(servCod: number): Observable<ServicoValorAgregadoResponse> {
-    return this.http.get<ServicoValorAgregadoResponse>(`${this.base}/${servCod}`);
+  findById(servCod: number): Observable<ServicoValorAgregadoDTO> {
+    return this.http.get<ServicoValorAgregadoDTO>(`${this.base}/${servCod}`);
   }
-  save(body: ServicoValorAgregadoRequest): Observable<ServicoValorAgregadoResponse> {
-    return this.http.post<ServicoValorAgregadoResponse>(this.base, body);
+  save(body: ServicoValorAgregadoDTO): Observable<ServicoValorAgregadoDTO> {
+    return this.http.post<ServicoValorAgregadoDTO>(this.base, body);
   }
-  update(servCod: number, body: ServicoValorAgregadoRequest): Observable<ServicoValorAgregadoResponse> {
-    return this.http.put<ServicoValorAgregadoResponse>(`${this.base}/${servCod}`, body);
+  update(servCod: number, body: ServicoValorAgregadoDTO): Observable<ServicoValorAgregadoDTO> {
+    return this.http.put<ServicoValorAgregadoDTO>(`${this.base}/${servCod}`, body);
   }
   delete(servCod: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${servCod}`);

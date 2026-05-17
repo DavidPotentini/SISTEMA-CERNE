@@ -1,53 +1,64 @@
 package com.github.davidpotentini.cerne2.service.informacoesgeraisincubadas;
 
-import com.github.davidpotentini.cerne2.dto.endereco.response.EnderecoDTOResponse;
-import com.github.davidpotentini.cerne2.dto.informacoesgeraisincubadas.request.IncubadasDTORequest;
-import com.github.davidpotentini.cerne2.dto.informacoesgeraisincubadas.respose.IncubadasDTOResponse;
+import com.github.davidpotentini.cerne2.dto.informacoesgeraisincubadas.IncubadasDTO;
+import com.github.davidpotentini.cerne2.mapper.endereco.EnderecoMapper;
+import com.github.davidpotentini.cerne2.mapper.informacoesgeraisincubadas.IncubadasMapper;
 import com.github.davidpotentini.cerne2.models.informacoesgeraisincubadas.IncubadasModel;
-import com.github.davidpotentini.cerne2.repository.enderecos.EnderecoRepository;
 import com.github.davidpotentini.cerne2.repository.informacoesgeraisincubadas.IncubadasRepository;
+import com.github.davidpotentini.cerne2.repository.pessoas.PessoasRepository;
 import com.github.davidpotentini.cerne2.service.enderecos.EnderecoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class IncubadasService {
 
     private final IncubadasRepository incubadasRepository;
+    private final PessoasRepository pessoasRepository;
     private final EnderecoService enderecoService;
+    private final IncubadasMapper incubadasMapper;
+    private final EnderecoMapper enderecoMapper;
 
-    public IncubadasService(IncubadasRepository incubadasRepository, EnderecoService enderecoService) {
+    public IncubadasService(IncubadasRepository incubadasRepository,
+                            PessoasRepository pessoasRepository,
+                            EnderecoService enderecoService,
+                            IncubadasMapper incubadasMapper,
+                            EnderecoMapper enderecoMapper) {
         this.incubadasRepository = incubadasRepository;
+        this.pessoasRepository = pessoasRepository;
         this.enderecoService = enderecoService;
+        this.incubadasMapper = incubadasMapper;
+        this.enderecoMapper = enderecoMapper;
     }
 
-    public List<IncubadasDTOResponse> findList() {
-        List<IncubadasModel> incubadasModelList = incubadasRepository.findAll();
-
-        List<IncubadasDTOResponse> incubadasDTOResponses = new ArrayList<>();
-
-        for (IncubadasModel i: incubadasModelList){
-            incubadasDTOResponses.add(mapToIncubadasDTO(i));
-        }
-
-        return incubadasDTOResponses;
+    public List<IncubadasDTO> findList() {
+        return incubadasMapper.toDTOList(incubadasRepository.findAll());
     }
 
-    public IncubadasDTOResponse findById(Long incCod) {
-        return mapToIncubadasDTO(incubadasRepository.findById(incCod)
+    public IncubadasDTO findById(Long incCod) {
+        return incubadasMapper.toDTO(incubadasRepository.findById(incCod)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
-
     //VERIFICAR SE QUANDO ATUALIZA O ENDEREÇO UM NOVO REGISTRO É CRIADO
     @Transactional(rollbackFor = Exception.class)
-    public IncubadasDTOResponse save(IncubadasDTORequest incubadasDTORequest, Long incCod){
-        return mapToIncubadasDTO(incubadasRepository.save(mapToIncubadasModel(incubadasDTORequest, incCod)));
+    public IncubadasDTO save(IncubadasDTO incubadasDTO, Long incCod){
+        IncubadasModel incubadasModel = incubadasMapper.toModel(incubadasDTO, incCod);
+
+        // Em atualizações reaproveita o endereço já vinculado à incubada.
+        Long endCod = incCod == null
+                ? null
+                : incubadasRepository.findById(incCod)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
+                    .getEnderecosModel().getEndCod();
+
+        incubadasModel.setEnderecosModel(enderecoMapper.toModel(incubadasDTO.enderecoDTO(), endCod));
+
+        return incubadasMapper.toDTO(incubadasRepository.save(incubadasModel));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -57,42 +68,8 @@ public class IncubadasService {
 
         enderecoService.delete(incubadasModel.getEnderecosModel().getEndCod());
 
+        pessoasRepository.deleteByIncubadasModel_IncCod(incCod);
+
         incubadasRepository.delete(incubadasModel);
-    }
-
-    private IncubadasDTOResponse mapToIncubadasDTO (IncubadasModel incubadasModel) {
-        return new IncubadasDTOResponse(
-                incubadasModel.getIncCod(),
-                incubadasModel.getNome(),
-                incubadasModel.getDataInicioIncubacao(),
-                incubadasModel.getEmail(),
-                incubadasModel.getEStatusIncubacao(),
-                incubadasModel.getDescricao(),
-                incubadasModel.getDocumentacao(),
-                enderecoService.mapToEnderecoDTO(incubadasModel.getEnderecosModel())
-        );
-    }
-
-    private IncubadasModel mapToIncubadasModel (IncubadasDTORequest incubadasDTORequest, Long incCod) {
-        IncubadasModel incubadasModel = new IncubadasModel();
-
-        incubadasModel.setIncCod(incCod);
-        incubadasModel.setNome(incubadasDTORequest.nome());
-        incubadasModel.setDataInicioIncubacao(incubadasDTORequest.dataInicioIncubacao());
-        incubadasModel.setEmail(incubadasDTORequest.email());
-        incubadasModel.setEStatusIncubacao(incubadasDTORequest.eStatusIncubacao());
-        incubadasModel.setDescricao(incubadasDTORequest.descricao());
-        incubadasModel.setDocumentacao(incubadasDTORequest.documentacao());
-
-        Long endCod = null;
-
-        if (incCod != null) {
-            endCod = incubadasRepository.findById(incCod).
-                    orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)).getEnderecosModel().getEndCod();
-        }
-
-        incubadasModel.setEnderecosModel(enderecoService.mapToEnderecosModel(incubadasDTORequest.enderecoDTORequest(), endCod));
-
-        return incubadasModel;
     }
 }

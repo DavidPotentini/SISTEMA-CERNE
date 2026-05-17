@@ -8,6 +8,5 @@ import org.springframework.data.repository.query.Param;
 
 public interface QuantidadeMensalMetricasRepository extends JpaRepository<QuantidadeMensalMetricasModel, QuantidadeMensalMetricasId> {
 
-    @Query(value = "DELETE FROM QUANTIDADE_MENSAL_METRICAS WHERE IND_COD = :IND_COD", nativeQuery = true)
-    void deleteAllByIndCod(@Param("IND_COD") Long indCod);
+    void deleteByIndicadoresMetricasModel_IndCod(Long indCod);
 }

@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { PessoaRequest } from '../../models/pessoas/pessoa.model';
+import { PessoaDTO } from '../../models/pessoas/pessoa.model';
 import { PessoasService } from '../../core/services/pessoas/pessoas.service';
 import { ETipoEmpreendimento } from '../../enums/tipo-empreendimento.enum';
 
@@ -14,7 +14,7 @@ import { ETipoEmpreendimento } from '../../enums/tipo-empreendimento.enum';
   imports: [FormsModule, CommonModule],
 })
 export class PessoaDetalheComponent implements OnInit, OnDestroy {
-  form: PessoaRequest = this.formVazio();
+  form: PessoaDTO = this.formVazio();
   pessoaCod = 0;
   isNovo = true;
   tiposEmpreendimento = Object.values(ETipoEmpreendimento);
@@ -40,8 +40,7 @@ export class PessoaDetalheComponent implements OnInit, OnDestroy {
       } else {
         this.pessoaCod = Number(cod);
         this.service.findById(this.pessoaCod).subscribe(data => {
-          const { pessoaCod, ...request } = data;
-          this.form = request;
+          this.form = data;
           this.cdr.detectChanges();
         });
       }
@@ -87,8 +86,9 @@ export class PessoaDetalheComponent implements OnInit, OnDestroy {
     }, 3000);
   }
 
-  private formVazio(): PessoaRequest {
+  private formVazio(): PessoaDTO {
     return {
+      pessoaCod: null,
       nome: '',
       email: '',
       cpf: '',

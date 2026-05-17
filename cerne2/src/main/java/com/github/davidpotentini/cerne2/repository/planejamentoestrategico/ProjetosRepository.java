@@ -9,5 +9,7 @@ import java.util.Optional;
 
 public interface ProjetosRepository extends JpaRepository<ProjetosModel, Long> {
 
-    Optional<List<ProjetosModel>> findByPlanejamentoEstrategicoModel_PesCod(Long pesCod);
+    List<ProjetosModel> findByPlanejamentoEstrategicoModel_PesCod(Long pesCod);
+
+    void deleteByPlanejamentoEstrategicoModel_PesCod(Long pesCod);
 }

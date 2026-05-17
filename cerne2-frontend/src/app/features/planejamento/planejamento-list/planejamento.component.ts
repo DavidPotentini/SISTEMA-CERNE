@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PlanejamentoService } from '../../../core/services/planejamento/planajamento.service';
-import { PlanejamentoResponse } from '../../../models/planejamento/planejamento.model';
+import { PlanejamentoDTO } from '../../../models/planejamento/planejamento.model';
 
 @Component({
   selector: 'app-planejamento',
@@ -12,7 +12,7 @@ import { PlanejamentoResponse } from '../../../models/planejamento/planejamento.
   imports: [CommonModule],
 })
 export class PlanejamentoComponent implements OnInit {
-  planejamentos: PlanejamentoResponse[] = [];
+  planejamentos: PlanejamentoDTO[] = [];
   erroCarregamento: string | null = null;
 
   constructor(

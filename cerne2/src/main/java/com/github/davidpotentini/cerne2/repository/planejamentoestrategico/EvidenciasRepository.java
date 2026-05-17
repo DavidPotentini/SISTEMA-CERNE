@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface EvidenciasRepository extends JpaRepository<EvidenciasModel, Long> {
     Optional<List<EvidenciasModel>> findByTarefasModel_TrfCod(Long trfCod);
+
+    void deleteByTarefasModel_TrfCod(Long trfCod);
 }

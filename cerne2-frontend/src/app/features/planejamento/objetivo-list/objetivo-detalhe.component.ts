@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ObjetivoRequest } from '../../../models/planejamento/objetivo.model';
+import { ObjetivoDTO } from '../../../models/planejamento/objetivo.model';
 import { PlanejamentoService } from '../../../core/services/planejamento/planajamento.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { PlanejamentoService } from '../../../core/services/planejamento/planaja
   imports: [FormsModule, CommonModule],
 })
 export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
-  form: ObjetivoRequest = this.formVazio();
+  form: ObjetivoDTO = this.formVazio();
   pesCod = 0;
   prjCod = 0;
   objCod = 0;
@@ -42,8 +42,7 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
       } else {
         this.objCod = Number(cod);
         this.service.findByObjetivoId(this.pesCod, this.prjCod, this.objCod).subscribe(data => {
-          const { objCod, prjCod, ...request } = data;
-          this.form = request;
+          this.form = data;
           this.cdr.detectChanges();
         });
       }
@@ -59,7 +58,7 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
       this.service.saveObjetivo(this.pesCod, this.prjCod, this.form).subscribe({
         next: data => {
           this.isNovo = false;
-          this.objCod = data.objCod;
+          this.objCod = data.objCod!;
           this.mostrarToast('Objetivo criado com sucesso!', 'sucesso');
           this.router.navigate(
             ['/', this.pesCod, 'projetos', this.prjCod, 'objetivos', data.objCod],
@@ -94,7 +93,7 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
     }, 3000);
   }
 
-  private formVazio(): ObjetivoRequest {
-    return { nome: '', dataInicio: '', dataTermino: '' };
+  private formVazio(): ObjetivoDTO {
+    return { objCod: null, nome: '', dataInicio: '', dataTermino: '', prjCod: null };
   }
 }

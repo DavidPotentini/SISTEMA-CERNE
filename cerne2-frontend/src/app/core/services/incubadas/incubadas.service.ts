@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IncubadaRequest, IncubadaResponse } from '../../../models/incubadas/incubada.model';
+import { IncubadaDTO } from '../../../models/incubadas/incubada.model';
 
 @Injectable({ providedIn: 'root' })
 export class IncubadasService {
@@ -9,17 +9,17 @@ export class IncubadasService {
 
   constructor(private http: HttpClient) {}
 
-  findAll(): Observable<IncubadaResponse[]> {
-    return this.http.get<IncubadaResponse[]>(this.base);
+  findAll(): Observable<IncubadaDTO[]> {
+    return this.http.get<IncubadaDTO[]>(this.base);
   }
-  findById(incCod: number): Observable<IncubadaResponse> {
-    return this.http.get<IncubadaResponse>(`${this.base}/${incCod}`);
+  findById(incCod: number): Observable<IncubadaDTO> {
+    return this.http.get<IncubadaDTO>(`${this.base}/${incCod}`);
   }
-  save(body: IncubadaRequest): Observable<IncubadaResponse> {
-    return this.http.post<IncubadaResponse>(this.base, body);
+  save(body: IncubadaDTO): Observable<IncubadaDTO> {
+    return this.http.post<IncubadaDTO>(this.base, body);
   }
-  update(incCod: number, body: IncubadaRequest): Observable<IncubadaResponse> {
-    return this.http.put<IncubadaResponse>(`${this.base}/${incCod}`, body);
+  update(incCod: number, body: IncubadaDTO): Observable<IncubadaDTO> {
+    return this.http.put<IncubadaDTO>(`${this.base}/${incCod}`, body);
   }
   delete(incCod: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${incCod}`);

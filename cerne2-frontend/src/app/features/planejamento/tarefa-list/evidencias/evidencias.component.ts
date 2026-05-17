@@ -10,10 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PlanejamentoService } from '../../../../core/services/planejamento/planajamento.service';
-import {
-  EvidenciaRequest,
-  EvidenciaResponse,
-} from '../../../../models/planejamento/evidencia.model';
+import { EvidenciaDTO } from '../../../../models/planejamento/evidencia.model';
 
 @Component({
   selector: 'app-evidencias',
@@ -28,9 +25,9 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
   @Input() objCod = 0;
   @Input() trfCod = 0;
 
-  evidencias: EvidenciaResponse[] = [];
+  evidencias: EvidenciaDTO[] = [];
   modalAberto = false;
-  form: EvidenciaRequest = this.formVazio();
+  form: EvidenciaDTO = this.formVazio();
   editandoCod: number | null = null;
   toast: { texto: string; tipo: 'sucesso' | 'erro' } | null = null;
 
@@ -75,9 +72,10 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  abrirEditar(e: EvidenciaResponse) {
+  abrirEditar(e: EvidenciaDTO) {
     this.editandoCod = e.evdCod;
     this.form = {
+      evdCod: e.evdCod,
       descricao: e.descricao,
       caminhoArquivo: e.caminhoArquivo,
       trfCod: this.trfCod,
@@ -93,7 +91,7 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   salvar() {
-    const body: EvidenciaRequest = { ...this.form, trfCod: this.trfCod };
+    const body: EvidenciaDTO = { ...this.form, trfCod: this.trfCod };
 
     if (this.editandoCod === null) {
       this.service
@@ -127,9 +125,9 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  excluir(e: EvidenciaResponse) {
+  excluir(e: EvidenciaDTO) {
     this.service
-      .deleteEvidencia(this.pesCod, this.prjCod, this.objCod, this.trfCod, e.evdCod)
+      .deleteEvidencia(this.pesCod, this.prjCod, this.objCod, this.trfCod, e.evdCod!)
       .subscribe({
         next: () => {
           this.evidencias = this.evidencias.filter(x => x.evdCod !== e.evdCod);
@@ -150,7 +148,7 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
     }, 3000);
   }
 
-  private formVazio(): EvidenciaRequest {
-    return { descricao: '', caminhoArquivo: '', trfCod: this.trfCod };
+  private formVazio(): EvidenciaDTO {
+    return { evdCod: null, descricao: '', caminhoArquivo: '', trfCod: this.trfCod };
   }
 }

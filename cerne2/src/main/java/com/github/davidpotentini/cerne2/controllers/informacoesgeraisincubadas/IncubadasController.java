@@ -1,7 +1,6 @@
 package com.github.davidpotentini.cerne2.controllers.informacoesgeraisincubadas;
 
-import com.github.davidpotentini.cerne2.dto.informacoesgeraisincubadas.request.IncubadasDTORequest;
-import com.github.davidpotentini.cerne2.dto.informacoesgeraisincubadas.respose.IncubadasDTOResponse;
+import com.github.davidpotentini.cerne2.dto.informacoesgeraisincubadas.IncubadasDTO;
 import com.github.davidpotentini.cerne2.service.informacoesgeraisincubadas.IncubadasService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,33 +20,33 @@ public class IncubadasController {
     }
 
     @GetMapping
-    public ResponseEntity<List<IncubadasDTOResponse>> findAll(){
+    public ResponseEntity<List<IncubadasDTO>> findAll(){
         return ResponseEntity.ok(incubadasService.findList());
     }
 
     @GetMapping("/{incCod}")
-    public ResponseEntity<IncubadasDTOResponse> findById(@PathVariable Long incCod){
+    public ResponseEntity<IncubadasDTO> findById(@PathVariable Long incCod){
         return ResponseEntity.ok(incubadasService.findById(incCod));
     }
 
     @PostMapping
-    public ResponseEntity<IncubadasDTOResponse> insert(@RequestBody IncubadasDTORequest incubadasDTORequest){
-        IncubadasDTOResponse incubadasDTOResponse = incubadasService.save(incubadasDTORequest, null);
+    public ResponseEntity<IncubadasDTO> insert(@RequestBody IncubadasDTO incubadasDTO){
+        IncubadasDTO incubadasDTOSalvo = incubadasService.save(incubadasDTO, null);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{incCod}")
-                .buildAndExpand(incubadasDTOResponse.incCod())
+                .buildAndExpand(incubadasDTOSalvo.incCod())
                 .toUri();
 
-        return ResponseEntity.created(location).body(incubadasDTOResponse);
+        return ResponseEntity.created(location).body(incubadasDTOSalvo);
     }
 
     @PutMapping("/{incCod}")
-    public ResponseEntity<IncubadasDTOResponse> update(@RequestBody IncubadasDTORequest incubadasDTORequest,
-                                                        @PathVariable Long incCod){
+    public ResponseEntity<IncubadasDTO> update(@RequestBody IncubadasDTO incubadasDTO,
+                                               @PathVariable Long incCod){
 
-        return ResponseEntity.ok(incubadasService.save(incubadasDTORequest, incCod));
+        return ResponseEntity.ok(incubadasService.save(incubadasDTO, incCod));
     }
 
     @DeleteMapping("/{incCod}")

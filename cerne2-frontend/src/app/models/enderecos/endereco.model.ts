@@ -1,4 +1,5 @@
-export interface EnderecoRequest {
+export interface EnderecoDTO {
+  endCod: number | null;
   cidade: string;
   rua: string;
   bairro: string;
@@ -6,8 +7,4 @@ export interface EnderecoRequest {
   complemento: string;
   estado: string;
   uf: string;
-}
-
-export interface EnderecoResponse extends EnderecoRequest {
-  endCod: number;
 }

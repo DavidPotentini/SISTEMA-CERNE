@@ -1,7 +1,7 @@
 package com.github.davidpotentini.cerne2.service.servicosvaloragregado;
 
-import com.github.davidpotentini.cerne2.dto.servicosvaloragregado.request.ServicosValorAgregadoDTORequest;
-import com.github.davidpotentini.cerne2.dto.servicosvaloragregado.response.ServicosValorAgregadoDTOResponse;
+import com.github.davidpotentini.cerne2.dto.servicosvaloragregado.ServicosValorAgregadoDTO;
+import com.github.davidpotentini.cerne2.mapper.servicosvaloragregado.ServicosValorAgregadoMapper;
 import com.github.davidpotentini.cerne2.models.servicosvaloragregado.ServicosValorAgregadoModel;
 import com.github.davidpotentini.cerne2.repository.servicosvaloragregado.ServicosValorAgregadoRepository;
 import org.springframework.http.HttpStatus;
@@ -9,66 +9,38 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ServicosValorAgregadoService {
 
     private final ServicosValorAgregadoRepository servicosValorAgregadoRepository;
+    private final ServicosValorAgregadoMapper servicosValorAgregadoMapper;
 
-    public ServicosValorAgregadoService(ServicosValorAgregadoRepository servicosValorAgregadoRepository){
+    public ServicosValorAgregadoService(ServicosValorAgregadoRepository servicosValorAgregadoRepository,
+                                        ServicosValorAgregadoMapper servicosValorAgregadoMapper) {
         this.servicosValorAgregadoRepository = servicosValorAgregadoRepository;
+        this.servicosValorAgregadoMapper = servicosValorAgregadoMapper;
     }
 
-
-    public List<ServicosValorAgregadoDTOResponse> findList(){
-        List<ServicosValorAgregadoModel> servicosValorAgregadoModel = servicosValorAgregadoRepository.findAll();
-
-        List<ServicosValorAgregadoDTOResponse> servicosValorAgregadoDTOResponses = new ArrayList<>();
-
-        for (ServicosValorAgregadoModel s: servicosValorAgregadoModel){
-            servicosValorAgregadoDTOResponses.add(mapToServicosValorAgregadoModelDTO(s));
-        }
-
-        return servicosValorAgregadoDTOResponses;
+    public List<ServicosValorAgregadoDTO> findList(){
+        return servicosValorAgregadoMapper.toDTOList(servicosValorAgregadoRepository.findAll());
     }
 
-    public ServicosValorAgregadoDTOResponse findById(Long pesCod){
-        return mapToServicosValorAgregadoModelDTO(servicosValorAgregadoRepository.findById(pesCod).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+    public ServicosValorAgregadoDTO findById(Long servCod){
+        return servicosValorAgregadoMapper.toDTO(servicosValorAgregadoRepository.findById(servCod)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public ServicosValorAgregadoDTOResponse save(ServicosValorAgregadoDTORequest servicosValorAgregadoDTORequest, Long servCod){
-        return mapToServicosValorAgregadoModelDTO(servicosValorAgregadoRepository.save(mapToServicoValorAgregadoModel(servicosValorAgregadoDTORequest, servCod)));
+    public ServicosValorAgregadoDTO save(ServicosValorAgregadoDTO servicosValorAgregadoDTO, Long servCod){
+        return servicosValorAgregadoMapper.toDTO(servicosValorAgregadoRepository
+                .save(servicosValorAgregadoMapper.toModel(servicosValorAgregadoDTO, servCod)));
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void delete(Long pesCod){
-        ServicosValorAgregadoModel servicosValorAgregadoModel = servicosValorAgregadoRepository.findById(pesCod).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public void delete(Long servCod){
 
-        servicosValorAgregadoRepository.delete(servicosValorAgregadoModel);
-    }
-
-    private ServicosValorAgregadoDTOResponse mapToServicosValorAgregadoModelDTO(ServicosValorAgregadoModel servicosValorAgregadoModel){
-        return new ServicosValorAgregadoDTOResponse(servicosValorAgregadoModel.getServCod(),
-                                            servicosValorAgregadoModel.getServTitulo(),
-                                            servicosValorAgregadoModel.getServDesc(),
-                                            servicosValorAgregadoModel.getServCusto(),
-                                            servicosValorAgregadoModel.getServCondContratacao(),
-                                            servicosValorAgregadoModel.getServAnexos());
-    }
-
-    public ServicosValorAgregadoModel mapToServicoValorAgregadoModel(ServicosValorAgregadoDTORequest servicosValorAgregadoDTORequest, Long servCod){
-        ServicosValorAgregadoModel servicosValorAgregadoModel = new ServicosValorAgregadoModel();
-
-        servicosValorAgregadoModel.setServCod(servCod);
-        servicosValorAgregadoModel.setServTitulo(servicosValorAgregadoDTORequest.servTitulo());
-        servicosValorAgregadoModel.setServDesc(servicosValorAgregadoDTORequest.servDesc());
-        servicosValorAgregadoModel.setServCusto(servicosValorAgregadoDTORequest.servCusto());
-        servicosValorAgregadoModel.setServCondContratacao(servicosValorAgregadoDTORequest.servCondContratacao());
-        servicosValorAgregadoModel.setServAnexos(servicosValorAgregadoDTORequest.servAnexos());
-
-        return servicosValorAgregadoModel;
+        servicosValorAgregadoRepository.deleteById(servCod);
     }
 }

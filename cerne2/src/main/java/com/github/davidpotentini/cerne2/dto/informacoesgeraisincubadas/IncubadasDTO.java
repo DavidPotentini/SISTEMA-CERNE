@@ -1,11 +1,11 @@
-package com.github.davidpotentini.cerne2.dto.informacoesgeraisincubadas.respose;
+package com.github.davidpotentini.cerne2.dto.informacoesgeraisincubadas;
 
-import com.github.davidpotentini.cerne2.dto.endereco.response.EnderecoDTOResponse;
+import com.github.davidpotentini.cerne2.dto.endereco.EnderecoDTO;
 import com.github.davidpotentini.cerne2.enums.EStatusIncubacao;
 
 import java.time.LocalDate;
 
-public record IncubadasDTOResponse(
+public record IncubadasDTO(
         Long incCod,
         String nome,
         LocalDate dataInicioIncubacao,
@@ -13,6 +13,6 @@ public record IncubadasDTOResponse(
         EStatusIncubacao eStatusIncubacao,
         String descricao,
         String documentacao,
-        EnderecoDTOResponse enderecoDTOResponse
+        EnderecoDTO enderecoDTO
 ) {
 }

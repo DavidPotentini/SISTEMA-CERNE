@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ServicoValorAgregadoResponse } from '../../models/servico-valor-agregado/servico-valor-agregado.model';
+import { ServicoValorAgregadoDTO } from '../../models/servico-valor-agregado/servico-valor-agregado.model';
 import { ServicoValorAgregadoService } from '../../core/services/servico-valor-agregado/servico-valor-agregado.service';
 
 @Component({
@@ -12,7 +12,7 @@ import { ServicoValorAgregadoService } from '../../core/services/servico-valor-a
   imports: [CommonModule]
 })
 export class ServicoValorAgregadoListComponent implements OnInit {
-  servicos: ServicoValorAgregadoResponse[] = [];
+  servicos: ServicoValorAgregadoDTO[] = [];
 
   constructor(
     private service: ServicoValorAgregadoService,

@@ -1,17 +1,26 @@
 package com.github.davidpotentini.cerne2.service.planejamentoestrategico;
 
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.request.*;
-import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.response.*;
-import com.github.davidpotentini.cerne2.models.planejamentoestrategico.*;
-import com.github.davidpotentini.cerne2.repository.pessoas.PessoasRepository;
+import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.EvidenciasDTO;
+import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.ObjetivosDTO;
+import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.PlanejamentoEstrategicoDTO;
+import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.ProjetosDTO;
+import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.TarefasDTO;
+import com.github.davidpotentini.cerne2.mapper.planejamentoestrategico.EvidenciasMapper;
+import com.github.davidpotentini.cerne2.mapper.planejamentoestrategico.ObjetivosMapper;
+import com.github.davidpotentini.cerne2.mapper.planejamentoestrategico.PlanejamentoEstrategicoMapper;
+import com.github.davidpotentini.cerne2.mapper.planejamentoestrategico.ProjetosMapper;
+import com.github.davidpotentini.cerne2.mapper.planejamentoestrategico.TarefasMapper;
+import com.github.davidpotentini.cerne2.models.planejamentoestrategico.ObjetivosModel;
+import com.github.davidpotentini.cerne2.models.planejamentoestrategico.ProjetosModel;
+import com.github.davidpotentini.cerne2.models.planejamentoestrategico.TarefasModel;
 import com.github.davidpotentini.cerne2.repository.planejamentoestrategico.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PlanejamentoEstrategicoService {
@@ -21,54 +30,65 @@ public class PlanejamentoEstrategicoService {
     private final ObjetivosRepository objetivosRepository;
     private final TarefasRepository tarefasRepository;
     private final EvidenciasRepository evidenciasRepository;
-    private final PessoasRepository pessoasRepository;
+    private final PlanejamentoEstrategicoMapper planejamentoEstrategicoMapper;
+    private final ProjetosMapper projetosMapper;
+    private final ObjetivosMapper objetivosMapper;
+    private final TarefasMapper tarefasMapper;
+    private final EvidenciasMapper evidenciasMapper;
 
     public PlanejamentoEstrategicoService(PlanejamentoEstrategicoRepository planejamentoEstrategicoRepository,
                                           ProjetosRepository projetosRepository,
                                           ObjetivosRepository objetivosRepository,
                                           TarefasRepository tarefasRepository,
                                           EvidenciasRepository evidenciasRepository,
-                                          PessoasRepository pessoasRepository) {
-
+                                          PlanejamentoEstrategicoMapper planejamentoEstrategicoMapper,
+                                          ProjetosMapper projetosMapper,
+                                          ObjetivosMapper objetivosMapper,
+                                          TarefasMapper tarefasMapper,
+                                          EvidenciasMapper evidenciasMapper) {
         this.planejamentoEstrategicoRepository = planejamentoEstrategicoRepository;
         this.projetosRepository = projetosRepository;
         this.objetivosRepository = objetivosRepository;
         this.tarefasRepository = tarefasRepository;
         this.evidenciasRepository = evidenciasRepository;
-        this.pessoasRepository = pessoasRepository;
+        this.planejamentoEstrategicoMapper = planejamentoEstrategicoMapper;
+        this.projetosMapper = projetosMapper;
+        this.objetivosMapper = objetivosMapper;
+        this.tarefasMapper = tarefasMapper;
+        this.evidenciasMapper = evidenciasMapper;
     }
 
     /*
-    *
-    * Planos Anuais Integrados
-    *
-    */
+     *
+     * Planos Anuais Integrados
+     *
+     */
 
-    public  List<PlanejamentoEstrategicoDTOResponse> findList(){
-        List<PlanejamentoEstrategicoModel> planejamentoEstrategicoModelList = planejamentoEstrategicoRepository.findAll();
+    public List<PlanejamentoEstrategicoDTO> findList(){
+        return planejamentoEstrategicoMapper.toDTOList(planejamentoEstrategicoRepository.findAll());
+    }
 
-        List<PlanejamentoEstrategicoDTOResponse> planejamentoEstrategicoDTORespons = new ArrayList<>();
+    public PlanejamentoEstrategicoDTO findById (Long pesCod){
+        return planejamentoEstrategicoMapper.toDTO(planejamentoEstrategicoRepository.findById(pesCod)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+    }
 
-        for (PlanejamentoEstrategicoModel planejamentoEstrategicoModel : planejamentoEstrategicoModelList){
-                planejamentoEstrategicoDTORespons.add(mapToPlanoAnualIntegradoDTO(planejamentoEstrategicoModel));
+    @Transactional(rollbackFor = Exception.class)
+    public PlanejamentoEstrategicoDTO save (PlanejamentoEstrategicoDTO planejamentoEstrategicoDTO, Long pesCod){
+        return planejamentoEstrategicoMapper.toDTO(planejamentoEstrategicoRepository
+                .save(planejamentoEstrategicoMapper.toModel(planejamentoEstrategicoDTO, pesCod)));
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void delete (Long pesCod) {
+
+        List<ProjetosModel> projetosModelList = projetosRepository.findByPlanejamentoEstrategicoModel_PesCod(pesCod);
+
+        for (ProjetosModel p: projetosModelList){
+            deleteProjetos(p.getPrjCod());
         }
 
-        return planejamentoEstrategicoDTORespons;
-    }
-
-    public PlanejamentoEstrategicoDTOResponse findById (Long pesCod){
-        return mapToPlanoAnualIntegradoDTO(planejamentoEstrategicoRepository.findById(pesCod).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public PlanejamentoEstrategicoDTOResponse save (PlanejamentoEstrategicoDTORequest planejamentoEstrategicoDTORequest, Long pesCod){
-        return mapToPlanoAnualIntegradoDTO(planejamentoEstrategicoRepository.save(mapToPlanosAnuaisIntegradosModel(planejamentoEstrategicoDTORequest, pesCod)));
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public void delete (Long pesCod){
-         planejamentoEstrategicoRepository.delete(planejamentoEstrategicoRepository.findById(pesCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        planejamentoEstrategicoRepository.deleteById(pesCod);
     }
 
     /*
@@ -77,37 +97,31 @@ public class PlanejamentoEstrategicoService {
      *
      */
 
-    public List<ProjetosDTOResponse> findProjetoByPlano(Long pesCod) {
-        List<ProjetosModel> projetosModelList =  projetosRepository.findByPlanejamentoEstrategicoModel_PesCod(pesCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        List<ProjetosDTOResponse> projetosDTOResponses = new ArrayList<>();
-
-        for (ProjetosModel projetosModel: projetosModelList) {
-            projetosDTOResponses.add(mapToProjetosDTO(projetosModel));
-        }
-
-        return projetosDTOResponses;
+    public List<ProjetosDTO> findProjetoByPlano(Long pesCod) {
+        return projetosMapper.toDTOList(projetosRepository.findByPlanejamentoEstrategicoModel_PesCod(pesCod));
     }
 
-    public ProjetosDTOResponse findByProjetoId(Long prjCod) {
-        ProjetosModel projetosModel = projetosRepository.findById(prjCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        return mapToProjetosDTO(projetosModel);
+    public ProjetosDTO findByProjetoId(Long prjCod) {
+        return projetosMapper.toDTO(projetosRepository.findById(prjCod)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public ProjetosDTOResponse saveProjetos(ProjetosDTORequest projetosDTORequest, Long pesCod, Long prjCod) {
-        return mapToProjetosDTO(projetosRepository.save(mapToProjetosModel(projetosDTORequest, pesCod, prjCod)));
+    public ProjetosDTO saveProjetos(ProjetosDTO projetosDTO, Long pesCod, Long prjCod) {
+        return projetosMapper.toDTO(projetosRepository.save(projetosMapper.toModel(projetosDTO, prjCod, pesCod)));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteProjetos(Long prjCod) {
-        projetosRepository.delete(projetosRepository.findById(prjCod)
-                .orElseThrow(() -> new ResponseStatusException (HttpStatus.NOT_FOUND)));
-    }
 
+        List<ObjetivosModel> objetivosModelList = objetivosRepository.findByProjetosModel_PrjCod(prjCod);
+
+        for (ObjetivosModel o: objetivosModelList){
+            deleteObjetivos(o.getObjCod());
+        }
+
+        projetosRepository.deleteById(prjCod);
+    }
 
     /*
      *
@@ -115,222 +129,81 @@ public class PlanejamentoEstrategicoService {
      *
      */
 
-
-    public List<ObjetivosDTOResponse> findObjetivosByProjetos(Long prjCod){
-        List<ObjetivosModel> objetivosModelList = objetivosRepository.findByProjetosModel_PrjCod(prjCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        List<ObjetivosDTOResponse> objetivosDTOResponses = new ArrayList<>();
-
-        for (ObjetivosModel o : objetivosModelList){
-            objetivosDTOResponses.add(mapToObjetivosDTO(o));
-        }
-
-        return objetivosDTOResponses;
+    public List<ObjetivosDTO> findObjetivosByProjetos(Long prjCod){
+        return objetivosMapper.toDTOList(objetivosRepository.findByProjetosModel_PrjCod(prjCod));
     }
 
-    public ObjetivosDTOResponse findByObjetivosId(Long objCod){
-        ObjetivosModel objetivosModel = objetivosRepository.findById(objCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        return mapToObjetivosDTO(objetivosModel);
+    public ObjetivosDTO findByObjetivosId(Long objCod){
+        return objetivosMapper.toDTO(objetivosRepository.findById(objCod)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public ObjetivosDTOResponse saveObjetivos(ObjetivosDTORequest objetivosDTORequest, Long prjCod, Long objCod){
-        return mapToObjetivosDTO(objetivosRepository.save(mapToObjetivosModel(objetivosDTORequest, prjCod, objCod)));
+    public ObjetivosDTO saveObjetivos(ObjetivosDTO objetivosDTO, Long prjCod, Long objCod){
+        return objetivosMapper.toDTO(objetivosRepository.save(objetivosMapper.toModel(objetivosDTO, objCod, prjCod)));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteObjetivos(Long objCod){
-        objetivosRepository.delete(objetivosRepository
-                .findById(objCod).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+
+        List<TarefasModel> tarefasModelList = tarefasRepository.findByObjetivosModel_ObjCod(objCod);
+
+        for (TarefasModel t: tarefasModelList){
+            deleteTarefas(t.getTrfCod());
+        }
+
+        objetivosRepository.deleteById(objCod);
     }
 
     /*
-    *
-    *Tarefas
-    *
-    */
+     *
+     * Tarefas
+     *
+     */
 
-    public List<TarefasDTOResponse> findTarefasByObjetivos(Long objCod){
-        List<TarefasModel> tarefasModelList = tarefasRepository.findByObjetivosModel_ObjCod(objCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        List<TarefasDTOResponse> tarefasDTOResponses = new ArrayList<>();
-
-        for(TarefasModel t: tarefasModelList){
-            tarefasDTOResponses.add(mapToTarefasDTO(t));
-        }
-
-        return tarefasDTOResponses;
+    public List<TarefasDTO> findTarefasByObjetivos(Long objCod){
+        return tarefasMapper.toDTOList(tarefasRepository.findByObjetivosModel_ObjCod(objCod));
     }
 
-    public TarefasDTOResponse findByTarefaId(Long trfCod){
-        TarefasModel tarefasModel = tarefasRepository.findById(trfCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        return mapToTarefasDTO(tarefasModel);
+    public TarefasDTO findByTarefaId(Long trfCod){
+        return tarefasMapper.toDTO(tarefasRepository.findById(trfCod)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public TarefasDTOResponse saveTarefas(TarefasDTORequest tarefasDTORequest, Long objCod, Long trfCod){
-        return mapToTarefasDTO(tarefasRepository.save(mapToTarefasModel(tarefasDTORequest, objCod, trfCod)));
+    public TarefasDTO saveTarefas(TarefasDTO tarefasDTO, Long objCod, Long trfCod){
+        return tarefasMapper.toDTO(tarefasRepository.save(tarefasMapper.toModel(tarefasDTO, trfCod, objCod)));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteTarefas(Long trfCod){
-        tarefasRepository.delete(tarefasRepository.findById(trfCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        evidenciasRepository.deleteByTarefasModel_TrfCod(trfCod);
+        tarefasRepository.deleteById(trfCod);
     }
 
     /*
-    *
-    * Evidências
-    *
-    */
+     *
+     * Evidências
+     *
+     */
 
-    public List<EvidenciasDTOResponse> findEvidenciasByTarefas(Long trfCod){
-        List<EvidenciasModel> evidenciasModelList = evidenciasRepository.findByTarefasModel_TrfCod(trfCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        List<EvidenciasDTOResponse> evidenciasDTOS = new ArrayList<>();
-
-        for (EvidenciasModel e : evidenciasModelList){
-            evidenciasDTOS.add(mapToEvidenciasDTO(e));
-        }
-
-        return evidenciasDTOS;
+    public List<EvidenciasDTO> findEvidenciasByTarefas(Long trfCod){
+        return evidenciasMapper.toDTOList(evidenciasRepository.findByTarefasModel_TrfCod(trfCod)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
-    public EvidenciasDTOResponse findByEvidenciaId(Long evdCod){
-        EvidenciasModel evidenciasModel = evidenciasRepository.findById(evdCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        return mapToEvidenciasDTO(evidenciasModel);
+    public EvidenciasDTO findByEvidenciaId(Long evdCod){
+        return evidenciasMapper.toDTO(evidenciasRepository.findById(evdCod)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
-    public EvidenciasDTOResponse saveEvidencia(EvidenciasDTORequest evidenciasDTORequest, Long evdCod){
-        return mapToEvidenciasDTO(evidenciasRepository.save(mapToEvidenciasModel(evidenciasDTORequest, evdCod)));
+    @Transactional(rollbackFor = Exception.class)
+    public EvidenciasDTO saveEvidencia(EvidenciasDTO evidenciasDTO, Long evdCod){
+        return evidenciasMapper.toDTO(evidenciasRepository.save(evidenciasMapper.toModel(evidenciasDTO, evdCod)));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void deleteEvidencia(Long evdCod){
         evidenciasRepository.deleteById(evdCod);
-    }
-
-    /*
-    *
-    * Model para DTO, e vice-versa
-    *
-    */
-
-    private PlanejamentoEstrategicoDTOResponse mapToPlanoAnualIntegradoDTO(PlanejamentoEstrategicoModel planejamentoEstrategicoModel){
-        return new PlanejamentoEstrategicoDTOResponse(planejamentoEstrategicoModel.getPesCod(),
-                                             planejamentoEstrategicoModel.getNome(),
-                                             planejamentoEstrategicoModel.getDataInicio(),
-                                             planejamentoEstrategicoModel.getDataTermino());
-    }
-
-    public PlanejamentoEstrategicoModel mapToPlanosAnuaisIntegradosModel(PlanejamentoEstrategicoDTORequest planejamentoEstrategicoDTORequest, Long pesCod){
-        PlanejamentoEstrategicoModel planejamentoEstrategicoModel = new PlanejamentoEstrategicoModel();
-
-        planejamentoEstrategicoModel.setPesCod(pesCod);
-        planejamentoEstrategicoModel.setNome(planejamentoEstrategicoDTORequest.nome());
-        planejamentoEstrategicoModel.setDataInicio(planejamentoEstrategicoDTORequest.dataInicio());
-        planejamentoEstrategicoModel.setDataTermino(planejamentoEstrategicoDTORequest.dataTermino());
-
-        return planejamentoEstrategicoModel;
-    }
-
-    private ProjetosDTOResponse mapToProjetosDTO(ProjetosModel projetosModel){
-        return new ProjetosDTOResponse(projetosModel.getPrjCod(),
-                               projetosModel.getNome(),
-                               projetosModel.getDataInicio(),
-                               projetosModel.getDataTermino(),
-                               projetosModel.getPlanejamentoEstrategicoModel().getPesCod());
-    }
-
-    public ProjetosModel mapToProjetosModel(ProjetosDTORequest projetosDTORequest, Long pesCod, Long prjCod) {
-        ProjetosModel projetosModel = new ProjetosModel();
-
-        projetosModel.setPrjCod(prjCod);
-        projetosModel.setNome(projetosDTORequest.nome());
-        projetosModel.setDataInicio(projetosDTORequest.dataInicio());
-        projetosModel.setDataTermino(projetosDTORequest.dataTermino());
-
-        projetosModel.setPlanejamentoEstrategicoModel(planejamentoEstrategicoRepository
-                .findById(pesCod).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-
-        return projetosModel;
-    }
-
-    public ObjetivosDTOResponse mapToObjetivosDTO (ObjetivosModel objetivosModel){
-        return new ObjetivosDTOResponse(objetivosModel.getObjCod(),
-                                objetivosModel.getNome(),
-                                objetivosModel.getDataInicio(),
-                                objetivosModel.getDataTermino(),
-                                objetivosModel.getProjetosModel().getPrjCod());
-    }
-
-    public ObjetivosModel mapToObjetivosModel(ObjetivosDTORequest objetivosDTORequest, Long prjCod, Long objCod){
-        ObjetivosModel objetivosModel = new ObjetivosModel();
-
-        objetivosModel.setObjCod(objCod);
-        objetivosModel.setNome(objetivosDTORequest.nome());
-        objetivosModel.setDataInicio(objetivosDTORequest.dataInicio());
-        objetivosModel.setDataTermino(objetivosDTORequest.dataTermino());
-
-        objetivosModel.setProjetosModel(projetosRepository
-                .findById(prjCod).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-
-        return objetivosModel;
-    }
-
-    public TarefasDTOResponse mapToTarefasDTO (TarefasModel tarefasModel){
-        return new TarefasDTOResponse(tarefasModel.getTrfCod(),
-                              tarefasModel.getNome(),
-                              tarefasModel.getDataInicio(),
-                              tarefasModel.getDataTermino(),
-                              tarefasModel.getESituacaoTarefa(),
-                              tarefasModel.getObjetivosModel().getObjCod(),
-                              tarefasModel.getPessoasModel().getPessoaCod());
-    }
-
-    public TarefasModel mapToTarefasModel (TarefasDTORequest tarefasDTORequest, Long objCod, Long trfCod){
-        TarefasModel tarefasModel = new TarefasModel();
-
-        tarefasModel.setTrfCod(trfCod);
-        tarefasModel.setNome(tarefasDTORequest.nome());
-        tarefasModel.setDataInicio(tarefasDTORequest.dataInicio());
-        tarefasModel.setDataTermino(tarefasDTORequest.dataTermino());
-        tarefasModel.setESituacaoTarefa(tarefasDTORequest.eSituacaoTarefa());
-
-        tarefasModel.setObjetivosModel(objetivosRepository.findById(objCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-
-        tarefasModel.setPessoasModel(pessoasRepository.findById(tarefasDTORequest.respCod())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-
-        return tarefasModel;
-    }
-
-        public EvidenciasDTOResponse mapToEvidenciasDTO (EvidenciasModel evidenciasModel){
-        return new EvidenciasDTOResponse(evidenciasModel.getEvdCod(),
-                                 evidenciasModel.getDescricao(),
-                                 evidenciasModel.getCaminhoArquivo(),
-                                 evidenciasModel.getTarefasModel().getTrfCod());
-    }
-
-    public EvidenciasModel mapToEvidenciasModel (EvidenciasDTORequest evidenciasDTORequest, Long evdCod){
-        EvidenciasModel evidenciasModel = new EvidenciasModel();
-
-        evidenciasModel.setEvdCod(evdCod);
-        evidenciasModel.setDescricao(evidenciasDTORequest.descricao());
-        evidenciasModel.setCaminhoArquivo(evidenciasDTORequest.caminhoArquivo());
-
-        evidenciasModel.setTarefasModel(tarefasRepository.findById(evidenciasDTORequest.trfCod())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-
-        return evidenciasModel;
     }
 }
