@@ -19,9 +19,15 @@ public class TenantFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
-            String tenant = request.getHeader(TENANT_HEADER);
-            if (tenant != null && !tenant.isBlank()) {
-                TenantContext.set(tenant);
+            // O JwtAuthenticationFilter (dentro do SecurityFilterChain) roda antes
+            // e popula TenantContext via claim. Só usamos o header como fallback
+            // para chamadas não-autenticadas (login/cadastro).
+
+            if(TenantContext.get() == null) {
+                String tenant = request.getHeader(TENANT_HEADER);
+                if (tenant != null && !tenant.isBlank()) {
+                    TenantContext.set(tenant);
+                }
             }
             filterChain.doFilter(request, response);
         } finally {

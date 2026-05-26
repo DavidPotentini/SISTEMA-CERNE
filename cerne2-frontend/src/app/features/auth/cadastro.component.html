@@ -1,0 +1,86 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <header class="auth-header">
+      <h1>CERNE</h1>
+      <p>Criar conta</p>
+    </header>
+
+    <div class="modo-switch">
+      <button
+        type="button"
+        class="modo"
+        [class.ativa]="modo === 'nova'"
+        (click)="selecionarModo('nova')"
+      >Nova empresa</button>
+      <button
+        type="button"
+        class="modo"
+        [class.ativa]="modo === 'existente'"
+        (click)="selecionarModo('existente')"
+      >Empresa existente</button>
+    </div>
+
+    <form (ngSubmit)="cadastrar()">
+      <ng-container *ngIf="modo === 'nova'">
+        <div class="form-group">
+          <label for="nome">Nome</label>
+          <input id="nome" type="text" name="nome" [(ngModel)]="nome" required>
+        </div>
+
+        <div class="form-group">
+          <label for="cpf">CPF</label>
+          <input
+            id="cpf"
+            type="text"
+            name="cpf"
+            [(ngModel)]="cpf"
+            maxlength="11"
+            placeholder="Somente números"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="nomeEmpresa">Nome da empresa</label>
+          <input id="nomeEmpresa" type="text" name="nomeEmpresa" [(ngModel)]="nomeEmpresa" required>
+        </div>
+      </ng-container>
+
+      <div class="form-group" *ngIf="modo === 'existente'">
+        <label for="empresa">Empresa</label>
+        <select id="empresa" name="empresa" [(ngModel)]="tntCod" required>
+          <option [ngValue]="null" disabled>Selecione a empresa</option>
+          <option *ngFor="let e of empresas" [ngValue]="e.tntCod">{{ e.nomeEmpresa }}</option>
+        </select>
+        <small class="hint">Seu e-mail já deve estar cadastrado na empresa.</small>
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input id="email" type="email" name="email" [(ngModel)]="email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input id="senha" type="password" name="senha" [(ngModel)]="senha" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="carregando">
+        {{ carregando ? 'Enviando...' : 'Cadastrar' }}
+      </button>
+    </form>
+
+    <p class="auth-foot">
+      Já tem conta? <a routerLink="/login">Entrar</a>
+    </p>
+  </div>
+
+  <div
+    class="toast"
+    *ngIf="toast"
+    [class.toast-sucesso]="toast.tipo === 'sucesso'"
+    [class.toast-erro]="toast.tipo === 'erro'"
+  >
+    {{ toast.texto }}
+  </div>
+</div>

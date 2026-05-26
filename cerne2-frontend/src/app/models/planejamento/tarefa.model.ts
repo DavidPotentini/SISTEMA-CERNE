@@ -8,4 +8,6 @@ export interface TarefaDTO {
   eSituacaoTarefa: ESituacaoTarefa;
   objCod: number | null;
   respCod: number | null;
+  pontuacao: number | null;
+  observacao: string | null;
 }

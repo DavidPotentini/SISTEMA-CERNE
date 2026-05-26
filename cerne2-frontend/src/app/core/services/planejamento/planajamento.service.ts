@@ -11,25 +11,30 @@ import { EvidenciaDTO } from '../../../models/planejamento/evidencia.model';
 
 @Injectable({ providedIn: 'root' })
 export class PlanejamentoService {
-  private base = 'http://localhost:8080/planosAnuaisIntegrados';
+  private host = 'http://localhost:8080';
+  private base = `${this.host}/planejamento`;
 
   constructor(private http: HttpClient) {}
 
+  private planejamentoUrl(incCod?: number | null): string {
+    return incCod ? `${this.host}/${incCod}/planejamento` : this.base;
+  }
+
   // Planos
-  findAll(): Observable<PlanejamentoDTO[]> {
-    return this.http.get<PlanejamentoDTO[]>(this.base);
+  findAll(incCod?: number | null): Observable<PlanejamentoDTO[]> {
+    return this.http.get<PlanejamentoDTO[]>(this.planejamentoUrl(incCod));
   }
-  findById(pesCod: number): Observable<PlanejamentoDTO> {
-    return this.http.get<PlanejamentoDTO>(`${this.base}/${pesCod}`);
+  findById(pesCod: number, incCod?: number | null): Observable<PlanejamentoDTO> {
+    return this.http.get<PlanejamentoDTO>(`${this.planejamentoUrl(incCod)}/${pesCod}`);
   }
-  save(body: PlanejamentoDTO): Observable<PlanejamentoDTO> {
-    return this.http.post<PlanejamentoDTO>(this.base, body);
+  save(body: PlanejamentoDTO, incCod?: number | null): Observable<PlanejamentoDTO> {
+    return this.http.post<PlanejamentoDTO>(this.planejamentoUrl(incCod), body);
   }
-  update(pesCod: number, body: PlanejamentoDTO): Observable<PlanejamentoDTO> {
-    return this.http.put<PlanejamentoDTO>(`${this.base}/${pesCod}`, body);
+  update(pesCod: number, body: PlanejamentoDTO, incCod?: number | null): Observable<PlanejamentoDTO> {
+    return this.http.put<PlanejamentoDTO>(`${this.planejamentoUrl(incCod)}/${pesCod}`, body);
   }
-  delete(pesCod: number): Observable<void> {
-    return this.http.delete<void>(`${this.base}/${pesCod}`);
+  delete(pesCod: number, incCod?: number | null): Observable<void> {
+    return this.http.delete<void>(`${this.planejamentoUrl(incCod)}/${pesCod}`);
   }
 
   // Projetos
@@ -81,6 +86,19 @@ export class PlanejamentoService {
   }
   deleteTarefa(pesCod: number, prjCod: number, objCod: number,trfCod:number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas/${trfCod}`);
+  }
+  avaliarTarefa(
+    incCod: number,
+    pesCod: number,
+    prjCod: number,
+    objCod: number,
+    trfCod: number,
+    body: { pontuacao: number | null; observacao: string | null },
+  ): Observable<TarefaDTO> {
+    return this.http.patch<TarefaDTO>(
+      `${this.host}/${incCod}/planejamento/${pesCod}/projetos/${prjCod}/objetivos/${objCod}/tarefas/${trfCod}/avaliacao`,
+      body,
+    );
   }
 
   // Evidências

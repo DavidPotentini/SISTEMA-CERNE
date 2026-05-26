@@ -16,6 +16,8 @@ export class ProjetoDetalheComponent implements OnInit, OnDestroy {
   form: ProjetoDTO = this.formVazio();
   pesCod = 0;
   prjCod = 0;
+  incCod: number | null = null;
+  modoAvaliacao = false;
   isNovo = true;
   toast: { texto: string; tipo: 'sucesso' | 'erro' } | null = null;
 
@@ -29,7 +31,10 @@ export class ProjetoDetalheComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.modoAvaliacao = !!this.route.snapshot.data['modoAvaliacao'];
     this.route.paramMap.subscribe(params => {
+      const inc = params.get('incCod');
+      this.incCod = inc ? Number(inc) : null;
       this.pesCod = Number(params.get('pesCod'));
       const cod = params.get('prjCod');
       this.isNovo = !cod || cod === 'novo';
@@ -51,14 +56,26 @@ export class ProjetoDetalheComponent implements OnInit, OnDestroy {
     if (this.toastTimer) clearTimeout(this.toastTimer);
   }
 
+  private prefixo(): unknown[] {
+    if (this.modoAvaliacao && this.incCod != null)
+      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+    return ['/planejamento'];
+  }
+
+  private caminhoProjetos(): unknown[] {
+    return [...this.prefixo(), this.pesCod, 'projetos'];
+  }
+
   salvar() {
+    if (this.modoAvaliacao) return;
     if (this.isNovo) {
       this.service.saveProjeto(this.pesCod, this.form).subscribe({
         next: data => {
           this.isNovo = false;
           this.prjCod = data.prjCod!;
           this.mostrarToast('Projeto criado com sucesso!', 'sucesso');
-          this.router.navigate(['/', this.pesCod, 'projetos', data.prjCod], { replaceUrl: true });
+          this.router.navigate([...this.caminhoProjetos(), data.prjCod], { replaceUrl: true });
         },
         error: () => this.mostrarToast('Erro ao criar o projeto.', 'erro'),
       });
@@ -71,11 +88,12 @@ export class ProjetoDetalheComponent implements OnInit, OnDestroy {
   }
 
   deletar() {
+    if (this.modoAvaliacao) return;
     this.service.deleteProjeto(this.pesCod, this.prjCod).subscribe(() => this.voltar());
   }
 
   voltar() {
-    this.router.navigate(['/', this.pesCod, 'projetos']);
+    this.router.navigate(this.caminhoProjetos());
   }
 
   private mostrarToast(texto: string, tipo: 'sucesso' | 'erro') {

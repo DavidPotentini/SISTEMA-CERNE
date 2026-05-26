@@ -16,6 +16,8 @@ export class ObjetivoComponent implements OnInit {
   projetoNome = '';
   pesCod = 0;
   prjCod = 0;
+  incCod: number | null = null;
+  modoAvaliacao = false;
   erroCarregamento: string | null = null;
 
   constructor(
@@ -26,8 +28,13 @@ export class ObjetivoComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.pesCod = Number(this.route.snapshot.paramMap.get('pesCod'));
-    this.prjCod = Number(this.route.snapshot.paramMap.get('prjCod'));
+    this.modoAvaliacao = !!this.route.snapshot.data['modoAvaliacao'];
+    const params = this.route.snapshot.paramMap;
+    const inc = params.get('incCod');
+    this.incCod = inc ? Number(inc) : null;
+    this.pesCod = Number(params.get('pesCod'));
+    this.prjCod = Number(params.get('prjCod'));
+
     this.service.findObjetivos(this.pesCod, this.prjCod).subscribe({
       next: data => { this.objetivos = data; this.cdr.detectChanges(); },
       error: err => { this.erroCarregamento = `Erro ao carregar objetivos: ${err.message ?? err.status ?? 'desconhecido'}`; this.cdr.detectChanges(); },
@@ -35,16 +42,31 @@ export class ObjetivoComponent implements OnInit {
     this.service.findByProjetoId(this.pesCod, this.prjCod).subscribe(data => { this.projetoNome = data.nome; this.cdr.detectChanges(); });
   }
 
+  private prefixo(): unknown[] {
+    if (this.modoAvaliacao && this.incCod != null)
+      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+    return ['/planejamento'];
+  }
+
+  private caminhoObjetivos(): unknown[] {
+    return [...this.prefixo(), this.pesCod, 'projetos', this.prjCod, 'objetivos'];
+  }
+
+  private caminhoProjetos(): unknown[] {
+    return [...this.prefixo(), this.pesCod, 'projetos'];
+  }
+
   novo() {
-    this.router.navigate(['/', this.pesCod, 'projetos', this.prjCod, 'objetivos', 'novo']);
+    this.router.navigate([...this.caminhoObjetivos(), 'novo']);
   }
 
   editar(objCod: number) {
-    this.router.navigate(['/', this.pesCod, 'projetos', this.prjCod, 'objetivos', objCod]);
+    this.router.navigate([...this.caminhoObjetivos(), objCod]);
   }
 
   abrirTarefas(objCod: number) {
-    this.router.navigate(['/', this.pesCod, 'projetos', this.prjCod, 'objetivos', objCod, 'tarefas']);
+    this.router.navigate([...this.caminhoObjetivos(), objCod, 'tarefas']);
   }
 
   deletar(objCod: number) {
@@ -55,6 +77,6 @@ export class ObjetivoComponent implements OnInit {
   }
 
   voltar() {
-    this.router.navigate(['/', this.pesCod, 'projetos']);
+    this.router.navigate(this.caminhoProjetos());
   }
 }

@@ -11,13 +11,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PlanejamentoService } from '../../../../core/services/planejamento/planajamento.service';
 import { EvidenciaDTO } from '../../../../models/planejamento/evidencia.model';
+import { AnexosComponent } from '../../../shared/anexos/anexos.component';
 
 @Component({
   selector: 'app-evidencias',
   templateUrl: 'evidencias.component.html',
   styleUrls: ['evidencias.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AnexosComponent],
 })
 export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
   @Input() pesCod = 0;
@@ -27,6 +28,7 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
 
   evidencias: EvidenciaDTO[] = [];
   modalAberto = false;
+  anexosDe: EvidenciaDTO | null = null;
   form: EvidenciaDTO = this.formVazio();
   editandoCod: number | null = null;
   toast: { texto: string; tipo: 'sucesso' | 'erro' } | null = null;
@@ -77,7 +79,6 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
     this.form = {
       evdCod: e.evdCod,
       descricao: e.descricao,
-      caminhoArquivo: e.caminhoArquivo,
       trfCod: this.trfCod,
     };
     this.modalAberto = true;
@@ -88,6 +89,32 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
     this.modalAberto = false;
     this.editandoCod = null;
     this.cdr.detectChanges();
+  }
+
+  abrirAnexos(e: EvidenciaDTO) {
+    this.anexosDe = e;
+    this.cdr.detectChanges();
+  }
+
+  fecharAnexos() {
+    this.anexosDe = null;
+    this.cdr.detectChanges();
+  }
+
+  arquivosUrlEvidencia(evdCod: number): string {
+    return this.evidenciaBase(evdCod) + '/arquivos';
+  }
+
+  arquivoBaseUrlEvidencia(evdCod: number): string {
+    return this.evidenciaBase(evdCod) + '/arquivos';
+  }
+
+  private evidenciaBase(evdCod: number): string {
+    const base = 'http://localhost:8080/planejamento';
+    return (
+      `${base}/${this.pesCod}/projetos/${this.prjCod}/objetivos/${this.objCod}` +
+      `/tarefas/${this.trfCod}/evidencias/${evdCod}`
+    );
   }
 
   salvar() {
@@ -149,6 +176,6 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private formVazio(): EvidenciaDTO {
-    return { evdCod: null, descricao: '', caminhoArquivo: '', trfCod: this.trfCod };
+    return { evdCod: null, descricao: '', trfCod: this.trfCod };
   }
 }

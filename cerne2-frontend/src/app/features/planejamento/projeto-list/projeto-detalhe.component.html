@@ -5,27 +5,27 @@
 <div class="container">
   <header class="page-header">
     <button type="button" class="btn-back" (click)="voltar()">← Projetos</button>
-    <h1>{{ isNovo ? 'Novo Projeto' : 'Editar Projeto' }}</h1>
+    <h1>{{ modoAvaliacao ? 'Projeto' : (isNovo ? 'Novo Projeto' : 'Editar Projeto') }}</h1>
   </header>
 
   <form class="form-card" (ngSubmit)="salvar()">
     <div class="form-group">
       <label for="nome">Nome</label>
-      <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" placeholder="Nome do projeto" required>
+      <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" placeholder="Nome do projeto" required [readonly]="modoAvaliacao">
     </div>
 
     <div class="form-row">
       <div class="form-group">
         <label for="dataInicio">Data de Início</label>
-        <input id="dataInicio" type="date" [(ngModel)]="form.dataInicio" name="dataInicio" required>
+        <input id="dataInicio" type="date" [(ngModel)]="form.dataInicio" name="dataInicio" required [readonly]="modoAvaliacao">
       </div>
       <div class="form-group">
         <label for="dataTermino">Data de Término</label>
-        <input id="dataTermino" type="date" [(ngModel)]="form.dataTermino" name="dataTermino" required>
+        <input id="dataTermino" type="date" [(ngModel)]="form.dataTermino" name="dataTermino" required [readonly]="modoAvaliacao">
       </div>
     </div>
 
-    <div class="form-actions">
+    <div class="form-actions" *ngIf="!modoAvaliacao">
       <button type="submit" class="btn btn-success">{{ isNovo ? 'Salvar' : 'Atualizar' }}</button>
       <button *ngIf="!isNovo" type="button" class="btn btn-danger" (click)="deletar()">Excluir</button>
     </div>

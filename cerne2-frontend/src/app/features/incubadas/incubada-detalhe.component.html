@@ -34,10 +34,17 @@
       (click)="selecionarAba('pessoas')"
       [title]="isNovo ? 'Salve a incubada para ver as pessoas' : ''"
     >Pessoas</button>
+    <button
+      type="button"
+      class="aba"
+      [disabled]="isNovo"
+      (click)="abrirMonitoramento()"
+      [title]="isNovo ? 'Salve a incubada para acessar o monitoramento' : ''"
+    >Monitoramento</button>
   </nav>
 
   <form
-    *ngIf="abaAtiva !== 'pessoas'"
+    *ngIf="abaAtiva === 'geral' || abaAtiva === 'endereco'"
     class="form-card"
     (ngSubmit)="salvar()"
   >
@@ -85,14 +92,12 @@
         ></textarea>
       </div>
 
-      <div class="form-group">
-        <label for="documentacao">Documentação</label>
-        <textarea
-          id="documentacao"
-          [(ngModel)]="form.documentacao"
-          name="documentacao"
-          rows="3"
-        ></textarea>
+      <div class="form-group" *ngIf="!isNovo">
+        <label>Documentação</label>
+        <app-anexos
+          [arquivosUrl]="arquivosUrl"
+          [arquivoBaseUrl]="arquivosUrl"
+        />
       </div>
     </ng-container>
 

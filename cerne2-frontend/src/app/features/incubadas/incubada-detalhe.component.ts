@@ -6,6 +6,7 @@ import { IncubadasService } from '../../core/services/incubadas/incubadas.servic
 import { IncubadaDTO } from '../../models/incubadas/incubada.model';
 import { EStatusIncubacao } from '../../enums/status-incubacao.enum';
 import { PessoasAbaComponent } from './abas/pessoas-aba.component';
+import { AnexosComponent } from '../shared/anexos/anexos.component';
 import { CepService } from '../../core/services/cep/cep.service';
 
 type Aba = 'geral' | 'endereco' | 'pessoas';
@@ -15,7 +16,7 @@ type Aba = 'geral' | 'endereco' | 'pessoas';
   templateUrl: 'incubada-detalhe.component.html',
   styleUrls: ['incubada-detalhe.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, PessoasAbaComponent],
+  imports: [CommonModule, FormsModule, PessoasAbaComponent, AnexosComponent],
 })
 export class IncubadaDetalheComponent implements OnInit, OnDestroy {
   form: IncubadaDTO = this.formVazio();
@@ -84,6 +85,10 @@ export class IncubadaDetalheComponent implements OnInit, OnDestroy {
     this.abaAtiva = a;
   }
 
+  get arquivosUrl(): string {
+    return `http://localhost:8080/gerenciaIncubadas/${this.incCod}/arquivos`;
+  }
+
   salvar() {
     if (this.isNovo) {
       this.service.save(this.form).subscribe({
@@ -110,6 +115,11 @@ export class IncubadaDetalheComponent implements OnInit, OnDestroy {
 
   voltar() {
     this.router.navigate(['/incubadas']);
+  }
+
+  abrirMonitoramento() {
+    if (this.isNovo) return;
+    this.router.navigate(['/gerenciaIncubadas', this.incCod, 'planejamento']);
   }
 
   buscarCep() {

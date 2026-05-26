@@ -1,0 +1,34 @@
+<section class="anexos">
+  <header class="anexos-header">
+    <h2>Anexos</h2>
+    <label class="btn btn-primary" [class.disabled]="enviando">
+      {{ enviando ? 'Enviando...' : '+ Adicionar arquivo' }}
+      <input type="file" hidden (change)="selecionarArquivo($event)" [disabled]="enviando">
+    </label>
+  </header>
+
+  <p *ngIf="carregando" class="vazio">Carregando...</p>
+  <p *ngIf="!carregando && arquivos.length === 0" class="vazio">Nenhum arquivo anexado.</p>
+
+  <ul class="anexos-list" *ngIf="!carregando && arquivos.length > 0">
+    <li *ngFor="let a of arquivos" class="anexo-item">
+      <div class="anexo-info">
+        <strong class="nome">{{ a.nomeOriginal }}</strong>
+        <span class="meta">{{ formatarTamanho(a.tamanhoType) }}</span>
+      </div>
+      <div class="anexo-acoes">
+        <button type="button" class="btn-link" (click)="baixar(a)">Baixar</button>
+        <button type="button" class="btn-link btn-link-danger" (click)="excluir(a)">Excluir</button>
+      </div>
+    </li>
+  </ul>
+
+  <div
+    class="toast"
+    *ngIf="toast"
+    [class.toast-sucesso]="toast.tipo === 'sucesso'"
+    [class.toast-erro]="toast.tipo === 'erro'"
+  >
+    {{ toast.texto }}
+  </div>
+</section>

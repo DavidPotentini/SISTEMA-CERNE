@@ -1,24 +1,37 @@
 package com.github.davidpotentini.cerne2.service.planejamentoestrategico;
 
+import com.github.davidpotentini.cerne2.dto.arquivo.ArquivoDTO;
+import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.AvaliacaoTarefaDTO;
 import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.EvidenciasDTO;
 import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.ObjetivosDTO;
 import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.PlanejamentoEstrategicoDTO;
 import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.ProjetosDTO;
 import com.github.davidpotentini.cerne2.dto.planejamentoestrategico.TarefasDTO;
+import com.github.davidpotentini.cerne2.mapper.arquivo.ArquivosMapper;
 import com.github.davidpotentini.cerne2.mapper.planejamentoestrategico.EvidenciasMapper;
 import com.github.davidpotentini.cerne2.mapper.planejamentoestrategico.ObjetivosMapper;
 import com.github.davidpotentini.cerne2.mapper.planejamentoestrategico.PlanejamentoEstrategicoMapper;
 import com.github.davidpotentini.cerne2.mapper.planejamentoestrategico.ProjetosMapper;
 import com.github.davidpotentini.cerne2.mapper.planejamentoestrategico.TarefasMapper;
+import com.github.davidpotentini.cerne2.models.arquivo.ArquivosEvidenciasModel;
+import com.github.davidpotentini.cerne2.models.arquivo.ArquivosIncubadasModel;
+import com.github.davidpotentini.cerne2.models.arquivo.ArquivosModel;
+import com.github.davidpotentini.cerne2.models.arquivo.ids.ArquivosEvidenciasId;
+import com.github.davidpotentini.cerne2.models.arquivo.ids.ArquivosIcubadasId;
+import com.github.davidpotentini.cerne2.models.planejamentoestrategico.EvidenciasModel;
 import com.github.davidpotentini.cerne2.models.planejamentoestrategico.ObjetivosModel;
 import com.github.davidpotentini.cerne2.models.planejamentoestrategico.ProjetosModel;
 import com.github.davidpotentini.cerne2.models.planejamentoestrategico.TarefasModel;
+import com.github.davidpotentini.cerne2.repository.arquivo.ArquivosEvidenciasRepository;
 import com.github.davidpotentini.cerne2.repository.planejamentoestrategico.*;
+import com.github.davidpotentini.cerne2.service.arquivos.ArquivoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +48,9 @@ public class PlanejamentoEstrategicoService {
     private final ObjetivosMapper objetivosMapper;
     private final TarefasMapper tarefasMapper;
     private final EvidenciasMapper evidenciasMapper;
+    private final ArquivosEvidenciasRepository arquivosEvidenciasRepository;
+    private final ArquivosMapper arquivosMapper;
+    private final ArquivoService arquivoService;
 
     public PlanejamentoEstrategicoService(PlanejamentoEstrategicoRepository planejamentoEstrategicoRepository,
                                           ProjetosRepository projetosRepository,
@@ -45,7 +61,9 @@ public class PlanejamentoEstrategicoService {
                                           ProjetosMapper projetosMapper,
                                           ObjetivosMapper objetivosMapper,
                                           TarefasMapper tarefasMapper,
-                                          EvidenciasMapper evidenciasMapper) {
+                                          ArquivosEvidenciasRepository arquivosEvidenciasRepository,
+                                          EvidenciasMapper evidenciasMapper, ArquivosMapper arquivosMapper,
+                                          ArquivoService arquivoService) {
         this.planejamentoEstrategicoRepository = planejamentoEstrategicoRepository;
         this.projetosRepository = projetosRepository;
         this.objetivosRepository = objetivosRepository;
@@ -56,16 +74,22 @@ public class PlanejamentoEstrategicoService {
         this.objetivosMapper = objetivosMapper;
         this.tarefasMapper = tarefasMapper;
         this.evidenciasMapper = evidenciasMapper;
+        this.arquivosEvidenciasRepository = arquivosEvidenciasRepository;
+        this.arquivosMapper = arquivosMapper;
+        this.arquivoService = arquivoService;
     }
 
     /*
      *
-     * Planos Anuais Integrados
+     * Planejamento Estratégico
      *
      */
 
-    public List<PlanejamentoEstrategicoDTO> findList(){
-        return planejamentoEstrategicoMapper.toDTOList(planejamentoEstrategicoRepository.findAll());
+    public List<PlanejamentoEstrategicoDTO> findList(Long incCod){
+        if (incCod != null){
+            return findByIncCod(incCod);
+        }
+        return planejamentoEstrategicoMapper.toDTOList(planejamentoEstrategicoRepository.findByIncubadora());
     }
 
     public PlanejamentoEstrategicoDTO findById (Long pesCod){
@@ -74,9 +98,13 @@ public class PlanejamentoEstrategicoService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public PlanejamentoEstrategicoDTO save (PlanejamentoEstrategicoDTO planejamentoEstrategicoDTO, Long pesCod){
+    public PlanejamentoEstrategicoDTO save (PlanejamentoEstrategicoDTO planejamentoEstrategicoDTO, Long pesCod, Long incCod){
+        if (incCod != null){
+
+        }
+
         return planejamentoEstrategicoMapper.toDTO(planejamentoEstrategicoRepository
-                .save(planejamentoEstrategicoMapper.toModel(planejamentoEstrategicoDTO, pesCod)));
+                .save(planejamentoEstrategicoMapper.toModel(planejamentoEstrategicoDTO, pesCod, incCod)));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -89,6 +117,16 @@ public class PlanejamentoEstrategicoService {
         }
 
         planejamentoEstrategicoRepository.deleteById(pesCod);
+    }
+
+    /*
+    *
+    * Planejamento Estratégico - Incubadas
+    *
+    */
+
+    private List<PlanejamentoEstrategicoDTO> findByIncCod(Long incCod){
+        return planejamentoEstrategicoMapper.toDTOList(planejamentoEstrategicoRepository.findByIncubadasModel_IncCod(incCod));
     }
 
     /*
@@ -181,6 +219,17 @@ public class PlanejamentoEstrategicoService {
         tarefasRepository.deleteById(trfCod);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public TarefasDTO avaliarTarefa(Long trfCod, AvaliacaoTarefaDTO avaliacaoTarefaDTO){
+        TarefasModel tarefasModel = tarefasRepository.findById(trfCod)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        tarefasModel.setPontuacao(avaliacaoTarefaDTO.pontuacao());
+        tarefasModel.setObservacao(avaliacaoTarefaDTO.observacao());
+
+        return tarefasMapper.toDTO(tarefasRepository.save(tarefasModel));
+    }
+
     /*
      *
      * Evidências
@@ -206,4 +255,35 @@ public class PlanejamentoEstrategicoService {
     public void deleteEvidencia(Long evdCod){
         evidenciasRepository.deleteById(evdCod);
     }
+
+    public List<ArquivoDTO> findArquivosEvidencias(Long evdCod){
+        List<ArquivosEvidenciasModel> arquivosEvidenciasModelList = arquivosEvidenciasRepository.findByEvidenciasModel_EvdCod(evdCod);
+
+        List<ArquivosModel> arquivosModelList = new ArrayList<>();
+
+        for (ArquivosEvidenciasModel a: arquivosEvidenciasModelList){
+            arquivosModelList.add(arquivoService.findById(a.getArquivosModel().getArqCod()));
+        }
+
+        return arquivosMapper.toDTOList(arquivosModelList);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public ArquivoDTO uploadArquivosEvidencias(MultipartFile multipartFile, Long evdCod){
+        ArquivoDTO arquivoDTO = arquivoService.upload(multipartFile);
+
+        ArquivosModel arquivosModel = arquivoService.findById(arquivoDTO.arqCod());
+        EvidenciasModel evidenciasModel = evidenciasRepository.findById(evdCod)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        ArquivosEvidenciasModel arquivosEvidenciasModel = new ArquivosEvidenciasModel();
+        arquivosEvidenciasModel.setArquivosEvidenciasId(new ArquivosEvidenciasId());
+        arquivosEvidenciasModel.setEvidenciasModel(evidenciasModel);
+        arquivosEvidenciasModel.setArquivosModel(arquivosModel);
+
+        arquivosEvidenciasRepository.save(arquivosEvidenciasModel);
+
+        return arquivoDTO;
+    }
+
 }

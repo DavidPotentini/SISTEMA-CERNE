@@ -3,7 +3,7 @@
 
   <div class="page-header">
     <h1 class="page-title">Objetivos{{ projetoNome ? ' — ' + projetoNome : '' }}</h1>
-    <button class="btn-primary" (click)="novo()">+ Novo Objetivo</button>
+    <button *ngIf="!modoAvaliacao" class="btn-primary" (click)="novo()">+ Novo Objetivo</button>
   </div>
 
   <div class="lista">
@@ -17,7 +17,7 @@
         </div>
         <span class="card-nav">Tarefas →</span>
       </div>
-      <div class="card-actions">
+      <div class="card-actions" *ngIf="!modoAvaliacao">
         <button class="btn-action btn-edit" (click)="editar(o.objCod!)">Editar</button>
         <button class="btn-action btn-delete" (click)="deletar(o.objCod!)">Excluir</button>
       </div>

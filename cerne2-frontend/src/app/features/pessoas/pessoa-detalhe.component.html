@@ -67,6 +67,18 @@
       </select>
     </div>
 
+    <div class="form-group">
+      <label for="incCod">Incubada</label>
+      <select
+        id="incCod"
+        [(ngModel)]="form.incCod"
+        name="incCod"
+      >
+        <option [ngValue]="null">— Nenhuma —</option>
+        <option *ngFor="let i of incubadas" [ngValue]="i.incCod">{{ i.nome }}</option>
+      </select>
+    </div>
+
     <div class="form-actions">
       <button type="submit" class="btn btn-success">
         {{ isNovo ? 'Salvar' : 'Atualizar' }}

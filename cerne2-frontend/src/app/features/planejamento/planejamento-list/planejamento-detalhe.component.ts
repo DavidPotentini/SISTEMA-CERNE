@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PlanejamentoDTO } from '../../../models/planejamento/planejamento.model';
 import { PlanejamentoService } from '../../../core/services/planejamento/planajamento.service';
+import { ETipoEmpreendimento } from '../../../enums/tipo-empreendimento.enum';
 
 @Component({
   selector: 'app-planejamento-detalhe',
@@ -15,6 +16,9 @@ import { PlanejamentoService } from '../../../core/services/planejamento/planaja
 export class PlanejamentoDetalheComponent implements OnInit, OnDestroy {
   form: PlanejamentoDTO = this.formVazio();
   pesCod = 0;
+  incCod: number | null = null;
+  tipoEmpreendimento: ETipoEmpreendimento = ETipoEmpreendimento.INCUBADORA;
+  modoAvaliacao = false;
   isNovo = true;
   toast: { texto: string; tipo: 'sucesso' | 'erro' } | null = null;
 
@@ -28,7 +32,14 @@ export class PlanejamentoDetalheComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.modoAvaliacao = !!this.route.snapshot.data['modoAvaliacao'];
     this.route.paramMap.subscribe(params => {
+      const inc = params.get('incCod');
+      this.incCod = inc ? Number(inc) : null;
+      this.tipoEmpreendimento = this.incCod
+        ? ETipoEmpreendimento.INCUBADA
+        : ETipoEmpreendimento.INCUBADORA;
+
       const cod = params.get('pesCod');
       this.isNovo = !cod || cod === 'novo';
 
@@ -37,7 +48,7 @@ export class PlanejamentoDetalheComponent implements OnInit, OnDestroy {
         this.pesCod = 0;
       } else {
         this.pesCod = Number(cod);
-        this.service.findById(this.pesCod).subscribe(data => {
+        this.service.findById(this.pesCod, this.incCod).subscribe(data => {
           this.form = data;
           this.cdr.detectChanges();
         });
@@ -50,16 +61,19 @@ export class PlanejamentoDetalheComponent implements OnInit, OnDestroy {
   }
 
   salvar() {
+    if (this.modoAvaliacao) return;
+    this.form.vldTipoEmpreendimento = this.tipoEmpreendimento;
+
     if (this.isNovo) {
-      this.service.save(this.form).subscribe({
+      this.service.save(this.form, this.incCod).subscribe({
         next: data => {
           this.mostrarToast('Planejamento criado com sucesso!', 'sucesso');
-          this.router.navigate(['/planejamento', data.pesCod], { replaceUrl: true });
+          this.router.navigate([...this.prefixo(), data.pesCod], { replaceUrl: true });
         },
         error: () => this.mostrarToast('Erro ao criar o planejamento.', 'erro'),
       });
     } else {
-      this.service.update(this.pesCod, this.form).subscribe({
+      this.service.update(this.pesCod, this.form, this.incCod).subscribe({
         next: () => this.mostrarToast('Planejamento atualizado com sucesso!', 'sucesso'),
         error: () => this.mostrarToast('Erro ao atualizar o planejamento.', 'erro'),
       });
@@ -67,11 +81,19 @@ export class PlanejamentoDetalheComponent implements OnInit, OnDestroy {
   }
 
   deletar() {
-    this.service.delete(this.pesCod).subscribe(() => this.router.navigate(['/']));
+    if (this.modoAvaliacao) return;
+    this.service.delete(this.pesCod, this.incCod).subscribe(() => this.voltar());
   }
 
   voltar() {
-    this.router.navigate(['/']);
+    this.router.navigate(this.prefixo());
+  }
+
+  private prefixo(): unknown[] {
+    if (this.modoAvaliacao && this.incCod != null)
+      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+    return ['/planejamento'];
   }
 
   private mostrarToast(texto: string, tipo: 'sucesso' | 'erro') {
@@ -85,6 +107,6 @@ export class PlanejamentoDetalheComponent implements OnInit, OnDestroy {
   }
 
   private formVazio(): PlanejamentoDTO {
-    return { pesCod: null, nome: '', dataInicio: '', dataTermino: '' };
+    return { pesCod: null, nome: '', dataInicio: '', dataTermino: '', vldTipoEmpreendimento: null };
   }
 }

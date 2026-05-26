@@ -4,12 +4,16 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
+
+import static jakarta.transaction.Transactional.TxType.REQUIRES_NEW;
 
 @Service
 public class TenantSchemaProvisioner {
@@ -25,16 +29,18 @@ public class TenantSchemaProvisioner {
         this.resourceLoader = resourceLoader;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void criarSchemaECarregarDDL(String nomeSchema) {
-        if (nomeSchema == null || !SCHEMA_NAME.matcher(nomeSchema).matches()) {
+
+        if (nomeSchema == null || !SCHEMA_NAME.matcher(nomeSchema.toLowerCase()).matches()) {
             throw new IllegalArgumentException("Nome de schema inválido: " + nomeSchema);
         }
 
         String ddl = lerDDL();
 
-        jdbcTemplate.execute("CREATE SCHEMA IF NOT EXISTS \"" + nomeSchema + "\"");
+        jdbcTemplate.execute("CREATE SCHEMA IF NOT EXISTS \"" + nomeSchema.toLowerCase() + "\"");
         try {
-            jdbcTemplate.execute("SET search_path TO \"" + nomeSchema + "\"");
+            jdbcTemplate.execute("SET search_path TO \"" + nomeSchema.toLowerCase() + "\"");
             jdbcTemplate.execute(ddl);
         } finally {
             jdbcTemplate.execute("SET search_path TO public");

@@ -17,6 +17,8 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
   pesCod = 0;
   prjCod = 0;
   objCod = 0;
+  incCod: number | null = null;
+  modoAvaliacao = false;
   isNovo = true;
   toast: { texto: string; tipo: 'sucesso' | 'erro' } | null = null;
 
@@ -30,7 +32,10 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.modoAvaliacao = !!this.route.snapshot.data['modoAvaliacao'];
     this.route.paramMap.subscribe(params => {
+      const inc = params.get('incCod');
+      this.incCod = inc ? Number(inc) : null;
       this.pesCod = Number(params.get('pesCod'));
       this.prjCod = Number(params.get('prjCod'));
       const cod = params.get('objCod');
@@ -53,7 +58,19 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
     if (this.toastTimer) clearTimeout(this.toastTimer);
   }
 
+  private prefixo(): unknown[] {
+    if (this.modoAvaliacao && this.incCod != null)
+      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+    return ['/planejamento'];
+  }
+
+  private caminhoObjetivos(): unknown[] {
+    return [...this.prefixo(), this.pesCod, 'projetos', this.prjCod, 'objetivos'];
+  }
+
   salvar() {
+    if (this.modoAvaliacao) return;
     if (this.isNovo) {
       this.service.saveObjetivo(this.pesCod, this.prjCod, this.form).subscribe({
         next: data => {
@@ -61,7 +78,7 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
           this.objCod = data.objCod!;
           this.mostrarToast('Objetivo criado com sucesso!', 'sucesso');
           this.router.navigate(
-            ['/', this.pesCod, 'projetos', this.prjCod, 'objetivos', data.objCod],
+            [...this.caminhoObjetivos(), data.objCod],
             { replaceUrl: true },
           );
         },
@@ -76,11 +93,12 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
   }
 
   deletar() {
+    if (this.modoAvaliacao) return;
     this.service.deleteObjetivo(this.pesCod, this.prjCod, this.objCod).subscribe(() => this.voltar());
   }
 
   voltar() {
-    this.router.navigate(['/', this.pesCod, 'projetos', this.prjCod, 'objetivos']);
+    this.router.navigate(this.caminhoObjetivos());
   }
 
   private mostrarToast(texto: string, tipo: 'sucesso' | 'erro') {

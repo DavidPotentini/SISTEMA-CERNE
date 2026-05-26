@@ -5,36 +5,36 @@
 <div class="container">
   <header class="page-header">
     <button type="button" class="btn-back" (click)="voltar()">← Tarefas</button>
-    <h1>{{ isNovo ? 'Nova Tarefa' : 'Editar Tarefa' }}</h1>
+    <h1>{{ modoAvaliacao ? 'Avaliar Tarefa' : (isNovo ? 'Nova Tarefa' : 'Editar Tarefa') }}</h1>
   </header>
 
   <form class="form-card" (ngSubmit)="salvar()">
     <div class="form-group">
       <label for="nome">Nome</label>
-      <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" placeholder="Nome da tarefa" required>
+      <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" placeholder="Nome da tarefa" required [readonly]="modoAvaliacao">
     </div>
 
     <div class="form-row">
       <div class="form-group">
         <label for="dataInicio">Data de Início</label>
-        <input id="dataInicio" type="date" [(ngModel)]="form.dataInicio" name="dataInicio" required>
+        <input id="dataInicio" type="date" [(ngModel)]="form.dataInicio" name="dataInicio" required [readonly]="modoAvaliacao">
       </div>
       <div class="form-group">
         <label for="dataTermino">Data de Término</label>
-        <input id="dataTermino" type="date" [(ngModel)]="form.dataTermino" name="dataTermino" required>
+        <input id="dataTermino" type="date" [(ngModel)]="form.dataTermino" name="dataTermino" required [readonly]="modoAvaliacao">
       </div>
     </div>
 
     <div class="form-row">
       <div class="form-group">
         <label for="situacao">Situação</label>
-        <select id="situacao" [(ngModel)]="form.eSituacaoTarefa" name="situacao" required>
+        <select id="situacao" [(ngModel)]="form.eSituacaoTarefa" name="situacao" required [disabled]="modoAvaliacao">
           <option *ngFor="let s of situacoes" [value]="s">{{ situacaoLabel(s) }}</option>
         </select>
       </div>
       <div class="form-group">
         <label for="respCod">Responsável</label>
-        <select id="respCod" [(ngModel)]="form.respCod" name="respCod" required>
+        <select id="respCod" [(ngModel)]="form.respCod" name="respCod" required [disabled]="modoAvaliacao">
           <option [ngValue]="0" disabled>Selecione um responsável</option>
           <option *ngFor="let p of responsaveis" [ngValue]="p.pessoaCod">
             {{ p.nome }}<ng-container *ngIf="p.cargo"> — {{ p.cargo }}</ng-container>
@@ -43,9 +43,29 @@
       </div>
     </div>
 
+    <fieldset *ngIf="modoAvaliacao && !isNovo" class="form-group" style="border:1px solid #ddd; padding:0.75rem 1rem; margin-top:1rem;">
+      <legend style="font-weight:600;">Avaliação</legend>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="pontuacao">Pontuação</label>
+          <input id="pontuacao" type="number" min="0" [(ngModel)]="form.pontuacao" name="pontuacao">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="observacao">Observação</label>
+        <textarea id="observacao" rows="4" [(ngModel)]="form.observacao" name="observacao"></textarea>
+      </div>
+    </fieldset>
+
     <div class="form-actions">
-      <button type="submit" class="btn btn-success">{{ isNovo ? 'Salvar' : 'Atualizar' }}</button>
-      <button *ngIf="!isNovo" type="button" class="btn btn-danger" (click)="deletar()">Excluir</button>
+      <button
+        type="submit"
+        class="btn btn-success"
+        *ngIf="!modoAvaliacao || !isNovo"
+      >
+        {{ modoAvaliacao ? 'Salvar avaliação' : (isNovo ? 'Salvar' : 'Atualizar') }}
+      </button>
+      <button *ngIf="!modoAvaliacao && !isNovo" type="button" class="btn btn-danger" (click)="deletar()">Excluir</button>
     </div>
   </form>
 

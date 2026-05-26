@@ -4,6 +4,20 @@
   padding: 32px 24px;
 }
 
+.btn-back {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 8px;
+  display: inline-block;
+  transition: color 0.15s;
+}
+
+.btn-back:hover { color: #4f46e5; }
+
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -15,7 +29,7 @@
 
 .page-title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 600;
   color: #1a1a2e;
 }
@@ -47,11 +61,7 @@
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
-.lista {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+.lista { display: flex; flex-direction: column; gap: 10px; }
 
 .card {
   background: white;
@@ -63,9 +73,7 @@
   transition: box-shadow 0.2s;
 }
 
-.card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
+.card:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); }
 
 .card-body {
   flex: 1;
@@ -78,32 +86,13 @@
   transition: background 0.15s;
 }
 
-.card-body:hover {
-  background: #fafafa;
-}
+.card-body:hover { background: #fafafa; }
 
-.card-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #1a1a2e;
-  margin-bottom: 4px;
-}
+.card-title { font-size: 0.95rem; font-weight: 600; color: #1a1a2e; margin-bottom: 4px; }
+.card-dates { font-size: 0.8rem; color: #9ca3af; }
 
-.card-dates {
-  font-size: 0.8rem;
-  color: #9ca3af;
-}
-
-.card-nav {
-  font-size: 0.8rem;
-  color: #9ca3af;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.card-body:hover .card-nav {
-  color: #4f46e5;
-}
+.card-nav { font-size: 0.8rem; color: #9ca3af; white-space: nowrap; flex-shrink: 0; }
+.card-body:hover .card-nav { color: #4f46e5; }
 
 .card-actions {
   display: flex;
@@ -124,14 +113,8 @@
   white-space: nowrap;
 }
 
-.btn-action:hover {
-  background: #f9fafb;
-}
-
-.btn-action + .btn-action {
-  border-top: 1px solid #f3f4f6;
-}
-
+.btn-action:hover { background: #f9fafb; }
+.btn-action + .btn-action { border-top: 1px solid #f3f4f6; }
 .btn-edit { color: #4f46e5; }
 .btn-delete { color: #dc2626; }
 
@@ -143,4 +126,28 @@
   border: 2px dashed #e5e7eb;
   color: #9ca3af;
   font-size: 0.9rem;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  min-width: 280px;
+  padding: 18px 24px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  animation: slideIn 0.25s ease;
+}
+
+.toast-sucesso { background: #059669; }
+.toast-erro { background: #dc2626; }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -19,5 +19,6 @@ public interface EvidenciasMapper {
 
     @Mapping(target = "evdCod", source = "evdCod")
     @Mapping(source = "evidenciasDTO.trfCod", target = "tarefasModel")
+    @Mapping(target = "arquivosEvidenciasModelList", ignore = true)
     EvidenciasModel toModel(EvidenciasDTO evidenciasDTO, Long evdCod);
 }

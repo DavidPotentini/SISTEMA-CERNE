@@ -1,0 +1,140 @@
+.anexos {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.anexos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.anexos-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.vazio {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  padding: 12px 0;
+}
+
+.anexos-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.anexo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.anexo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nome {
+  font-size: 0.95rem;
+  color: #1a1a2e;
+  word-break: break-all;
+}
+
+.meta {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.anexo-acoes {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: #4f46e5;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #4338ca;
+}
+
+.btn.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  color: #4f46e5;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.btn-link:hover {
+  background: #eef2ff;
+}
+
+.btn-link-danger {
+  color: #dc2626;
+}
+
+.btn-link-danger:hover {
+  background: #fef2f2;
+}
+
+.toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  min-width: 280px;
+  padding: 18px 24px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.toast-sucesso {
+  background: #059669;
+}
+
+.toast-erro {
+  background: #dc2626;
+}

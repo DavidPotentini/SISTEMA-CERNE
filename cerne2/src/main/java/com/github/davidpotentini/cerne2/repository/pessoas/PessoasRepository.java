@@ -11,6 +11,8 @@ public interface PessoasRepository extends JpaRepository <PessoasModel, Long> {
 
     Optional<List<PessoasModel>> findByTipoEmpreendimento(ETipoEmpreendimento tipoEmpreendimento);
 
+    Optional<PessoasModel> findByEmail(String email);
+
     Optional<List<PessoasModel>> findByIncubadasModel_IncCod(Long incCod);
 
     void deleteByIncubadasModel_IncCod(Long incCod);

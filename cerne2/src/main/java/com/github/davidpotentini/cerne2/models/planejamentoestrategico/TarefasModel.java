@@ -32,6 +32,14 @@ public class TarefasModel {
     @Column (name = "DATA_TERMINO")
     private LocalDate dataTermino;
 
+    /*UTILIZADO SOMENTE NO MONITORAMENTO DE PLANEJAMENTO*/
+    @Column (name = "PONTUACAO")
+    private Integer pontuacao;
+
+    /*UTILIZADO SOMENTE NO MONITORAMENTO DE PLANEJAMENTO*/
+    @Column (name = "OBSERVACAO")
+    private String observacao;
+
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column (name = "SITUACAO_TAREFA")

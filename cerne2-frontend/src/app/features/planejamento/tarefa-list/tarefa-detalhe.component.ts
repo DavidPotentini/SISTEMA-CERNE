@@ -22,6 +22,8 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
   prjCod = 0;
   objCod = 0;
   trfCod = 0;
+  incCod: number | null = null;
+  modoAvaliacao = false;
   isNovo = true;
   toast: { texto: string; tipo: 'sucesso' | 'erro' } | null = null;
 
@@ -39,12 +41,16 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.modoAvaliacao = !!this.route.snapshot.data['modoAvaliacao'];
+
     this.pessoasService.findByIncubadora().subscribe(data => {
       this.responsaveis = data ?? [];
       this.cdr.detectChanges();
     });
 
     this.route.paramMap.subscribe(params => {
+      const inc = params.get('incCod');
+      this.incCod = inc ? Number(inc) : null;
       this.pesCod = Number(params.get('pesCod'));
       this.prjCod = Number(params.get('prjCod'));
       this.objCod = Number(params.get('objCod'));
@@ -68,7 +74,23 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
     if (this.toastTimer) clearTimeout(this.toastTimer);
   }
 
+  private prefixo(): unknown[] {
+    if (this.modoAvaliacao && this.incCod != null)
+      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+    return ['/planejamento'];
+  }
+
+  private caminhoTarefas(): unknown[] {
+    return [...this.prefixo(), this.pesCod, 'projetos', this.prjCod, 'objetivos', this.objCod, 'tarefas'];
+  }
+
   salvar() {
+    if (this.modoAvaliacao) {
+      this.salvarAvaliacao();
+      return;
+    }
+
     if (this.isNovo) {
       this.service.saveTarefa(this.pesCod, this.prjCod, this.objCod, this.form).subscribe({
         next: data => {
@@ -76,7 +98,7 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
           this.trfCod = data.trfCod!;
           this.mostrarToast('Tarefa criada com sucesso!', 'sucesso');
           this.router.navigate(
-            ['/', this.pesCod, 'projetos', this.prjCod, 'objetivos', this.objCod, 'tarefas', data.trfCod],
+            [...this.caminhoTarefas(), data.trfCod],
             { replaceUrl: true },
           );
         },
@@ -90,14 +112,28 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
     }
   }
 
+  private salvarAvaliacao() {
+    if (this.incCod == null || this.isNovo) return;
+    this.service
+      .avaliarTarefa(this.incCod, this.pesCod, this.prjCod, this.objCod, this.trfCod, {
+        pontuacao: this.form.pontuacao,
+        observacao: this.form.observacao,
+      })
+      .subscribe({
+        next: () => this.mostrarToast('Avaliação salva.', 'sucesso'),
+        error: () => this.mostrarToast('Erro ao salvar a avaliação.', 'erro'),
+      });
+  }
+
   deletar() {
+    if (this.modoAvaliacao) return;
     this.service
       .deleteTarefa(this.pesCod, this.prjCod, this.objCod, this.trfCod)
       .subscribe(() => this.voltar());
   }
 
   voltar() {
-    this.router.navigate(['/', this.pesCod, 'projetos', this.prjCod, 'objetivos', this.objCod, 'tarefas']);
+    this.router.navigate(this.caminhoTarefas());
   }
 
   situacaoLabel(s: string): string {
@@ -128,6 +164,8 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
       eSituacaoTarefa: ESituacaoTarefa.PENDENTE,
       objCod: null,
       respCod: null,
+      pontuacao: null,
+      observacao: null,
     };
   }
 }

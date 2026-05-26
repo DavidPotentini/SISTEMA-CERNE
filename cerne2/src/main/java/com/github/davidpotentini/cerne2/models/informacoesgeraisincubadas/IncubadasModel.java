@@ -1,9 +1,11 @@
 package com.github.davidpotentini.cerne2.models.informacoesgeraisincubadas;
 
 import com.github.davidpotentini.cerne2.enums.EStatusIncubacao;
+import com.github.davidpotentini.cerne2.models.arquivo.ArquivosIncubadasModel;
 import com.github.davidpotentini.cerne2.models.canvas.AmbienteCanvasModel;
 import com.github.davidpotentini.cerne2.models.enderecos.EnderecosModel;
 import com.github.davidpotentini.cerne2.models.pessoas.PessoasModel;
+import com.github.davidpotentini.cerne2.models.planejamentoestrategico.PlanejamentoEstrategicoModel;
 import com.github.davidpotentini.cerne2.models.validacaohipotese.QuadroValidacaoHipoteseModel;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -41,9 +43,9 @@ public class IncubadasModel {
 
     @Column(name = "DESCRICAO")
     private String descricao;
-
-    @Column(name = "DOCUMENTACAO")
-    private String documentacao;
+//
+//    @Column(name = "DOCUMENTACAO")
+//    private String documentacao;
 
     @JoinColumn(name = "END_COD")
     @OneToOne(cascade = CascadeType.PERSIST)
@@ -57,4 +59,10 @@ public class IncubadasModel {
 
     @OneToMany(mappedBy = "incubadasModel")
     private List<QuadroValidacaoHipoteseModel> quadroValidacaoHipoteseModelList;
+
+    @OneToMany(mappedBy = "incubadasModel")
+    private List<ArquivosIncubadasModel> arquivosIncubadasModelList;
+
+    @OneToMany(mappedBy = "incubadasModel")
+    private List<PlanejamentoEstrategicoModel> planejamentoEstrategicoModelList;
 }

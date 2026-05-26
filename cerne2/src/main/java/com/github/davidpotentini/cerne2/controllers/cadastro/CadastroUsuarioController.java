@@ -1,7 +1,6 @@
 package com.github.davidpotentini.cerne2.controllers.cadastro;
 
 import com.github.davidpotentini.cerne2.dto.cadastro.CadastroUsuarioDTO;
-import com.github.davidpotentini.cerne2.models.cadastro.UsersModel;
 import com.github.davidpotentini.cerne2.service.cadastro.CadastroUsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,13 +24,7 @@ public class CadastroUsuarioController {
     @PostMapping
     private ResponseEntity cadastrarUsuario(@RequestBody CadastroUsuarioDTO cadastroUsuarioDTO){
 
-        UsersModel usersModel = cadastroUsuarioDTO.mapToUser();
-
-        if (cadastroUsuarioDTO.tntCod() != null){
-            cadastroUsuarioService.cadastrarUsuarioIncubadoraExistente(usersModel, cadastroUsuarioDTO.tntCod());
-        }else {
-            cadastroUsuarioService.cadastrarUsuarioIncubadoraNaoExistente(usersModel, cadastroUsuarioDTO.mapToTenants());
-        }
+        cadastroUsuarioService.cadastrarUsuario(cadastroUsuarioDTO);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

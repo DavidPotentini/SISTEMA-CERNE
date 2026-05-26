@@ -18,6 +18,8 @@ export class TarefaComponent implements OnInit {
   pesCod = 0;
   prjCod = 0;
   objCod = 0;
+  incCod: number | null = null;
+  modoAvaliacao = false;
   erroCarregamento: string | null = null;
 
   constructor(
@@ -28,9 +30,14 @@ export class TarefaComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.pesCod = Number(this.route.snapshot.paramMap.get('pesCod'));
-    this.prjCod = Number(this.route.snapshot.paramMap.get('prjCod'));
-    this.objCod = Number(this.route.snapshot.paramMap.get('objCod'));
+    this.modoAvaliacao = !!this.route.snapshot.data['modoAvaliacao'];
+    const params = this.route.snapshot.paramMap;
+    const inc = params.get('incCod');
+    this.incCod = inc ? Number(inc) : null;
+    this.pesCod = Number(params.get('pesCod'));
+    this.prjCod = Number(params.get('prjCod'));
+    this.objCod = Number(params.get('objCod'));
+
     this.service.findTarefas(this.pesCod, this.prjCod, this.objCod).subscribe({
       next: data => { this.tarefas = data; this.cdr.detectChanges(); },
       error: err => { this.erroCarregamento = `Erro ao carregar tarefas: ${err.message ?? err.status ?? 'desconhecido'}`; this.cdr.detectChanges(); },
@@ -40,30 +47,27 @@ export class TarefaComponent implements OnInit {
       .subscribe(data => { this.objetivoNome = data.nome; this.cdr.detectChanges(); });
   }
 
+  private prefixo(): unknown[] {
+    if (this.modoAvaliacao && this.incCod != null)
+      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+    return ['/planejamento'];
+  }
+
+  private caminhoTarefas(): unknown[] {
+    return [...this.prefixo(), this.pesCod, 'projetos', this.prjCod, 'objetivos', this.objCod, 'tarefas'];
+  }
+
+  private caminhoObjetivos(): unknown[] {
+    return [...this.prefixo(), this.pesCod, 'projetos', this.prjCod, 'objetivos'];
+  }
+
   novo() {
-    this.router.navigate([
-      '/',
-      this.pesCod,
-      'projetos',
-      this.prjCod,
-      'objetivos',
-      this.objCod,
-      'tarefas',
-      'novo',
-    ]);
+    this.router.navigate([...this.caminhoTarefas(), 'novo']);
   }
 
   editar(trfCod: number) {
-    this.router.navigate([
-      '/',
-      this.pesCod,
-      'projetos',
-      this.prjCod,
-      'objetivos',
-      this.objCod,
-      'tarefas',
-      trfCod,
-    ]);
+    this.router.navigate([...this.caminhoTarefas(), trfCod]);
   }
 
   deletar(trfCod: number) {
@@ -74,7 +78,7 @@ export class TarefaComponent implements OnInit {
   }
 
   voltar() {
-    this.router.navigate(['/', this.pesCod, 'projetos', this.prjCod, 'objetivos']);
+    this.router.navigate(this.caminhoObjetivos());
   }
 
   situacaoLabel(s: ESituacaoTarefa): string {

@@ -1,10 +1,18 @@
+<div class="toast" *ngIf="toast" [class.toast-sucesso]="toast.tipo === 'sucesso'" [class.toast-erro]="toast.tipo === 'erro'">
+  {{ toast.texto }}
+</div>
+
 <div class="container">
+  <button *ngIf="modoAvaliacao" class="btn-back" (click)="voltar()">← Incubada</button>
+
   <div class="page-header">
     <div>
-      <h1 class="page-title">Planejamento Estratégico</h1>
-      <p class="page-subtitle">Planos anuais integrados</p>
+      <h1 class="page-title">
+        {{ modoAvaliacao ? 'Monitoramento de Planejamento' : 'Planejamento Estratégico' }}
+      </h1>
+      <p class="page-subtitle">{{ tipoEmpreendimento === 'INCUBADA' ? 'Incubada' : 'Incubadora' }}</p>
     </div>
-    <button class="btn-primary" (click)="novo()">+ Novo Planejamento</button>
+    <button *ngIf="!modoAvaliacao" class="btn-primary" (click)="novo()">+ Novo Planejamento</button>
   </div>
 
   <div class="lista">
@@ -18,13 +26,13 @@
         </div>
         <span class="card-nav">Projetos →</span>
       </div>
-      <div class="card-actions">
+      <div class="card-actions" *ngIf="!modoAvaliacao">
         <button class="btn-action btn-edit" (click)="editar(p.pesCod!)">Editar</button>
-        <button class="btn-action btn-delete" (click)="deletar(p.pesCod!)">Excluir</button>
+        <button class="btn-action btn-delete" (click)="deletar(p.pesCod!, p.nome)">Excluir</button>
       </div>
     </div>
 
-    <div class="empty-state" *ngIf="planejamentos.length === 0">
+    <div class="empty-state" *ngIf="planejamentos.length === 0 && !erroCarregamento">
       Nenhum planejamento cadastrado.
     </div>
   </div>

@@ -25,5 +25,7 @@ public interface IncubadasMapper {
     @Mapping(target = "pessoasModelList", ignore = true)
     @Mapping(target = "ambienteCanvasModelList", ignore = true)
     @Mapping(target = "quadroValidacaoHipoteseModelList", ignore = true)
+    @Mapping(target = "arquivosIncubadasModelList", ignore = true)
+    @Mapping(target = "planejamentoEstrategicoModelList", ignore = true)
     IncubadasModel toModel(IncubadasDTO incubadasDTO, Long incCod);
 }

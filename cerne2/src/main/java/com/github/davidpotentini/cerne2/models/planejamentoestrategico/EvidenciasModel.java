@@ -1,8 +1,12 @@
 package com.github.davidpotentini.cerne2.models.planejamentoestrategico;
 
+import com.github.davidpotentini.cerne2.models.arquivo.ArquivosEvidenciasModel;
+import com.github.davidpotentini.cerne2.models.arquivo.ArquivosIncubadasModel;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity(name = "EVIDENCIAS")
 @Table
@@ -18,11 +22,10 @@ public class EvidenciasModel {
     @Column (name = "DESCRICAO")
     private String descricao;
 
-    @Column (name = "CAMINHO_ARQUIVO")
-    private String caminhoArquivo;
-
     @ManyToOne
     @JoinColumn (name = "TRF_COD")
     private TarefasModel tarefasModel;
 
+    @OneToMany(mappedBy = "evidenciasModel")
+    private List<ArquivosEvidenciasModel> arquivosEvidenciasModelList;
 }

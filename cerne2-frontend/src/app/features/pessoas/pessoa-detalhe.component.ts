@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { PessoaDTO } from '../../models/pessoas/pessoa.model';
 import { PessoasService } from '../../core/services/pessoas/pessoas.service';
 import { ETipoEmpreendimento } from '../../enums/tipo-empreendimento.enum';
+import { IncubadasService } from '../../core/services/incubadas/incubadas.service';
+import { IncubadaDTO } from '../../models/incubadas/incubada.model';
 
 @Component({
   selector: 'app-pessoa-detalhe',
@@ -18,18 +20,25 @@ export class PessoaDetalheComponent implements OnInit, OnDestroy {
   pessoaCod = 0;
   isNovo = true;
   tiposEmpreendimento = Object.values(ETipoEmpreendimento);
+  incubadas: IncubadaDTO[] = [];
   toast: { texto: string; tipo: 'sucesso' | 'erro' } | null = null;
 
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private service: PessoasService,
+    private incubadasService: IncubadasService,
     private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
+    this.incubadasService.findAll().subscribe(data => {
+      this.incubadas = data ?? [];
+      this.cdr.detectChanges();
+    });
+
     this.route.paramMap.subscribe(params => {
       const cod = params.get('pessoaCod');
       this.isNovo = !cod || cod === 'novo';
