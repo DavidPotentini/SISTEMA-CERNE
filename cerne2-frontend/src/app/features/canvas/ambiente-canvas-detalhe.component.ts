@@ -94,7 +94,7 @@ export class AmbienteCanvasDetalheComponent implements OnInit {
   }
 
   voltar() {
-    this.router.navigate(['/incubadas', this.incCod, 'ambientesCanvas']);
+    this.router.navigate(['/incubadas', this.incCod, 'ambienteCanvas']);
   }
 
   private mostrarToast(texto: string, tipo: 'sucesso' | 'erro') {

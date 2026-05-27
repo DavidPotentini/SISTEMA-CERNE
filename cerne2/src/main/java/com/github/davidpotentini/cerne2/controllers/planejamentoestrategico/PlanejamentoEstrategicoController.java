@@ -32,7 +32,7 @@ public class PlanejamentoEstrategicoController {
     *
     */
 
-    @GetMapping({"/planejamento", "/{incCod}/planejamento"})
+    @GetMapping({"/planejamento", "/incubadas/{incCod}/planejamento"})
     @AcessoIncubada
     public ResponseEntity<List<PlanejamentoEstrategicoDTO>> findList(@PathVariable(required = false) Long incCod){
         List<PlanejamentoEstrategicoDTO> planejamentoEstrategicoDTO = planejamentoEstrategicoService.findList(incCod);
@@ -40,7 +40,7 @@ public class PlanejamentoEstrategicoController {
         return ResponseEntity.ok(planejamentoEstrategicoDTO);
     }
 
-    @GetMapping({"/planejamento/{pesCod}", "/{incCod}/planejamento/{pesCod}"})
+    @GetMapping({"/planejamento/{pesCod}", "/incubadas/{incCod}/planejamento/{pesCod}"})
     @AcessoIncubada
     public ResponseEntity<PlanejamentoEstrategicoDTO> findById(@PathVariable Long pesCod,
                                                                @PathVariable(required = false) Long incCod){
@@ -49,7 +49,7 @@ public class PlanejamentoEstrategicoController {
         return ResponseEntity.ok(planejamentoEstrategicoDTOResponse);
     }
 
-    @PostMapping({"/planejamento", "/{incCod}/planejamento"})
+    @PostMapping({"/planejamento", "/incubadas/{incCod}/planejamento"})
     @AcessoIncubada
     public ResponseEntity<PlanejamentoEstrategicoDTO> insert(@RequestBody PlanejamentoEstrategicoDTO planejamentoEstrategicoDTORequest,
                                                              @PathVariable(required = false) Long incCod){
@@ -64,7 +64,7 @@ public class PlanejamentoEstrategicoController {
         return ResponseEntity.created(location).body(planosDTO);
     }
 
-    @PutMapping({"/planejamento/{pesCod}", "/{incCod}/planejamento/{pesCod}"})
+    @PutMapping({"/planejamento/{pesCod}", "/incubadas/{incCod}/planejamento/{pesCod}"})
     @AcessoIncubada
     public ResponseEntity<PlanejamentoEstrategicoDTO> update(@RequestBody PlanejamentoEstrategicoDTO planejamentoEstrategicoDTORequest,
                                                              @PathVariable Long pesCod,
@@ -75,8 +75,10 @@ public class PlanejamentoEstrategicoController {
         return ResponseEntity.ok(planosDTO);
     }
 
-    @DeleteMapping({"/planejamento/{pesCod}", "/{incCod}/planejamento/{pesCod}"})
-    public ResponseEntity<Void> delete(@PathVariable Long pesCod) {
+    @DeleteMapping({"/planejamento/{pesCod}", "/incubadas/{incCod}/planejamento/{pesCod}"})
+    @AcessoIncubada
+    public ResponseEntity<Void> delete(@PathVariable Long pesCod,
+                                       @PathVariable(required = false) Long incCod) {
         planejamentoEstrategicoService.delete(pesCod);
 
         return ResponseEntity.noContent().build();
@@ -88,23 +90,29 @@ public class PlanejamentoEstrategicoController {
      *
      */
 
-    @GetMapping({"/planejamento/{pesCod}/projetos", "/{incCod}/planejamento/{pesCod}/projetos"})
-    public ResponseEntity<List<ProjetosDTO>> findProjetoByPlano (@PathVariable Long pesCod) {
+    @GetMapping({"/planejamento/{pesCod}/projetos", "/incubadas/{incCod}/planejamento/{pesCod}/projetos"})
+    @AcessoIncubada
+    public ResponseEntity<List<ProjetosDTO>> findProjetoByPlano (@PathVariable Long pesCod,
+                                                                 @PathVariable(required = false) Long incCod) {
         List<ProjetosDTO> projetosDTOResponseList = planejamentoEstrategicoService.findProjetoByPlano(pesCod);
 
         return ResponseEntity.ok(projetosDTOResponseList);
     }
 
-    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}"})
-    public ResponseEntity<ProjetosDTO> findByProjetoId(@PathVariable Long prjCod){
+    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}"})
+    @AcessoIncubada
+    public ResponseEntity<ProjetosDTO> findByProjetoId(@PathVariable Long prjCod,
+                                                       @PathVariable(required = false) Long incCod){
         ProjetosDTO projetosDTOResponse = planejamentoEstrategicoService.findByProjetoId(prjCod);
 
         return ResponseEntity.ok(projetosDTOResponse);
     }
 
-    @PostMapping({"/planejamento/{pesCod}/projetos", "/{incCod}/planejamento/{pesCod}/projetos"})
+    @PostMapping({"/planejamento/{pesCod}/projetos", "/incubadas/{incCod}/planejamento/{pesCod}/projetos"})
+    @AcessoIncubada
     public ResponseEntity<ProjetosDTO> insertProjetos(@RequestBody ProjetosDTO projetosDTORequest,
-                                                              @PathVariable Long pesCod){
+                                                      @PathVariable Long pesCod,
+                                                      @PathVariable(required = false) Long incCod){
         ProjetosDTO projetosDTOResponse = planejamentoEstrategicoService.saveProjetos(projetosDTORequest, pesCod, null);
 
         URI location = ServletUriComponentsBuilder
@@ -116,17 +124,21 @@ public class PlanejamentoEstrategicoController {
         return ResponseEntity.created(location).body(projetosDTOResponse);
     }
 
-    @PutMapping({"/planejamento/{pesCod}/projetos/{prjCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}"})
+    @PutMapping({"/planejamento/{pesCod}/projetos/{prjCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}"})
+    @AcessoIncubada
     public ResponseEntity<ProjetosDTO> updateProjetos(@RequestBody ProjetosDTO projetosDTORequest,
-                                                              @PathVariable Long pesCod,
-                                                              @PathVariable Long prjCod){
+                                                      @PathVariable Long pesCod,
+                                                      @PathVariable Long prjCod,
+                                                      @PathVariable(required = false) Long incCod){
         ProjetosDTO projetosDTOResponse = planejamentoEstrategicoService.saveProjetos(projetosDTORequest, pesCod, prjCod);
 
         return ResponseEntity.ok(projetosDTOResponse);
     }
 
-    @DeleteMapping({"/planejamento/{pesCod}/projetos/{prjCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}"})
-    public ResponseEntity<Void> deleteProjetos (@PathVariable Long prjCod) {
+    @DeleteMapping({"/planejamento/{pesCod}/projetos/{prjCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}"})
+    @AcessoIncubada
+    public ResponseEntity<Void> deleteProjetos (@PathVariable Long prjCod,
+                                                @PathVariable(required = false) Long incCod) {
         planejamentoEstrategicoService.deleteProjetos(prjCod);
 
         return ResponseEntity.noContent().build();
@@ -138,23 +150,29 @@ public class PlanejamentoEstrategicoController {
      *
      */
 
-    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos"})
-    public ResponseEntity<List<ObjetivosDTO>> findObjetivosByProjetos(@PathVariable Long prjCod){
+    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos"})
+    @AcessoIncubada
+    public ResponseEntity<List<ObjetivosDTO>> findObjetivosByProjetos(@PathVariable Long prjCod,
+                                                                      @PathVariable(required = false) Long incCod){
         List<ObjetivosDTO> objetivosDTOResponse = planejamentoEstrategicoService.findObjetivosByProjetos(prjCod);
 
         return ResponseEntity.ok(objetivosDTOResponse);
     }
 
-    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}"})
-    public ResponseEntity<ObjetivosDTO> findByObjetivosId(@PathVariable Long objCod){
+    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}"})
+    @AcessoIncubada
+    public ResponseEntity<ObjetivosDTO> findByObjetivosId(@PathVariable Long objCod,
+                                                          @PathVariable(required = false) Long incCod){
         ObjetivosDTO objetivosDTOResponse = planejamentoEstrategicoService.findByObjetivosId(objCod);
 
         return ResponseEntity.ok(objetivosDTOResponse);
     }
 
-    @PostMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos"})
+    @PostMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos"})
+    @AcessoIncubada
     public ResponseEntity<ObjetivosDTO> insertObjetivos(@RequestBody ObjetivosDTO ObjetivosDTO,
-                                                                @PathVariable Long prjCod){
+                                                        @PathVariable Long prjCod,
+                                                        @PathVariable(required = false) Long incCod){
         ObjetivosDTO objetivosDTOResponse = planejamentoEstrategicoService.saveObjetivos(ObjetivosDTO,
                                                                                                 prjCod,
                                                                                                 null);
@@ -168,10 +186,12 @@ public class PlanejamentoEstrategicoController {
         return ResponseEntity.created(location).body(objetivosDTOResponse);
     }
 
-    @PutMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}"})
+    @PutMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}"})
+    @AcessoIncubada
     public ResponseEntity<ObjetivosDTO> updateObjetivos(@RequestBody ObjetivosDTO objetivosDTORequest,
-                                                                @PathVariable Long prjCod,
-                                                                @PathVariable Long objCod){
+                                                        @PathVariable Long prjCod,
+                                                        @PathVariable Long objCod,
+                                                        @PathVariable(required = false) Long incCod){
         ObjetivosDTO objetivosDTOResponse = planejamentoEstrategicoService.saveObjetivos(objetivosDTORequest,
                                                                                                  prjCod,
                                                                                                  objCod);
@@ -179,8 +199,10 @@ public class PlanejamentoEstrategicoController {
         return ResponseEntity.ok(objetivosDTOResponse);
     }
 
-    @DeleteMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}"})
-    public ResponseEntity<Void> deleteObjetivos(@PathVariable Long objCod){
+    @DeleteMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}"})
+    @AcessoIncubada
+    public ResponseEntity<Void> deleteObjetivos(@PathVariable Long objCod,
+                                                @PathVariable(required = false) Long incCod){
         planejamentoEstrategicoService.deleteObjetivos(objCod);
 
         return ResponseEntity.noContent().build();
@@ -192,23 +214,29 @@ public class PlanejamentoEstrategicoController {
     *
     */
 
-    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas"})
-    public ResponseEntity<List<TarefasDTO>> findTarefasByObjetivos(@PathVariable Long objCod){
+    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas"})
+    @AcessoIncubada
+    public ResponseEntity<List<TarefasDTO>> findTarefasByObjetivos(@PathVariable Long objCod,
+                                                                   @PathVariable(required = false) Long incCod){
         List<TarefasDTO> tarefasDTOResponse = planejamentoEstrategicoService.findTarefasByObjetivos(objCod);
 
         return ResponseEntity.ok(tarefasDTOResponse);
     }
 
-    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}"})
-    public ResponseEntity<TarefasDTO> findByTarefaId(@PathVariable Long trfCod){
+    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}"})
+    @AcessoIncubada
+    public ResponseEntity<TarefasDTO> findByTarefaId(@PathVariable Long trfCod,
+                                                     @PathVariable(required = false) Long incCod){
         TarefasDTO tarefasDTOResponse = planejamentoEstrategicoService.findByTarefaId(trfCod);
 
         return ResponseEntity.ok(tarefasDTOResponse);
     }
 
-    @PostMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas"})
+    @PostMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas"})
+    @AcessoIncubada
     public ResponseEntity<TarefasDTO> insertTarefas(@RequestBody TarefasDTO tarefasDTORequest,
-                                                            @PathVariable Long objCod){
+                                                    @PathVariable Long objCod,
+                                                    @PathVariable(required = false) Long incCod){
         TarefasDTO tarefasDTOResponse = planejamentoEstrategicoService.saveTarefas(tarefasDTORequest,
                                                                                            objCod,
                                                                                            null);
@@ -222,10 +250,12 @@ public class PlanejamentoEstrategicoController {
         return ResponseEntity.created(location).body(tarefasDTOResponse);
     }
 
-    @PutMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}"})
+    @PutMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}"})
+    @AcessoIncubada
     public ResponseEntity<TarefasDTO> updateTarefas(@RequestBody TarefasDTO tarefasDTORequest,
-                                                            @PathVariable Long objCod,
-                                                            @PathVariable Long trfCod){
+                                                    @PathVariable Long objCod,
+                                                    @PathVariable Long trfCod,
+                                                    @PathVariable(required = false) Long incCod){
 
         TarefasDTO tarefasDTOResponse = planejamentoEstrategicoService.saveTarefas(tarefasDTORequest,
                                                                                            objCod,
@@ -234,14 +264,16 @@ public class PlanejamentoEstrategicoController {
         return ResponseEntity.ok(tarefasDTOResponse);
     }
 
-    @DeleteMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}"})
-    public ResponseEntity<Void> deleteTarefas(@PathVariable Long trfCod){
+    @DeleteMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}"})
+    @AcessoIncubada
+    public ResponseEntity<Void> deleteTarefas(@PathVariable Long trfCod,
+                                              @PathVariable(required = false) Long incCod){
         planejamentoEstrategicoService.deleteTarefas(trfCod);
 
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/avaliacao")
+    @PatchMapping("/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/avaliacao")
     @AcessoIncubada
     public ResponseEntity<TarefasDTO> avaliarTarefa(@PathVariable Long incCod,
                                                     @PathVariable Long trfCod,
@@ -255,13 +287,17 @@ public class PlanejamentoEstrategicoController {
     *
     */
 
-    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias"})
-    public ResponseEntity<List<EvidenciasDTO>> findEvidenciasByTarefas(@PathVariable Long trfCod){
+    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias"})
+    @AcessoIncubada
+    public ResponseEntity<List<EvidenciasDTO>> findEvidenciasByTarefas(@PathVariable Long trfCod,
+                                                                       @PathVariable(required = false) Long incCod){
         return ResponseEntity.ok(planejamentoEstrategicoService.findEvidenciasByTarefas(trfCod));
     }
 
-    @PostMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias"})
-    public ResponseEntity<EvidenciasDTO> insertEvidencias(@RequestBody EvidenciasDTO evidenciasDTORequest){
+    @PostMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias"})
+    @AcessoIncubada
+    public ResponseEntity<EvidenciasDTO> insertEvidencias(@RequestBody EvidenciasDTO evidenciasDTORequest,
+                                                          @PathVariable(required = false) Long incCod){
         EvidenciasDTO evidenciasDTOResponse = planejamentoEstrategicoService.saveEvidencia(evidenciasDTORequest, null);
 
         URI location = ServletUriComponentsBuilder
@@ -273,27 +309,35 @@ public class PlanejamentoEstrategicoController {
         return ResponseEntity.created(location).body(evidenciasDTOResponse);
     }
 
-    @PostMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}"})
+    @PostMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}"})
+    @AcessoIncubada
     public ResponseEntity<EvidenciasDTO> updateEvidencias(@RequestBody EvidenciasDTO evidenciasDTORequest,
-                                                                  @PathVariable Long evdCod){
+                                                          @PathVariable Long evdCod,
+                                                          @PathVariable(required = false) Long incCod){
         return ResponseEntity.ok(planejamentoEstrategicoService.saveEvidencia(evidenciasDTORequest, evdCod));
     }
 
-    @DeleteMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}"})
-    public ResponseEntity<Void> deleteEvidencias(@PathVariable Long evdCod){
+    @DeleteMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}"})
+    @AcessoIncubada
+    public ResponseEntity<Void> deleteEvidencias(@PathVariable Long evdCod,
+                                                 @PathVariable(required = false) Long incCod){
         planejamentoEstrategicoService.deleteEvidencia(evdCod);
 
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos"})
-    public ResponseEntity<List<ArquivoDTO>> findArquivosEvidencias(@PathVariable Long evdCod){
+    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos"})
+    @AcessoIncubada
+    public ResponseEntity<List<ArquivoDTO>> findArquivosEvidencias(@PathVariable Long evdCod,
+                                                                   @PathVariable(required = false) Long incCod){
         return ResponseEntity.ok(planejamentoEstrategicoService.findArquivosEvidencias(evdCod));
     }
 
-    @PostMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos"})
+    @PostMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos"})
+    @AcessoIncubada
     public ResponseEntity<ArquivoDTO> uploadArquivoEvidencias (@PathVariable Long evdCod,
-                                                            MultipartFile multipartFile){
+                                                               @PathVariable(required = false) Long incCod,
+                                                               MultipartFile multipartFile){
 
         ArquivoDTO arquivoDTO = planejamentoEstrategicoService.uploadArquivosEvidencias(multipartFile, evdCod);
 
@@ -306,13 +350,17 @@ public class PlanejamentoEstrategicoController {
         return ResponseEntity.created(location).body(arquivoDTO);
     }
 
-    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos/{arqCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos/{arqCod}"})
-    public ResponseEntity<String> downloadArquivoEvidencias(@PathVariable Long arqCod){
+    @GetMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos/{arqCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos/{arqCod}"})
+    @AcessoIncubada
+    public ResponseEntity<String> downloadArquivoEvidencias(@PathVariable Long arqCod,
+                                                            @PathVariable(required = false) Long incCod){
         return ResponseEntity.ok(arquivoService.gerarUrlDownload(arqCod));
     }
 
-    @DeleteMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos/{arqCod}", "/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos/{arqCod}"})
-    public ResponseEntity<Void> deleteArquivoEvidencias(@PathVariable Long arqCod){
+    @DeleteMapping({"/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos/{arqCod}", "/incubadas/{incCod}/planejamento/{pesCod}/projetos/{prjCod}/objetivos/{objCod}/tarefas/{trfCod}/evidencias/{evdCod}/arquivos/{arqCod}"})
+    @AcessoIncubada
+    public ResponseEntity<Void> deleteArquivoEvidencias(@PathVariable Long arqCod,
+                                                        @PathVariable(required = false) Long incCod){
         arquivoService.deletar(arqCod);
 
         return ResponseEntity.noContent().build();

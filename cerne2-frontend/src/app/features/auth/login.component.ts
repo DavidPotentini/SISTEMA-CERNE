@@ -54,7 +54,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.carregando = false;
-          this.router.navigate(['/incubadas']);
+          this.router.navigate(['/home']);
         },
         error: err => {
           this.carregando = false;

@@ -6,21 +6,10 @@ import { ValidacaoHipoteseService } from '../../core/services/validacao-hipotese
 import {
   HipoteseDTO,
   QuadroValidacaoHipoteseDTO,
-  hipoteseVazia,
   quadroVazio,
 } from '../../models/validacao-hipotese/validacao-hipotese.model';
-import {
-  BLOCO_LEAN_LABEL,
-  EBlocoLeanCanvas,
-} from '../../enums/bloco-lean-canvas.enum';
-import {
-  DECISAO_HIPOTESE_LABEL,
-  EDecisaoHipotese,
-  EResultadoHipotese,
-  EStatusHipotese,
-  RESULTADO_HIPOTESE_LABEL,
-  STATUS_HIPOTESE_LABEL,
-} from '../../enums/hipotese.enum';
+import { BLOCO_LEAN_LABEL, EBlocoLeanCanvas } from '../../enums/bloco-lean-canvas.enum';
+import { EStatusHipotese, STATUS_HIPOTESE_LABEL } from '../../enums/hipotese.enum';
 
 @Component({
   selector: 'app-quadro-detalhe',
@@ -33,12 +22,8 @@ export class QuadroDetalheComponent implements OnInit {
   incCod = 0;
   qvhCod = 0;
   quadro: QuadroValidacaoHipoteseDTO = quadroVazio(0);
+  hipoteses: HipoteseDTO[] = [];
   toast: { texto: string; tipo: 'sucesso' | 'erro' } | null = null;
-
-  readonly blocosLean = Object.values(EBlocoLeanCanvas);
-  readonly statusOpcoes = Object.values(EStatusHipotese);
-  readonly resultadoOpcoes = Object.values(EResultadoHipotese);
-  readonly decisaoOpcoes = Object.values(EDecisaoHipotese);
 
   constructor(
     private service: ValidacaoHipoteseService,
@@ -59,14 +44,20 @@ export class QuadroDetalheComponent implements OnInit {
     this.service.findById(this.incCod, this.qvhCod).subscribe({
       next: (data) => {
         this.quadro = {
-          qvhCod: data.qvhCod,
+          qvhCod: this.qvhCod,
           tituloQuadro: data.tituloQuadro ?? '',
-          incCod: data.incCod ?? this.incCod,
-          hipoteseDTOList: (data.hipoteseDTOList ?? []).map((h) => this.normalizarHipotese(h)),
+          incCod: this.incCod,
         };
         this.cdr.detectChanges();
       },
       error: () => this.mostrarToast('Não foi possível carregar o quadro.', 'erro'),
+    });
+    this.service.findHipoteses(this.incCod, this.qvhCod).subscribe({
+      next: (data) => {
+        this.hipoteses = data ?? [];
+        this.cdr.detectChanges();
+      },
+      error: () => this.mostrarToast('Não foi possível carregar as hipóteses.', 'erro'),
     });
   }
 
@@ -78,48 +69,26 @@ export class QuadroDetalheComponent implements OnInit {
     return s ? STATUS_HIPOTESE_LABEL[s] : '';
   }
 
-  resultadoLabel(r: EResultadoHipotese | null): string {
-    return r ? RESULTADO_HIPOTESE_LABEL[r] : '';
-  }
-
-  decisaoLabel(d: EDecisaoHipotese | null): string {
-    return d ? DECISAO_HIPOTESE_LABEL[d] : '';
-  }
-
   adicionarHipotese() {
-    const nova = hipoteseVazia(this.qvhCod);
-    nova.tituloHipotese = this.quadro.tituloQuadro;
-    this.quadro.hipoteseDTOList = [...this.quadro.hipoteseDTOList, nova];
-    this.cdr.detectChanges();
+    this.router.navigate([
+      '/incubadas', this.incCod, 'validacaoHipotese', this.qvhCod, 'hipoteses', 'novo',
+    ]);
   }
 
-  removerHipotese(h: HipoteseDTO) {
-    if (h.hipCod == null) {
-      this.quadro.hipoteseDTOList = this.quadro.hipoteseDTOList.filter((x) => x !== h);
-      this.cdr.detectChanges();
-      return;
-    }
-    if (!confirm('Excluir esta hipótese?')) return;
-    this.service.deleteHipotese(this.incCod, this.qvhCod, h.hipCod).subscribe({
-      next: () => {
-        this.quadro.hipoteseDTOList = this.quadro.hipoteseDTOList.filter((x) => x !== h);
-        this.mostrarToast('Hipótese excluída.', 'sucesso');
-        this.cdr.detectChanges();
-      },
-      error: () => this.mostrarToast('Erro ao excluir hipótese.', 'erro'),
-    });
+  abrirHipotese(hipCod: number | null) {
+    if (hipCod == null) return;
+    this.router.navigate([
+      '/incubadas', this.incCod, 'validacaoHipotese', this.qvhCod, 'hipoteses', hipCod,
+    ]);
   }
 
-  salvar() {
-    for (const h of this.quadro.hipoteseDTOList) {
-      h.tituloHipotese = this.quadro.tituloQuadro;
-      h.qvhCod = this.qvhCod == null ? null : String(this.qvhCod);
-    }
+  salvarQuadro() {
     this.service.update(this.incCod, this.qvhCod, this.quadro).subscribe({
       next: (data) => {
         this.quadro = {
-          ...data,
-          hipoteseDTOList: (data.hipoteseDTOList ?? []).map((h) => this.normalizarHipotese(h)),
+          qvhCod: this.qvhCod,
+          tituloQuadro: data.tituloQuadro ?? '',
+          incCod: this.incCod,
         };
         this.mostrarToast('Quadro salvo.', 'sucesso');
         this.cdr.detectChanges();
@@ -128,25 +97,16 @@ export class QuadroDetalheComponent implements OnInit {
     });
   }
 
-  voltar() {
-    this.router.navigate(['/incubadas', this.incCod, 'quadrosValidacao']);
+  excluirQuadro() {
+    if (!confirm('Excluir este quadro? Todas as hipóteses serão removidas.')) return;
+    this.service.delete(this.incCod, this.qvhCod).subscribe({
+      next: () => this.voltar(),
+      error: () => this.mostrarToast('Erro ao excluir o quadro.', 'erro'),
+    });
   }
 
-  private normalizarHipotese(h: HipoteseDTO): HipoteseDTO {
-    return {
-      hipCod: h.hipCod ?? null,
-      tituloHipotese: h.tituloHipotese ?? '',
-      vldBlocoLeanCanvas: h.vldBlocoLeanCanvas ?? null,
-      hipotese: h.hipotese ?? '',
-      experimento: h.experimento ?? '',
-      metrica: h.metrica ?? '',
-      vldStatusHipotese: h.vldStatusHipotese ?? null,
-      vldResultadoHipotese: h.vldResultadoHipotese ?? null,
-      resultadoDetalhamento: h.resultadoDetalhamento ?? '',
-      vldDecisaoHipotese: h.vldDecisaoHipotese ?? null,
-      decisaoDetalhamento: h.decisaoDetalhamento ?? '',
-      qvhCod: h.qvhCod ?? (this.qvhCod == null ? null : String(this.qvhCod)),
-    };
+  voltar() {
+    this.router.navigate(['/incubadas', this.incCod, 'validacaoHipotese']);
   }
 
   private mostrarToast(texto: string, tipo: 'sucesso' | 'erro') {

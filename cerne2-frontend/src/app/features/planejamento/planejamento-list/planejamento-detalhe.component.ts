@@ -91,8 +91,8 @@ export class PlanejamentoDetalheComponent implements OnInit, OnDestroy {
 
   private prefixo(): unknown[] {
     if (this.modoAvaliacao && this.incCod != null)
-      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
-    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+      return ['/gerenciaIncubadas', '/incubadas/', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/incubadas/', this.incCod, 'planejamento'];
     return ['/planejamento'];
   }
 

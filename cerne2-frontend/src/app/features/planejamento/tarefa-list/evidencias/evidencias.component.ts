@@ -25,6 +25,7 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
   @Input() prjCod = 0;
   @Input() objCod = 0;
   @Input() trfCod = 0;
+  @Input() incCod: number | null = null;
 
   evidencias: EvidenciaDTO[] = [];
   modalAberto = false;
@@ -54,7 +55,7 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
 
   private carregar() {
     this.service
-      .findEvidencias(this.pesCod, this.prjCod, this.objCod, this.trfCod)
+      .findEvidencias(this.pesCod, this.prjCod, this.objCod, this.trfCod, this.incCod)
       .subscribe({
         next: data => {
           this.evidencias = data ?? [];
@@ -110,7 +111,10 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private evidenciaBase(evdCod: number): string {
-    const base = 'http://localhost:8080/planejamento';
+    const host = 'http://localhost:8080';
+    const base = this.incCod
+      ? `${host}/incubadas/${this.incCod}/planejamento`
+      : `${host}/planejamento`;
     return (
       `${base}/${this.pesCod}/projetos/${this.prjCod}/objetivos/${this.objCod}` +
       `/tarefas/${this.trfCod}/evidencias/${evdCod}`
@@ -122,7 +126,7 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
 
     if (this.editandoCod === null) {
       this.service
-        .saveEvidencia(this.pesCod, this.prjCod, this.objCod, this.trfCod, body)
+        .saveEvidencia(this.pesCod, this.prjCod, this.objCod, this.trfCod, body, this.incCod)
         .subscribe({
           next: () => {
             this.mostrarToast('Evidência criada com sucesso!', 'sucesso');
@@ -140,6 +144,7 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
           this.trfCod,
           this.editandoCod,
           body,
+          this.incCod
         )
         .subscribe({
           next: () => {
@@ -154,7 +159,7 @@ export class EvidenciasComponent implements OnInit, OnChanges, OnDestroy {
 
   excluir(e: EvidenciaDTO) {
     this.service
-      .deleteEvidencia(this.pesCod, this.prjCod, this.objCod, this.trfCod, e.evdCod!)
+      .deleteEvidencia(this.pesCod, this.prjCod, this.objCod, this.trfCod, e.evdCod!, this.incCod)
       .subscribe({
         next: () => {
           this.evidencias = this.evidencias.filter(x => x.evdCod !== e.evdCod);

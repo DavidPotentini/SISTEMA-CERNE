@@ -35,17 +35,17 @@ export class ObjetivoComponent implements OnInit {
     this.pesCod = Number(params.get('pesCod'));
     this.prjCod = Number(params.get('prjCod'));
 
-    this.service.findObjetivos(this.pesCod, this.prjCod).subscribe({
+    this.service.findObjetivos(this.pesCod, this.prjCod, this.incCod).subscribe({
       next: data => { this.objetivos = data; this.cdr.detectChanges(); },
       error: err => { this.erroCarregamento = `Erro ao carregar objetivos: ${err.message ?? err.status ?? 'desconhecido'}`; this.cdr.detectChanges(); },
     });
-    this.service.findByProjetoId(this.pesCod, this.prjCod).subscribe(data => { this.projetoNome = data.nome; this.cdr.detectChanges(); });
+    this.service.findByProjetoId(this.pesCod, this.prjCod, this.incCod).subscribe(data => { this.projetoNome = data.nome; this.cdr.detectChanges(); });
   }
 
   private prefixo(): unknown[] {
     if (this.modoAvaliacao && this.incCod != null)
-      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
-    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+      return ['/gerenciaIncubadas', '/incubadas/', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/incubadas/', this.incCod, 'planejamento'];
     return ['/planejamento'];
   }
 
@@ -70,7 +70,7 @@ export class ObjetivoComponent implements OnInit {
   }
 
   deletar(objCod: number) {
-    this.service.deleteObjetivo(this.pesCod, this.prjCod, objCod).subscribe(() => {
+    this.service.deleteObjetivo(this.pesCod, this.prjCod, objCod, this.incCod).subscribe(() => {
       this.objetivos = this.objetivos.filter(o => o.objCod !== objCod);
       this.cdr.detectChanges();
     });

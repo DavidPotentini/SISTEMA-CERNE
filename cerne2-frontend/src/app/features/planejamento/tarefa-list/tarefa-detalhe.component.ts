@@ -43,10 +43,6 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.modoAvaliacao = !!this.route.snapshot.data['modoAvaliacao'];
 
-    this.pessoasService.findByIncubadora().subscribe(data => {
-      this.responsaveis = data ?? [];
-      this.cdr.detectChanges();
-    });
 
     this.route.paramMap.subscribe(params => {
       const inc = params.get('incCod');
@@ -57,12 +53,21 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
       const cod = params.get('trfCod');
       this.isNovo = !cod || cod === 'novo';
 
+      const responsaveis$ = this.incCod != null ?
+                            this.pessoasService.findByIncubada(this.incCod) :
+                            this.pessoasService.findByIncubadora();
+
+      responsaveis$.subscribe(data => {
+        this.responsaveis = data ?? [];
+        this.cdr.detectChanges();
+      });
+
       if (this.isNovo) {
         this.form = this.formVazio();
         this.trfCod = 0;
       } else {
         this.trfCod = Number(cod);
-        this.service.findByTarefaId(this.pesCod, this.prjCod, this.objCod, this.trfCod).subscribe(data => {
+        this.service.findByTarefaId(this.pesCod, this.prjCod, this.objCod, this.trfCod, this.incCod).subscribe(data => {
           this.form = data;
           this.cdr.detectChanges();
         });
@@ -76,8 +81,8 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
 
   private prefixo(): unknown[] {
     if (this.modoAvaliacao && this.incCod != null)
-      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
-    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+      return ['/gerenciaIncubadas', '/incubadas/', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/incubadas/', this.incCod, 'planejamento'];
     return ['/planejamento'];
   }
 
@@ -92,7 +97,7 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
     }
 
     if (this.isNovo) {
-      this.service.saveTarefa(this.pesCod, this.prjCod, this.objCod, this.form).subscribe({
+      this.service.saveTarefa(this.pesCod, this.prjCod, this.objCod, this.form, this.incCod).subscribe({
         next: data => {
           this.isNovo = false;
           this.trfCod = data.trfCod!;
@@ -105,7 +110,7 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
         error: () => this.mostrarToast('Erro ao criar a tarefa.', 'erro'),
       });
     } else {
-      this.service.updateTarefa(this.pesCod, this.prjCod, this.objCod, this.trfCod, this.form).subscribe({
+      this.service.updateTarefa(this.pesCod, this.prjCod, this.objCod, this.trfCod, this.form, this.incCod).subscribe({
         next: () => this.mostrarToast('Tarefa atualizada com sucesso!', 'sucesso'),
         error: () => this.mostrarToast('Erro ao atualizar a tarefa.', 'erro'),
       });
@@ -128,7 +133,7 @@ export class TarefaDetalheComponent implements OnInit, OnDestroy {
   deletar() {
     if (this.modoAvaliacao) return;
     this.service
-      .deleteTarefa(this.pesCod, this.prjCod, this.objCod, this.trfCod)
+      .deleteTarefa(this.pesCod, this.prjCod, this.objCod, this.trfCod, this.incCod)
       .subscribe(() => this.voltar());
   }
 

@@ -1,0 +1,50 @@
+<div class="container">
+  <header class="page-header">
+    <div>
+      <h1>Bem-vindo, {{ nome }}</h1>
+      <p class="empresa">{{ nomeEmpresa }}</p>
+    </div>
+  </header>
+
+  <section *ngIf="!ehIncubada" class="cards">
+    <a routerLink="/incubadas" class="card">
+      <h2>Incubadas</h2>
+      <p>Cadastro e gerência das incubadas</p>
+    </a>
+    <a routerLink="/pessoas" class="card">
+      <h2>Pessoas</h2>
+      <p>Cadastro de pessoas da incubadora</p>
+    </a>
+    <a routerLink="/planejamento" class="card">
+      <h2>Planejamento Estratégico</h2>
+      <p>Planejamento da incubadora</p>
+    </a>
+    <a routerLink="/metricas" class="card">
+      <h2>Métricas</h2>
+      <p>Indicadores e metas</p>
+    </a>
+    <a routerLink="/formularios" class="card">
+      <h2>Formulários</h2>
+      <p>Formulários da incubadora</p>
+    </a>
+    <a routerLink="/servicosValorAgregado" class="card">
+      <h2>Serviços de Valor Agregado</h2>
+      <p>Catálogo de serviços</p>
+    </a>
+  </section>
+
+  <section *ngIf="ehIncubada" class="cards">
+    <a [routerLink]="['/incubadas', incCod, 'planejamento']" class="card">
+      <h2>Planejamento Estratégico</h2>
+      <p>Planejamento da sua incubada</p>
+    </a>
+    <a [routerLink]="['/incubadas', incCod, 'ambienteCanvas']" class="card">
+      <h2>Ambientes de Canvas</h2>
+      <p>Modelagem de negócio</p>
+    </a>
+    <a [routerLink]="['/incubadas', incCod, 'validacaoHipotese']" class="card">
+      <h2>Quadros de Validação</h2>
+      <p>Validação de hipóteses</p>
+    </a>
+  </section>
+</div>

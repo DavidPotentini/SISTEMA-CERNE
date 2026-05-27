@@ -9,18 +9,15 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        uses = {EntityReferenceResolver.class, HipoteseMapper.class})
+        uses = EntityReferenceResolver.class)
 public interface QuadroValidacaoHipoteseMapper {
 
     @Mapping(source = "incubadasModel.incCod", target = "incCod")
-    @Mapping(source = "hipoteseModelList", target = "hipoteseDTOList")
     QuadroValidacaoHipoteseDTO toDTO(QuadroValidacaoHipoteseModel quadroValidacaoHipoteseModel);
 
     List<QuadroValidacaoHipoteseDTO> toDTOList(List<QuadroValidacaoHipoteseModel> quadroValidacaoHipoteseModelList);
 
     @Mapping(source = "quadroValidacaoHipoteseDTO.incCod", target = "incubadasModel")
-    @Mapping(source = "quadroValidacaoHipoteseDTO.hipoteseDTOList", target = "hipoteseModelList")
+    @Mapping(target = "hipoteseModelList", ignore = true)
     QuadroValidacaoHipoteseModel toModel(QuadroValidacaoHipoteseDTO quadroValidacaoHipoteseDTO, Long qvhCod);
-
-
 }

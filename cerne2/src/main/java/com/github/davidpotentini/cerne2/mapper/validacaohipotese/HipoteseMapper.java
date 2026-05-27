@@ -17,12 +17,6 @@ public interface HipoteseMapper {
 
     List<HipoteseDTO> toDTOList(List<HipoteseModel> hipoteseModelList);
 
-    @Mapping(source = "hipoteseDTO.qvhCod", target = "quadroValidacaoHipoteseModel")
-    HipoteseModel toModel(HipoteseDTO hipoteseDTO, Long hipCod);
-
-    // novo — usado pelo QuadroValidacaoHipoteseMapper na lista
-    @Mapping(source = "hipoteseDTO.qvhCod", target = "quadroValidacaoHipoteseModel")
-    HipoteseModel toModel(HipoteseDTO hipoteseDTO);
-
-    List<HipoteseModel> toModelList(List<HipoteseDTO> hipoteseDTOList);
+    @Mapping(target = "quadroValidacaoHipoteseModel", source = "qvhCod")
+    HipoteseModel toModel(HipoteseDTO hipoteseDTO, Long hipCod, Long qvhCod);
 }

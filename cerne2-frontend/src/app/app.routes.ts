@@ -26,6 +26,8 @@ import { AmbienteCanvasListComponent } from './features/canvas/ambiente-canvas-l
 import { AmbienteCanvasDetalheComponent } from './features/canvas/ambiente-canvas-detalhe.component';
 import { QuadroListComponent } from './features/validacao-hipotese/quadro-list.component';
 import { QuadroDetalheComponent } from './features/validacao-hipotese/quadro-detalhe.component';
+import { HipoteseDetalheComponent } from './features/validacao-hipotese/hipotese-detalhe.component';
+import { HomeComponent } from './features/home/home.component';
 
 // Filhas reaproveitadas pelos três prefixos de planejamento (incubadora / incubada direta /
 // monitoramento via gerência). Mantidas em uma única constante para que mudanças na árvore
@@ -48,15 +50,18 @@ const SO_INCUBADA: Role[] = ['ADMIN_INCUBADA'];
 
 // Rotas internas — exigem sessão ativa (authGuard) e papel compatível (roleGuard).
 const rotasInternas: Routes = [
+  // Tela inicial pós-login (decide os cards conforme sessao.incCod)
+  { path: 'home', component: HomeComponent, data: { roles: AMBOS } },
+
   // Planejamento da própria incubadora
   { path: 'planejamento', children: planejamentoChildren, data: { roles: AMBOS } },
 
   // Planejamento de uma incubada (leitura direta via prefixo de incubada)
-  { path: ':incCod/planejamento', children: planejamentoChildren, data: { roles: AMBOS } },
+  { path: 'incubadas/:incCod/planejamento', children: planejamentoChildren, data: { roles: AMBOS } },
 
   // Planejamento de uma incubada no modo monitoramento/avaliação dentro da gerência
   {
-    path: 'gerenciaIncubadas/:incCod/planejamento',
+    path: 'gerenciaIncubadas/incubadas/:incCod/planejamento',
     children: planejamentoChildren,
     data: { modoAvaliacao: true, roles: SO_INCUBADORA },
   },
@@ -68,10 +73,11 @@ const rotasInternas: Routes = [
   // Pessoas
   { path: 'pessoas', component: PessoaListComponent, data: { roles: SO_INCUBADORA } },
   { path: 'pessoas/:pessoaCod', component: PessoaDetalheComponent, data: { roles: SO_INCUBADORA } },
+  { path: 'pessoas/incubadas/:incCod"', component: PessoaDetalheComponent, data: { roles: AMBOS } },
 
   // Incubadas (lista e detalhe são acessíveis a ambos os papéis no backend)
-  { path: 'incubadas', component: IncubadaListComponent, data: { roles: AMBOS } },
-  { path: 'incubadas/:incCod', component: IncubadaDetalheComponent, data: { roles: AMBOS } },
+  { path: 'incubadas', component: IncubadaListComponent, data: { roles: SO_INCUBADORA } },
+  { path: 'incubadas/:incCod', component: IncubadaDetalheComponent, data: { roles: SO_INCUBADORA } },
 
   // Métricas
   { path: 'metricas', component: MetricaListComponent, data: { roles: SO_INCUBADORA } },
@@ -82,12 +88,13 @@ const rotasInternas: Routes = [
   { path: 'formularios/:frmCod', component: FormularioDetalheComponent, data: { roles: SO_INCUBADORA } },
 
   // Canvas (por incubada/ambiente)
-  { path: 'incubadas/:incCod/ambientesCanvas', component: AmbienteCanvasListComponent, data: { roles: SO_INCUBADA } },
-  { path: 'incubadas/:incCod/ambientesCanvas/:ambcCod', component: AmbienteCanvasDetalheComponent, data: { roles: SO_INCUBADA } },
+  { path: 'incubadas/:incCod/ambienteCanvas', component: AmbienteCanvasListComponent, data: { roles: SO_INCUBADA } },
+  { path: 'incubadas/:incCod/ambienteCanvas/:ambcCod', component: AmbienteCanvasDetalheComponent, data: { roles: SO_INCUBADA } },
 
   // Validação de Hipóteses (por incubada/quadro)
-  { path: 'incubadas/:incCod/quadrosValidacao', component: QuadroListComponent, data: { roles: SO_INCUBADA } },
-  { path: 'incubadas/:incCod/quadrosValidacao/:qvhCod', component: QuadroDetalheComponent, data: { roles: SO_INCUBADA } },
+  { path: 'incubadas/:incCod/validacaoHipotese', component: QuadroListComponent, data: { roles: SO_INCUBADA } },
+  { path: 'incubadas/:incCod/validacaoHipotese/:qvhCod', component: QuadroDetalheComponent, data: { roles: SO_INCUBADA } },
+  { path: 'incubadas/:incCod/validacaoHipotese/:qvhCod/hipoteses/:hipCod', component: HipoteseDetalheComponent, data: { roles: SO_INCUBADA } },
 ];
 
 export const routes: Routes = [

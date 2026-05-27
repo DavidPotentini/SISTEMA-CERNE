@@ -1,0 +1,107 @@
+<div class="toast" *ngIf="toast" [class.sucesso]="toast.tipo === 'sucesso'" [class.erro]="toast.tipo === 'erro'">
+  {{ toast.texto }}
+</div>
+
+<div class="container">
+  <header class="page-header">
+    <button type="button" class="btn-back" (click)="voltar()">← Voltar para o quadro</button>
+    <h1>{{ isNovo ? 'Nova Hipótese' : 'Editar Hipótese' }}</h1>
+    <span class="meta" *ngIf="!isNovo">Hipótese #{{ hipCod }} · Quadro #{{ qvhCod }}</span>
+  </header>
+
+  <form class="form-card" (ngSubmit)="salvar()">
+    <div class="form-group">
+      <label for="bloco">Bloco do Lean Canvas</label>
+      <select id="bloco" [(ngModel)]="form.vldBlocoLeanCanvas" name="bloco">
+        <option [ngValue]="null">— selecione —</option>
+        <option *ngFor="let b of blocosLean" [ngValue]="b">{{ blocoLabel(b) }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="hipotese">Hipótese</label>
+      <textarea
+        id="hipotese"
+        name="hipotese"
+        rows="3"
+        [(ngModel)]="form.hipotese"
+        placeholder="Acreditamos que..."
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="experimento">Experimento</label>
+      <textarea
+        id="experimento"
+        name="experimento"
+        rows="3"
+        [(ngModel)]="form.experimento"
+        placeholder="Para validar, faremos..."
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="metrica">Métrica de sucesso</label>
+      <input
+        id="metrica"
+        type="text"
+        name="metrica"
+        [(ngModel)]="form.metrica"
+        placeholder="Saberemos que deu certo se..."
+      />
+    </div>
+
+    <div class="form-row form-row-3">
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" name="status" [(ngModel)]="form.vldStatusHipotese">
+          <option [ngValue]="null">— selecione —</option>
+          <option *ngFor="let s of statusOpcoes" [ngValue]="s">{{ statusLabel(s) }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="resultado">Resultado</label>
+        <select id="resultado" name="resultado" [(ngModel)]="form.vldResultadoHipotese">
+          <option [ngValue]="null">— selecione —</option>
+          <option *ngFor="let r of resultadoOpcoes" [ngValue]="r">{{ resultadoLabel(r) }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="decisao">Decisão</label>
+        <select id="decisao" name="decisao" [(ngModel)]="form.vldDecisaoHipotese">
+          <option [ngValue]="null">— selecione —</option>
+          <option *ngFor="let d of decisaoOpcoes" [ngValue]="d">{{ decisaoLabel(d) }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="resultadoDetalhamento">Detalhamento do resultado</label>
+      <textarea
+        id="resultadoDetalhamento"
+        name="resultadoDetalhamento"
+        rows="2"
+        [(ngModel)]="form.resultadoDetalhamento"
+        placeholder="O que aprendemos?"
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="decisaoDetalhamento">Detalhamento da decisão</label>
+      <textarea
+        id="decisaoDetalhamento"
+        name="decisaoDetalhamento"
+        rows="2"
+        [(ngModel)]="form.decisaoDetalhamento"
+        placeholder="Próximos passos / razões"
+      ></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">{{ isNovo ? 'Salvar' : 'Atualizar' }}</button>
+      <button *ngIf="!isNovo" type="button" class="btn btn-danger" (click)="excluir()">Excluir</button>
+    </div>
+  </form>
+</div>

@@ -21,7 +21,6 @@
     <div class="card" *ngFor="let q of quadros" (click)="abrir(q.qvhCod)">
       <div class="card-content">
         <h3 class="card-title">{{ q.tituloQuadro || 'Quadro sem título' }}</h3>
-        <p class="card-meta">{{ totalHipoteses(q) }} hipótese(s)</p>
       </div>
       <div class="card-footer">
         <span class="card-id">#{{ q.qvhCod }}</span>

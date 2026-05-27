@@ -4,8 +4,6 @@ import com.github.davidpotentini.cerne2.dto.validacaohipotese.HipoteseDTO;
 import com.github.davidpotentini.cerne2.dto.validacaohipotese.QuadroValidacaoHipoteseDTO;
 import com.github.davidpotentini.cerne2.mapper.validacaohipotese.HipoteseMapper;
 import com.github.davidpotentini.cerne2.mapper.validacaohipotese.QuadroValidacaoHipoteseMapper;
-import com.github.davidpotentini.cerne2.models.validacaohipotese.HipoteseModel;
-import com.github.davidpotentini.cerne2.models.validacaohipotese.QuadroValidacaoHipoteseModel;
 import com.github.davidpotentini.cerne2.repository.validacaohipotese.HipoteseRepository;
 import com.github.davidpotentini.cerne2.repository.validacaohipotese.QuadroValidacaoHipoteseRepository;
 import org.springframework.http.HttpStatus;
@@ -18,10 +16,10 @@ import java.util.List;
 @Service
 public class ValidacaoHipoteseService {
 
-    private QuadroValidacaoHipoteseRepository quadroValidacaoHipoteseRepository;
-    private HipoteseRepository hipoteseRepository;
-    private QuadroValidacaoHipoteseMapper quadroValidacaoHipoteseMapper;
-    private HipoteseMapper hipoteseMapper;
+    private final QuadroValidacaoHipoteseRepository quadroValidacaoHipoteseRepository;
+    private final HipoteseRepository hipoteseRepository;
+    private final QuadroValidacaoHipoteseMapper quadroValidacaoHipoteseMapper;
+    private final HipoteseMapper hipoteseMapper;
 
     public ValidacaoHipoteseService(QuadroValidacaoHipoteseRepository quadroValidacaoHipoteseRepository,
                                     HipoteseRepository hipoteseRepository,
@@ -34,6 +32,7 @@ public class ValidacaoHipoteseService {
     }
 
     /*QUADRO VALIDAÇÃO HIPOTESE*/
+
     public List<QuadroValidacaoHipoteseDTO> findQuadroValidacaoHipoteseByIncCod(Long incCod){
         return quadroValidacaoHipoteseMapper.toDTOList(quadroValidacaoHipoteseRepository.findQuadroValidacaoHipoteseByIncCod(incCod));
     }
@@ -45,34 +44,13 @@ public class ValidacaoHipoteseService {
 
     @Transactional(rollbackFor = Exception.class)
     public QuadroValidacaoHipoteseDTO saveQuadroValidacaoHipotese(QuadroValidacaoHipoteseDTO quadroValidacaoHipoteseDTO, Long qvhCod){
-        QuadroValidacaoHipoteseModel quadroValidacaoHipoteseModel = quadroValidacaoHipoteseRepository.save(quadroValidacaoHipoteseMapper.toModel(quadroValidacaoHipoteseDTO, qvhCod));
-
-        List<HipoteseModel> hipoteseModelList = hipoteseMapper.toModelList(quadroValidacaoHipoteseDTO.hipoteseDTOList());
-        if (hipoteseModelList != null) {
-            // Liga cada hipótese ao quadro recém-salvo (cobre o caso de quadro novo,
-            // em que o front ainda não conhece o qvhCod).
-            hipoteseModelList.forEach(h -> h.setQuadroValidacaoHipoteseModel(quadroValidacaoHipoteseModel));
-            hipoteseRepository.saveAllAndFlush(hipoteseModelList);
-        }
-
-        // Reconsulta as hipóteses no banco em vez de usar a coleção inversa
-        // (@OneToMany mappedBy) do quadro, que fica defasada nesta mesma transação.
-        List<HipoteseDTO> hipoteseDTOList = hipoteseMapper.toDTOList(
-                hipoteseRepository.findHipoteseByQvhCod(quadroValidacaoHipoteseModel.getQvhCod()));
-
-        return new QuadroValidacaoHipoteseDTO(
-                quadroValidacaoHipoteseModel.getQvhCod(),
-                quadroValidacaoHipoteseModel.getTituloQuadro(),
-                quadroValidacaoHipoteseModel.getIncubadasModel() == null
-                        ? quadroValidacaoHipoteseDTO.incCod()
-                        : quadroValidacaoHipoteseModel.getIncubadasModel().getIncCod(),
-                hipoteseDTOList);
+        return quadroValidacaoHipoteseMapper.toDTO(quadroValidacaoHipoteseRepository.save(
+                quadroValidacaoHipoteseMapper.toModel(quadroValidacaoHipoteseDTO, qvhCod)));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteQuadroValidacaoHipotese(Long qvhCod){
         hipoteseRepository.deleteHipoteseByQvhCod(qvhCod);
-
         quadroValidacaoHipoteseRepository.deleteById(qvhCod);
     }
 
@@ -83,19 +61,13 @@ public class ValidacaoHipoteseService {
         return hipoteseMapper.toDTOList(hipoteseRepository.findHipoteseByQvhCod(qvhCod));
     }
 
-    public HipoteseDTO findHipoteseById(Long hipCod){
-        return hipoteseMapper.toDTO(hipoteseRepository.findById(hipCod)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-    }
-
     @Transactional(rollbackFor = Exception.class)
-    public HipoteseDTO saveHipotese(HipoteseDTO hipoteseDTO, Long hipCod){
-        return hipoteseMapper.toDTO(hipoteseRepository.save(hipoteseMapper.toModel(hipoteseDTO, hipCod)));
+    public HipoteseDTO saveHipotese(HipoteseDTO hipoteseDTO, Long qvhCod, Long hipCod){
+        return hipoteseMapper.toDTO(hipoteseRepository.save(hipoteseMapper.toModel(hipoteseDTO, hipCod, qvhCod)));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteHipotese(Long hipCod){
         hipoteseRepository.deleteById(hipCod);
     }
-
 }

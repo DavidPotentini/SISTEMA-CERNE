@@ -11,7 +11,7 @@ import java.net.URI;
 import java.util.List;
 
 @Controller
-@RequestMapping("/{incCod}/ambienteCanvas")
+@RequestMapping("/incubadas/{incCod}/ambienteCanvas")
 public class CanvasController {
 
     private final CanvasService canvasService;

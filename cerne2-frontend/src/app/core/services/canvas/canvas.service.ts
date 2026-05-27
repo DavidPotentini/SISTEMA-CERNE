@@ -17,7 +17,7 @@ export class CanvasService {
   constructor(private http: HttpClient) {}
 
   private base(incCod: number): string {
-    return `${this.host}/${incCod}/ambienteCanvas`;
+    return `${this.host}/incubadas/${incCod}/ambienteCanvas`;
   }
 
   // Ambiente Canvas

@@ -33,23 +33,30 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/login/**", "/cadastro/**").permitAll()
 
+                        .requestMatchers("/incubadas/*/planejamento/**")
+                        .hasAnyRole("ADMIN_INCUBADA","ADMIN_INCUBADORA")
+
                         .requestMatchers(
                                 "/gerenciaIncubadas/**",
-                                "/pessoas/**",
                                 "/metricas/**",
                                 "/formularios/**",
-                                "/servicosValorAgregado/**")
+                                "/servicosValorAgregado/**",
+                                "/planejamento/**"
+                                )
+                        .hasRole("ADMIN_INCUBADORA")
+
+                        .requestMatchers("/pessoas/incubada/{incCod}")
+                        .hasAnyRole("ADMIN_INCUBADA","ADMIN_INCUBADORA")
+
+                        .requestMatchers("/pessoas/**"
+                        )
                         .hasRole("ADMIN_INCUBADORA")
 
                         .requestMatchers(
-                                "/incubadas/*/ambientesCanvas/**",
-                                "/incubadas/*/quadrosValidacao/**")
+                                "/incubadas/*/ambienteCanvas/**",
+                                "/incubadas/*/validacaoHipotese/**"
+                                )
                         .hasRole("ADMIN_INCUBADA")
-
-                        .requestMatchers(
-                                "/planejamento/**",
-                                "/*/planejamento/**")
-                        .hasAnyRole("ADMIN_INCUBADA","ADMIN_INCUBADORA")
 
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFIlter, UsernamePasswordAuthenticationFilter.class);

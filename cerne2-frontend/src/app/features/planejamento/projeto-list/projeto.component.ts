@@ -33,7 +33,7 @@ export class ProjetoComponent implements OnInit {
     this.incCod = inc ? Number(inc) : null;
     this.pesCod = Number(params.get('pesCod'));
 
-    this.service.findProjetos(this.pesCod).subscribe({
+    this.service.findProjetos(this.pesCod, this.incCod).subscribe({
       next: data => { this.projetos = data; this.cdr.detectChanges(); },
       error: err => { this.erroCarregamento = `Erro ao carregar projetos: ${err.message ?? err.status ?? 'desconhecido'}`; this.cdr.detectChanges(); },
     });
@@ -42,8 +42,8 @@ export class ProjetoComponent implements OnInit {
 
   private prefixo(): unknown[] {
     if (this.modoAvaliacao && this.incCod != null)
-      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
-    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+      return ['/gerenciaIncubadas', '/incubadas/', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/incubadas/', this.incCod, 'planejamento'];
     return ['/planejamento'];
   }
 
@@ -64,7 +64,7 @@ export class ProjetoComponent implements OnInit {
   }
 
   deletar(prjCod: number) {
-    this.service.deleteProjeto(this.pesCod, prjCod).subscribe(() => {
+    this.service.deleteProjeto(this.pesCod, prjCod, this.incCod).subscribe(() => {
       this.projetos = this.projetos.filter(p => p.prjCod !== prjCod);
       this.cdr.detectChanges();
     });

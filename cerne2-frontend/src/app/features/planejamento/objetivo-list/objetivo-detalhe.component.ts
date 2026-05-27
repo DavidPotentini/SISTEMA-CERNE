@@ -46,7 +46,7 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
         this.objCod = 0;
       } else {
         this.objCod = Number(cod);
-        this.service.findByObjetivoId(this.pesCod, this.prjCod, this.objCod).subscribe(data => {
+        this.service.findByObjetivoId(this.pesCod, this.prjCod, this.objCod, this.incCod).subscribe(data => {
           this.form = data;
           this.cdr.detectChanges();
         });
@@ -60,8 +60,8 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
 
   private prefixo(): unknown[] {
     if (this.modoAvaliacao && this.incCod != null)
-      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
-    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+      return ['/gerenciaIncubadas', '/incubadas/', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/incubadas/', this.incCod, 'planejamento'];
     return ['/planejamento'];
   }
 
@@ -72,7 +72,7 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
   salvar() {
     if (this.modoAvaliacao) return;
     if (this.isNovo) {
-      this.service.saveObjetivo(this.pesCod, this.prjCod, this.form).subscribe({
+      this.service.saveObjetivo(this.pesCod, this.prjCod, this.form, this.incCod).subscribe({
         next: data => {
           this.isNovo = false;
           this.objCod = data.objCod!;
@@ -85,7 +85,7 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
         error: () => this.mostrarToast('Erro ao criar o objetivo.', 'erro'),
       });
     } else {
-      this.service.updateObjetivo(this.pesCod, this.prjCod, this.objCod, this.form).subscribe({
+      this.service.updateObjetivo(this.pesCod, this.prjCod, this.objCod, this.form, this.incCod).subscribe({
         next: () => this.mostrarToast('Objetivo atualizado com sucesso!', 'sucesso'),
         error: () => this.mostrarToast('Erro ao atualizar o objetivo.', 'erro'),
       });
@@ -94,7 +94,7 @@ export class ObjetivoDetalheComponent implements OnInit, OnDestroy {
 
   deletar() {
     if (this.modoAvaliacao) return;
-    this.service.deleteObjetivo(this.pesCod, this.prjCod, this.objCod).subscribe(() => this.voltar());
+    this.service.deleteObjetivo(this.pesCod, this.prjCod, this.objCod, this.incCod).subscribe(() => this.voltar());
   }
 
   voltar() {

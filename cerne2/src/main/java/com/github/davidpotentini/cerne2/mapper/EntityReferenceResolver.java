@@ -2,6 +2,8 @@ package com.github.davidpotentini.cerne2.mapper;
 
 import com.github.davidpotentini.cerne2.models.canvas.AmbienteCanvasModel;
 import com.github.davidpotentini.cerne2.models.informacoesgeraisincubadas.IncubadasModel;
+import com.github.davidpotentini.cerne2.models.monitoramentoempreendedor.FasesMonitoramentoEmpreendedorModel;
+import com.github.davidpotentini.cerne2.models.monitoramentoempreendedor.MonitoramentoEmpreendedorModel;
 import com.github.davidpotentini.cerne2.models.pessoas.PessoasModel;
 import com.github.davidpotentini.cerne2.models.planejamentoestrategico.ObjetivosModel;
 import com.github.davidpotentini.cerne2.models.planejamentoestrategico.PlanejamentoEstrategicoModel;
@@ -10,6 +12,8 @@ import com.github.davidpotentini.cerne2.models.planejamentoestrategico.TarefasMo
 import com.github.davidpotentini.cerne2.models.validacaohipotese.QuadroValidacaoHipoteseModel;
 import com.github.davidpotentini.cerne2.repository.canvas.AmbienteCanvasRepository;
 import com.github.davidpotentini.cerne2.repository.informacoesgeraisincubadas.IncubadasRepository;
+import com.github.davidpotentini.cerne2.repository.monitoramentoempreendedor.FasesMonitoramentoEmpreendedorRepository;
+import com.github.davidpotentini.cerne2.repository.monitoramentoempreendedor.MonitoramentoEmpreendedorRepository;
 import com.github.davidpotentini.cerne2.repository.pessoas.PessoasRepository;
 import com.github.davidpotentini.cerne2.repository.planejamentoestrategico.ObjetivosRepository;
 import com.github.davidpotentini.cerne2.repository.planejamentoestrategico.PlanejamentoEstrategicoRepository;
@@ -30,6 +34,8 @@ public class EntityReferenceResolver {
     private final ObjetivosRepository objetivosRepository;
     private final TarefasRepository tarefasRepository;
     private final PessoasRepository pessoasRepository;
+    private final FasesMonitoramentoEmpreendedorRepository fasesMonitoramentoEmpreendedorRepository;
+    private final MonitoramentoEmpreendedorRepository monitoramentoEmpreendedorRepository;
 
     public IncubadasModel toIncubadasModel(Long incCod){
         return incCod == null? null: incubadasRepository.getReferenceById(incCod);
@@ -61,5 +67,13 @@ public class EntityReferenceResolver {
 
     public PessoasModel toPessoasModel(Long pessoaCod){
         return pessoaCod == null? null: pessoasRepository.getReferenceById(pessoaCod);
+    }
+
+    public FasesMonitoramentoEmpreendedorModel toFasesMonitoramentoEmpreendedorModel(Long fasCod){
+        return fasCod == null? null: fasesMonitoramentoEmpreendedorRepository.getReferenceById(fasCod);
+    }
+
+    public MonitoramentoEmpreendedorModel toMonitoramentoEmpreendedorModel(Long monCod){
+        return monCod == null? null: monitoramentoEmpreendedorRepository.getReferenceById(monCod);
     }
 }

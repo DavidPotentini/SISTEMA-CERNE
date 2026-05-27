@@ -53,7 +53,7 @@ public class PessoasController {
         return ResponseEntity.ok(pessoasService.save(pessoasDTO, pessoaCod));
     }
 
-    @DeleteMapping("/{pessoaCod}")
+    @DeleteMapping({"/{pessoaCod}"})
     public ResponseEntity<Void> delete(@PathVariable Long pessoaCod){
         pessoasService.delete(pessoaCod);
 

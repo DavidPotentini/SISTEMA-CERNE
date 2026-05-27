@@ -24,7 +24,6 @@ export interface QuadroValidacaoHipoteseDTO {
   qvhCod: number | null;
   tituloQuadro: string;
   incCod: number;
-  hipoteseDTOList: HipoteseDTO[];
 }
 
 export function hipoteseVazia(qvhCod: number | null = null): HipoteseDTO {
@@ -49,6 +48,5 @@ export function quadroVazio(incCod: number): QuadroValidacaoHipoteseDTO {
     qvhCod: null,
     tituloQuadro: '',
     incCod,
-    hipoteseDTOList: [],
   };
 }

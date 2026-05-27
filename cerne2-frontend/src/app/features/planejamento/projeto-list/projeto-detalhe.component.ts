@@ -44,7 +44,7 @@ export class ProjetoDetalheComponent implements OnInit, OnDestroy {
         this.prjCod = 0;
       } else {
         this.prjCod = Number(cod);
-        this.service.findByProjetoId(this.pesCod, this.prjCod).subscribe(data => {
+        this.service.findByProjetoId(this.pesCod, this.prjCod, this.incCod).subscribe(data => {
           this.form = data;
           this.cdr.detectChanges();
         });
@@ -58,8 +58,8 @@ export class ProjetoDetalheComponent implements OnInit, OnDestroy {
 
   private prefixo(): unknown[] {
     if (this.modoAvaliacao && this.incCod != null)
-      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
-    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+      return ['/gerenciaIncubadas', '/incubadas/', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/incubadas/', this.incCod, 'planejamento'];
     return ['/planejamento'];
   }
 
@@ -70,7 +70,7 @@ export class ProjetoDetalheComponent implements OnInit, OnDestroy {
   salvar() {
     if (this.modoAvaliacao) return;
     if (this.isNovo) {
-      this.service.saveProjeto(this.pesCod, this.form).subscribe({
+      this.service.saveProjeto(this.pesCod, this.form, this.incCod).subscribe({
         next: data => {
           this.isNovo = false;
           this.prjCod = data.prjCod!;
@@ -80,7 +80,7 @@ export class ProjetoDetalheComponent implements OnInit, OnDestroy {
         error: () => this.mostrarToast('Erro ao criar o projeto.', 'erro'),
       });
     } else {
-      this.service.updateProjeto(this.pesCod, this.prjCod, this.form).subscribe({
+      this.service.updateProjeto(this.pesCod, this.prjCod, this.form, this.incCod).subscribe({
         next: () => this.mostrarToast('Projeto atualizado com sucesso!', 'sucesso'),
         error: () => this.mostrarToast('Erro ao atualizar o projeto.', 'erro'),
       });
@@ -89,7 +89,7 @@ export class ProjetoDetalheComponent implements OnInit, OnDestroy {
 
   deletar() {
     if (this.modoAvaliacao) return;
-    this.service.deleteProjeto(this.pesCod, this.prjCod).subscribe(() => this.voltar());
+    this.service.deleteProjeto(this.pesCod, this.prjCod, this.incCod).subscribe(() => this.voltar());
   }
 
   voltar() {

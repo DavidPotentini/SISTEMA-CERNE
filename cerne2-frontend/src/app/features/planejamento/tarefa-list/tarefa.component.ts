@@ -38,19 +38,19 @@ export class TarefaComponent implements OnInit {
     this.prjCod = Number(params.get('prjCod'));
     this.objCod = Number(params.get('objCod'));
 
-    this.service.findTarefas(this.pesCod, this.prjCod, this.objCod).subscribe({
+    this.service.findTarefas(this.pesCod, this.prjCod, this.objCod, this.incCod).subscribe({
       next: data => { this.tarefas = data; this.cdr.detectChanges(); },
       error: err => { this.erroCarregamento = `Erro ao carregar tarefas: ${err.message ?? err.status ?? 'desconhecido'}`; this.cdr.detectChanges(); },
     });
     this.service
-      .findByObjetivoId(this.pesCod, this.prjCod, this.objCod)
+      .findByObjetivoId(this.pesCod, this.prjCod, this.objCod, this.incCod)
       .subscribe(data => { this.objetivoNome = data.nome; this.cdr.detectChanges(); });
   }
 
   private prefixo(): unknown[] {
     if (this.modoAvaliacao && this.incCod != null)
-      return ['/gerenciaIncubadas', this.incCod, 'planejamento'];
-    if (this.incCod != null) return ['/', this.incCod, 'planejamento'];
+      return ['/gerenciaIncubadas', '/incubadas/', this.incCod, 'planejamento'];
+    if (this.incCod != null) return ['/incubadas/', this.incCod, 'planejamento'];
     return ['/planejamento'];
   }
 
@@ -71,7 +71,7 @@ export class TarefaComponent implements OnInit {
   }
 
   deletar(trfCod: number) {
-    this.service.deleteTarefa(this.pesCod, this.prjCod, this.objCod, trfCod).subscribe(() => {
+    this.service.deleteTarefa(this.pesCod, this.prjCod, this.objCod, trfCod, this.incCod).subscribe(() => {
       this.tarefas = this.tarefas.filter(t => t.trfCod !== trfCod);
       this.cdr.detectChanges();
     });

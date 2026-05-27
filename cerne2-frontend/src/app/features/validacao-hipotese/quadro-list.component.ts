@@ -56,12 +56,11 @@ export class QuadroListComponent implements OnInit {
         qvhCod: null,
         tituloQuadro,
         incCod: this.incCod,
-        hipoteseDTOList: [],
       })
       .subscribe((q) => {
         this.novoTitulo = '';
         if (q.qvhCod != null) {
-          this.router.navigate(['/incubadas', this.incCod, 'quadrosValidacao', q.qvhCod]);
+          this.router.navigate(['/incubadas', this.incCod, 'validacaoHipotese', q.qvhCod]);
         } else {
           this.carregar();
         }
@@ -70,11 +69,7 @@ export class QuadroListComponent implements OnInit {
 
   abrir(qvhCod: number | null) {
     if (qvhCod != null)
-      this.router.navigate(['/incubadas', this.incCod, 'quadrosValidacao', qvhCod]);
-  }
-
-  totalHipoteses(q: QuadroValidacaoHipoteseDTO): number {
-    return q.hipoteseDTOList?.length ?? 0;
+      this.router.navigate(['/incubadas', this.incCod, 'validacaoHipotese', qvhCod]);
   }
 
   voltar() {

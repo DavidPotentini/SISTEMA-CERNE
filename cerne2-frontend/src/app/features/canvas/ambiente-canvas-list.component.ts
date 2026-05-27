@@ -56,7 +56,7 @@ export class AmbienteCanvasListComponent implements OnInit {
       .subscribe((amb) => {
         this.novoNome = '';
         if (amb.ambcCod != null) {
-          this.router.navigate(['/incubadas', this.incCod, 'ambientesCanvas', amb.ambcCod]);
+          this.router.navigate(['/incubadas', this.incCod, 'ambienteCanvas', amb.ambcCod]);
         } else {
           this.carregar();
         }
@@ -65,7 +65,7 @@ export class AmbienteCanvasListComponent implements OnInit {
 
   abrir(ambcCod: number | null) {
     if (ambcCod != null)
-      this.router.navigate(['/incubadas', this.incCod, 'ambientesCanvas', ambcCod]);
+      this.router.navigate(['/incubadas', this.incCod, 'ambienteCanvas', ambcCod]);
   }
 
   excluir(amb: AmbienteCanvasDTO, ev: Event) {
