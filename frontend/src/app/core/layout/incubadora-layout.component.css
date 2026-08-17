@@ -1,0 +1,65 @@
+.shell {
+  height: 100dvh;
+}
+.side {
+  width: fit-content;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+
+/* Preenche a altura do menu e empilha os blocos; o rodapé desce com margin-top:auto. */
+.side-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.brand {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 20px 20px 12px;
+}
+.menu {
+  flex: 1;
+}
+.ativo {
+  background: rgba(255, 255, 255, 0.16);
+}
+.rodape {
+  margin-top: auto;
+  padding: 12px 12px 12px 20px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.identidade {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.identidade .nome {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.identidade .nivel {
+  font-size: 0.78rem;
+}
+.rodape button {
+  color: #eaf1fb;
+}
+.conteudo {
+  padding: 24px;
+}
+.grupo-menu {
+  padding: 1rem 1rem 0.3rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #eaf1fb;
+}

@@ -1,0 +1,46 @@
+.shell {
+  height: 100dvh;
+}
+.side {
+  width: 250px;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+/* Preenche a altura do menu e empilha os blocos; o rodapé desce com margin-top:auto. */
+.side-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.brand {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 20px 20px 12px;
+}
+.menu {
+  flex: 1;
+}
+.ativo {
+  background: rgba(255, 255, 255, 0.16);
+}
+.futuro {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.rodape {
+  margin-top: auto;
+  padding: 8px 12px 8px 20px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.rodape button {
+  color: #eaf1fb;
+}
+.conteudo {
+  padding: 24px;
+}

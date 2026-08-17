@@ -1,0 +1,68 @@
+<mat-sidenav-container class="shell">
+  <mat-sidenav mode="side" opened class="side">
+    <div class="side-content">
+      <div class="brand">Incubadora</div>
+
+      <mat-nav-list class="menu">
+
+        <div class="grupo-menu">Operação</div>
+        
+        <a mat-list-item routerLink="/incubadora/planejamento" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>event_note</mat-icon>
+          <span matListItemTitle>Planejamento institucional</span>
+        </a>
+        <a mat-list-item routerLink="/incubadora/evidencias" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>fact_check</mat-icon>
+          <span matListItemTitle>Registros de evidência</span>
+        </a>
+        <a mat-list-item routerLink="/incubadora/acompanhamento" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>track_changes</mat-icon>
+          <span matListItemTitle>Acompanhamento de execução</span>
+        </a>
+        <a mat-list-item routerLink="/incubadora/indicadores" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>insights</mat-icon>
+          <span matListItemTitle>Indicadores e metas</span>
+        </a>
+        <a mat-list-item routerLink="/incubadora/apuracao" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>assessment</mat-icon>
+          <span matListItemTitle>Apuração de indicadores</span>
+        </a>
+        <a mat-list-item routerLink="/incubadora/monitoramento" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>monitoring</mat-icon>
+          <span matListItemTitle>Monitoramento dos empreendimentos</span>
+        </a>
+
+
+        <div class="grupo-menu">Configuração</div>
+
+        <a mat-list-item routerLink="/incubadora/metodologia" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>account_tree</mat-icon>
+          <span matListItemTitle>Metodologia</span>
+        </a>
+        <a mat-list-item routerLink="/incubadora/modelos" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>assignment</mat-icon>
+          <span matListItemTitle>Modelos de planejamento</span>
+        </a>
+        <a mat-list-item routerLink="/incubadora/minha-incubadora" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>domain</mat-icon>
+          <span matListItemTitle>Minha Incubadora</span>
+        </a>
+
+      </mat-nav-list>
+
+      <div class="rodape">
+        @if (incubadora.value(); as inc) {
+          <div class="identidade">
+            <span class="nome">{{ inc.nome }}</span>
+            <span class="nivel">{{ inc.nivel ? nivelLabel(inc.nivel) : '—' }}</span>
+          </div>
+        }
+        <button mat-button (click)="sair()">Sair</button>
+      </div>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="conteudo">
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>

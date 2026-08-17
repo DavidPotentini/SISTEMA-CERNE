@@ -1,0 +1,36 @@
+/* You can add global styles to this file, and also import other style files */
+
+/*
+ * Tema tonal da aplicação: substitui o branco padrão por uma leve tinta azure
+ * (cor primária do tema). Sobrescreve os tokens de superfície do Material 3
+ * — carregado DEPOIS de material-theme.scss, então vence.
+ *
+ * A rampa vai do mais claro (container-lowest) ao mais fundo (surface-dim):
+ * ajuste os HEX abaixo para clarear/escurecer a tinta de toda a aplicação.
+ */
+:root {
+  /* Fundo geral (body) e área de conteúdo */
+  --mat-sys-background: #eef3fb;
+  --mat-sys-surface: #eef3fb;
+  --mat-sys-surface-dim: #dbe2ee;
+  --mat-sys-surface-bright: #f7faff;
+
+  /* Superfícies "elevadas": cards, diálogos, menus, chips */
+  --mat-sys-surface-container-lowest: #ffffff;
+  --mat-sys-surface-container-low: #f2f6fc;
+  --mat-sys-surface-container: #e9eff9;
+  --mat-sys-surface-container-high: #e3eaf6;
+  --mat-sys-surface-container-highest: #dce5f2;
+}
+
+/*
+ * Menu lateral em azul profundo (harmoniza com a cor primária azure).
+ * Re-escopa os tokens de superfície E de foreground só na subárvore do drawer,
+ * então os itens, ícones e título viram claros automaticamente. O conteúdo
+ * (.mat-drawer-content) é irmão e mantém o fundo/texto do :root.
+ */
+.mat-drawer {
+  --mat-sys-surface: #123b63; /* fundo azul do menu */
+  --mat-sys-on-surface: #eaf1fb; /* texto principal (claro) */
+  --mat-sys-on-surface-variant: #b9cce6; /* ícones e texto secundário */
+}

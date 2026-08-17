@@ -1,0 +1,31 @@
+<mat-sidenav-container class="shell">
+  <mat-sidenav mode="side" opened class="side">
+    <div class="side-content">
+      <div class="brand">Plataforma</div>
+
+      <mat-nav-list class="menu">
+        <a mat-list-item routerLink="/admin/painel" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>dashboard</mat-icon>
+          <span matListItemTitle>Painel</span>
+        </a>
+        <a mat-list-item routerLink="/admin/incubadoras" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>domain</mat-icon>
+          <span matListItemTitle>Incubadoras</span>
+        </a>
+        <a mat-list-item routerLink="/admin/usuarios" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>group</mat-icon>
+          <span matListItemTitle>Usuários</span>
+        </a>
+      </mat-nav-list>
+
+      <div class="rodape">
+        <span><strong>{{ ativas.value() ?? '—' }}</strong> incubadora(s) ativa(s)</span>
+        <button mat-button (click)="sair()">Sair</button>
+      </div>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="conteudo">
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>
