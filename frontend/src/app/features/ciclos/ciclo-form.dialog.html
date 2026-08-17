@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>Novo ciclo</h2>
+<mat-dialog-content>
+  <p class="aviso">Ao criar, o ciclo ativo atual (se houver) será encerrado. O novo ciclo nasce ativo.</p>
+
+  <div class="grid">
+    <mat-form-field appearance="outline" class="col-2">
+      <mat-label>Nome</mat-label>
+      <input matInput [ngModel]="nome()" (ngModelChange)="nome.set($event)" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Início</mat-label>
+      <input matInput type="date" [ngModel]="inicio()" (ngModelChange)="inicio.set($event)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Fim</mat-label>
+      <input matInput type="date" [ngModel]="fim()" (ngModelChange)="fim.set($event)" />
+    </mat-form-field>
+  </div>
+
+  @if (erro()) {
+    <p class="erro">{{ erro() }}</p>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="salvando()">Cancelar</button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="salvar()"
+    [disabled]="salvando() || !nome().trim()"
+  >
+    Criar ciclo
+  </button>
+</mat-dialog-actions>

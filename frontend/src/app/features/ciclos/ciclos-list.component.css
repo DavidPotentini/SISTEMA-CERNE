@@ -1,0 +1,56 @@
+.cartao {
+  max-width: 900px;
+  padding: 20px 24px;
+  margin: 1rem;
+}
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.cabecalho h2 {
+  margin: 0;
+}
+.tabela {
+  width: 100%;
+  background: transparent;
+}
+.tabela .mat-mdc-header-cell,
+.tabela .mat-mdc-cell {
+  padding: 12px 16px;
+}
+.acoes {
+  text-align: right;
+  white-space: nowrap;
+}
+.chip {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.s-ATIVO {
+  background: #e2f4e6;
+  color: #1b7a37;
+}
+.s-ENCERRADO {
+  background: #ececec;
+  color: #555;
+}
+.tag-foco {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #e2ecfb;
+  color: #1c4f9c;
+}
+.vazio,
+.erro {
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: 16px;
+}
