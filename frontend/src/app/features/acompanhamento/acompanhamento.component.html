@@ -1,0 +1,119 @@
+<div class="topo">
+  <h1>Acompanhamento de execução</h1>
+</div>
+
+@if (atualRes.isLoading()) {
+  <p class="estado">Carregando…</p>
+} @else if (atualRes.error()) {
+  <p class="estado erro">Não foi possível carregar o acompanhamento.</p>
+} @else if (atualRes.value(); as atual) {
+  @if (!atual.cicloAtivo) {
+    <mat-card class="vazio-card">
+      <mat-icon>event_busy</mat-icon>
+      <p>Nenhum ciclo ativo. Abra um ciclo para acompanhar a execução.</p>
+    </mat-card>
+  } @else if (plano(); as m) {
+    <mat-card class="cabecalho">
+      <div class="cab-topo">
+        <div>
+          <h2>{{ m.nome }}</h2>
+          <span class="tag" [class.encerrado]="m.status === 'ENCERRADO'">
+            {{ statusPlanoLabel[m.status] }}
+          </span>
+        </div>
+      </div>
+
+      <dl class="meta">
+        <div><dt>Ciclo</dt><dd>{{ m.cicloNome || '—' }}</dd></div>
+        <div>
+          <dt>Período</dt>
+          <dd>
+            {{ m.inicio ? (m.inicio | date: 'dd/MM/yyyy') : '—' }} —
+            {{ m.fim ? (m.fim | date: 'dd/MM/yyyy') : '—' }}
+          </dd>
+        </div>
+      </dl>
+
+      <div class="progresso">
+        <div class="progresso-topo">
+          <span>Progresso</span>
+          <strong>{{ m.progresso }}% ({{ m.concluidas }}/{{ m.totalAtividades }})</strong>
+        </div>
+        <mat-progress-bar mode="determinate" [value]="m.progresso"></mat-progress-bar>
+      </div>
+    </mat-card>
+
+    <mat-chip-listbox class="filtros" [value]="filtro()">
+      @for (s of statusFiltraveis; track s) {
+        <mat-chip-option [selected]="filtro() === s" (click)="filtrar(s)">
+          {{ statusLabel[s] }}
+        </mat-chip-option>
+      }
+    </mat-chip-listbox>
+
+    @if (estruturaRes.isLoading()) {
+      <p class="estado">Carregando estrutura…</p>
+    } @else {
+      <mat-accordion multi>
+        @for (proc of estruturaRes.value() ?? []; track proc.prcCod) {
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <span class="ordem">{{ proc.ordem }}</span>
+                {{ proc.nome }}
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ concluidas(proc) }}/{{ total(proc) }} concluídas
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            @if (proc.descricao) {
+              <p class="proc-desc">{{ proc.descricao }}</p>
+            }
+
+            @for (pr of proc.praticas; track pr.prtCod) {
+              <div class="pratica">
+                <div class="pratica-topo">
+                  <span class="pratica-nome">{{ pr.nome }}</span>
+                </div>
+
+                <div class="atividades">
+                  @for (atv of visiveis(pr.atividades); track atv.atpCod) {
+                    <div class="atividade">
+                      <div class="atividade-info">
+                        <span class="atividade-nome">
+                          {{ atv.nome }}
+                          <span class="status-atv" [attr.data-status]="atv.status">
+                            {{ statusLabel[atv.status] }}
+                          </span>
+                        </span>
+                        @if (atv.prazo) {
+                          <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
+                        }
+                      </div>
+                      <button mat-stroked-button color="primary" (click)="registrar(atv)">
+                        <mat-icon>edit_note</mat-icon>
+                        Registrar
+                      </button>
+                    </div>
+                  } @empty {
+                    <p class="vazio">Nenhuma atividade nesta prática.</p>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <p class="vazio">Nenhuma prática ativa neste processo.</p>
+            }
+          </mat-expansion-panel>
+        } @empty {
+          <p class="estado">A metodologia base não tem processos ativos.</p>
+        }
+      </mat-accordion>
+    }
+  } @else {
+    <mat-card class="vazio-card">
+      <mat-icon>assignment_late</mat-icon>
+      <p>Ainda não há planejamento para o ciclo <strong>{{ atual.cicloNome }}</strong>.</p>
+    </mat-card>
+  }
+}

@@ -1,0 +1,129 @@
+.atividade h3 {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+}
+.atividade .desc {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.bloco {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+.bloco-titulo {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 10px;
+}
+
+.status-linha {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.status-linha mat-form-field {
+  min-width: 200px;
+}
+
+.aviso,
+.ok,
+.erro {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+}
+.aviso {
+  color: rgba(0, 0, 0, 0.6);
+}
+.ok {
+  color: #2e7d32;
+}
+.erro {
+  color: #b02020;
+}
+.aviso mat-icon,
+.ok mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.evidencias {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.evidencia {
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.015);
+}
+.ev-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ev-titulo {
+  font-weight: 600;
+}
+.ev-status {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.6);
+}
+.ev-status[data-status='VALIDADA'] {
+  background: rgba(46, 125, 50, 0.14);
+  color: #2e7d32;
+}
+.ev-status[data-status='CORRECAO_SOLICITADA'] {
+  background: rgba(176, 32, 32, 0.14);
+  color: #b02020;
+}
+.ev-arquivo {
+  margin: 4px 0;
+}
+.ev-obs {
+  width: 100%;
+  margin-top: 6px;
+}
+.ev-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.ev-motivo {
+  margin-top: 8px;
+  padding: 0.5rem 0.75rem;
+  background: rgba(176, 32, 32, 0.06);
+  border-left: 3px solid #b3261e;
+  border-radius: 4px;
+}
+.ev-motivo-rotulo {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #b3261e;
+}
+.ev-motivo-texto {
+  margin: 0.25rem 0 0;
+  white-space: pre-wrap;
+}
+.vazio {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 0.9rem;
+}

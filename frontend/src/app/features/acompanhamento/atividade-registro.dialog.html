@@ -1,0 +1,128 @@
+<h2 mat-dialog-title>Registrar atividade</h2>
+
+<mat-dialog-content>
+  <!-- Atividade (só leitura) -->
+  <section class="atividade">
+    <h3>{{ atividade().nome }}</h3>
+    @if (atividade().descricao) {
+      <p class="desc">{{ atividade().descricao }}</p>
+    }
+  </section>
+
+  <!-- Status da atividade -->
+  <section class="bloco">
+    <div class="bloco-titulo">Status da atividade</div>
+    <div class="status-linha">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Status</mat-label>
+        <mat-select [ngModel]="novoStatus()" (ngModelChange)="novoStatus.set($event)">
+          @for (s of statusManuais; track s) {
+            <mat-option [value]="s">{{ statusAtividadeLabel[s] }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button
+        mat-flat-button
+        color="primary"
+        [disabled]="salvandoStatus() || novoStatus() === atividade().status"
+        (click)="salvarStatus()"
+      >
+        Salvar status
+      </button>
+    </div>
+    @if (novoStatus() === 'CONCLUIDA' && !todasValidadas()) {
+      <p class="aviso">
+        <mat-icon>info</mat-icon>
+        Só é possível concluir com ao menos uma evidência e todas validadas.
+      </p>
+    }
+    @if (statusSalvo()) {
+      <p class="ok"><mat-icon>check_circle</mat-icon> Status atualizado.</p>
+    }
+    @if (erroStatus()) {
+      <p class="erro">{{ erroStatus() }}</p>
+    }
+  </section>
+
+  <!-- Evidências da atividade -->
+  <section class="bloco">
+    <div class="bloco-titulo">Evidências</div>
+
+    @if (carregando()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    } @else if (lista().length === 0) {
+      <p class="vazio">Nenhuma evidência registrada para esta atividade.</p>
+    } @else {
+      <div class="evidencias">
+        @for (ev of lista(); track ev.evdCod) {
+          <div class="evidencia">
+            <div class="ev-topo">
+              <span class="ev-titulo">{{ ev.titulo }}</span>
+              <span class="ev-status" [attr.data-status]="ev.status">
+                {{ statusEvidenciaLabel[ev.status] }}
+              </span>
+            </div>
+
+            @if (ev.arqCod) {
+              <button
+                mat-button
+                color="primary"
+                class="ev-arquivo"
+                [disabled]="abrindoArquivo()"
+                (click)="abrirArquivo(ev.arqCod)"
+              >
+                <mat-icon>attach_file</mat-icon>
+                {{ ev.arquivoNome || 'Abrir arquivo' }}
+              </button>
+            }
+
+            @if (ev.status === 'EM_VALIDACAO') {
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="ev-obs">
+                <mat-label>Motivo (ao solicitar correção)</mat-label>
+                <textarea
+                  matInput
+                  rows="2"
+                  [ngModel]="motivoDe(ev.evdCod)"
+                  (ngModelChange)="atualizarMotivo(ev.evdCod, $event)"
+                ></textarea>
+              </mat-form-field>
+
+              <div class="ev-acoes">
+                <button
+                  mat-stroked-button
+                  [disabled]="avaliandoCod() === ev.evdCod"
+                  (click)="solicitarCorrecao(ev)"
+                >
+                  <mat-icon>report_problem</mat-icon>
+                  Solicitar correção
+                </button>
+                <button
+                  mat-flat-button
+                  color="primary"
+                  [disabled]="avaliandoCod() === ev.evdCod"
+                  (click)="validar(ev)"
+                >
+                  <mat-icon>check</mat-icon>
+                  Validar
+                </button>
+              </div>
+            } @else if (ev.motivoCorrecao) {
+              <div class="ev-motivo">
+                <span class="ev-motivo-rotulo">Correção solicitada</span>
+                <p class="ev-motivo-texto">{{ ev.motivoCorrecao }}</p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @if (erro()) {
+      <p class="erro">{{ erro() }}</p>
+    }
+  </section>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Fechar</button>
+</mat-dialog-actions>
