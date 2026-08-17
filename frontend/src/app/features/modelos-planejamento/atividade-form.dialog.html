@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>{{ edicao ? 'Editar atividade' : 'Nova atividade' }}</h2>
+<mat-dialog-content>
+  <p class="contexto">Prática: <strong>{{ pratica }}</strong></p>
+
+  <div class="grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Nome</mat-label>
+      <input matInput [ngModel]="nome()" (ngModelChange)="nome.set($event)" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Descrição</mat-label>
+      <textarea
+        matInput
+        rows="3"
+        [ngModel]="descricao()"
+        (ngModelChange)="descricao.set($event)"
+      ></textarea>
+    </mat-form-field>
+  </div>
+
+  @if (erro()) {
+    <p class="erro">{{ erro() }}</p>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="salvando()">Cancelar</button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="salvar()"
+    [disabled]="salvando() || !nome().trim()"
+  >
+    {{ edicao ? 'Salvar' : 'Adicionar atividade' }}
+  </button>
+</mat-dialog-actions>
