@@ -1,0 +1,145 @@
+<div class="topo">
+  <h1>Planejamento institucional</h1>
+</div>
+
+@if (atualRes.isLoading()) {
+  <p class="estado">Carregando…</p>
+} @else if (atualRes.error()) {
+  <p class="estado erro">Não foi possível carregar o planejamento.</p>
+} @else if (atualRes.value(); as atual) {
+  @if (!atual.cicloAtivo) {
+    <mat-card class="vazio-card">
+      <mat-icon>event_busy</mat-icon>
+      <p>Nenhum ciclo ativo. Abra um ciclo para planejar.</p>
+    </mat-card>
+  } @else if (plano(); as m) {
+    <mat-card class="cabecalho">
+      <div class="cab-topo">
+        <div>
+          <h2>{{ m.nome }}</h2>
+          <span class="tag" [class.encerrado]="m.status === 'ENCERRADO'">{{ statusLabel[m.status] }}</span>
+        </div>
+        <div class="cab-acoes">
+          <button mat-stroked-button (click)="consultar()">
+            <mat-icon>fact_check</mat-icon>
+            Consultar publicação
+          </button>
+          <button mat-flat-button color="primary" (click)="gerar()">
+            <mat-icon>autorenew</mat-icon>
+            Gerar de modelo
+          </button>
+        </div>
+      </div>
+
+      <dl class="meta">
+        <div><dt>Ciclo</dt><dd>{{ m.cicloNome || '—' }}</dd></div>
+        <div><dt>Modelo</dt><dd>{{ m.modeloNome || '—' }}</dd></div>
+        <div>
+          <dt>Período</dt>
+          <dd>
+            {{ m.inicio ? (m.inicio | date: 'dd/MM/yyyy') : '—' }} —
+            {{ m.fim ? (m.fim | date: 'dd/MM/yyyy') : '—' }}
+          </dd>
+        </div>
+      </dl>
+
+      <div class="progresso">
+        <div class="progresso-topo">
+          <span>Progresso</span>
+          <strong>{{ m.progresso }}% ({{ m.concluidas }}/{{ m.totalAtividades }})</strong>
+        </div>
+        <mat-progress-bar mode="determinate" [value]="m.progresso"></mat-progress-bar>
+      </div>
+    </mat-card>
+
+    @if (estruturaRes.isLoading()) {
+      <p class="estado">Carregando estrutura…</p>
+    } @else {
+      <mat-accordion multi>
+        @for (proc of estruturaRes.value() ?? []; track proc.prcCod) {
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <span class="ordem">{{ proc.ordem }}</span>
+                {{ proc.nome }}
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ proc.praticas.length }} {{ proc.praticas.length === 1 ? 'prática' : 'práticas' }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            @if (proc.descricao) {
+              <p class="proc-desc">{{ proc.descricao }}</p>
+            }
+
+            @for (pr of proc.praticas; track pr.prtCod) {
+              <div class="pratica">
+                <div class="pratica-topo">
+                  <span class="pratica-nome">{{ pr.nome }}</span>
+                  @if (editavel()) {
+                    <button mat-button color="primary" (click)="adicionarAtividade(pr)">
+                      <mat-icon>add</mat-icon>
+                      Atividade
+                    </button>
+                  }
+                </div>
+
+                <div class="atividades">
+                  @for (atv of pr.atividades; track atv.atpCod) {
+                    <div class="atividade">
+                      <div class="atividade-info">
+                        <span class="atividade-nome">
+                          {{ atv.nome }}
+                          @if (atv.origem === 'COMPLEMENTAR') {
+                            <span class="tag-origem">Complementar</span>
+                          }
+                        </span>
+                        @if (atv.descricao) {
+                          <span class="atividade-desc">{{ atv.descricao }}</span>
+                        }
+                        @if (atv.prazo) {
+                          <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
+                        }
+                      </div>
+                      @if (editavel()) {
+                        <div class="atividade-acoes">
+                          <button mat-icon-button matTooltip="Ajustar" (click)="ajustarAtividade(pr, atv)">
+                            <mat-icon>edit</mat-icon>
+                          </button>
+                          @if (atv.origem === 'COMPLEMENTAR') {
+                            <button
+                              mat-icon-button
+                              matTooltip="Remover"
+                              (click)="removerAtividade(atv)"
+                            >
+                              <mat-icon>delete</mat-icon>
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                  } @empty {
+                    <p class="vazio">Nenhuma atividade nesta prática.</p>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <p class="vazio">Nenhuma prática ativa neste processo.</p>
+            }
+          </mat-expansion-panel>
+        } @empty {
+          <p class="estado">A metodologia base não tem processos ativos.</p>
+        }
+      </mat-accordion>
+    }
+  } @else {
+    <mat-card class="vazio-card">
+      <mat-icon>assignment_add</mat-icon>
+      <p>Ainda não há planejamento para o ciclo <strong>{{ atual.cicloNome }}</strong>.</p>
+      <button mat-flat-button color="primary" (click)="gerar()">
+        <mat-icon>autorenew</mat-icon>
+        Gerar de modelo
+      </button>
+    </mat-card>
+  }
+}

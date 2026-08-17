@@ -1,0 +1,49 @@
+.dados {
+  margin: 0;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.dados dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.dados dd {
+  margin: 0.15rem 0 0;
+  font-size: 1rem;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: #e6f4ea;
+  color: #1e6b3a;
+}
+
+.tag.encerrado {
+  background: #eceff1;
+  color: #546e7a;
+}
+
+.progresso {
+  margin-top: 1.4rem;
+}
+
+.progresso-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.4rem;
+}
+
+.progresso-detalhe {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.6);
+}

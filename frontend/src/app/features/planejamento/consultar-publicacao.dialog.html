@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>Publicação do planejamento</h2>
+<mat-dialog-content>
+  <dl class="dados">
+    <div>
+      <dt>Status</dt>
+      <dd>
+        <span class="tag" [class.encerrado]="plano.status === 'ENCERRADO'">
+          {{ statusLabel[plano.status] }}
+        </span>
+      </dd>
+    </div>
+    <div>
+      <dt>Período</dt>
+      <dd>
+        {{ plano.inicio ? (plano.inicio | date: 'dd/MM/yyyy') : '—' }}
+        —
+        {{ plano.fim ? (plano.fim | date: 'dd/MM/yyyy') : '—' }}
+      </dd>
+    </div>
+    <div>
+      <dt>Responsável</dt>
+      <dd>{{ plano.responsavel || '—' }}</dd>
+    </div>
+  </dl>
+
+  <div class="progresso">
+    <div class="progresso-topo">
+      <span>Progresso</span>
+      <strong>{{ plano.progresso }}%</strong>
+    </div>
+    <mat-progress-bar mode="determinate" [value]="plano.progresso"></mat-progress-bar>
+    <span class="progresso-detalhe">
+      {{ plano.concluidas }} de {{ plano.totalAtividades }}
+      {{ plano.totalAtividades === 1 ? 'atividade concluída' : 'atividades concluídas' }}
+    </span>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="primary" mat-dialog-close>Fechar</button>
+</mat-dialog-actions>

@@ -1,0 +1,57 @@
+package com.github.davidpotentini.model.planejamento;
+
+import com.github.davidpotentini.enums.EStatusPlanejamento;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDate;
+
+/**
+ * Planejamento institucional de um ciclo — no máx. um por ciclo (o ativo). Gerado a partir de um
+ * {@code MOD_COD} (modelo publicado), copiando as atividades do modelo para {@code ATIVIDADES_PLANEJADAS}.
+ * O período ({@code inicio}/{@code fim}) nasce do ciclo. A estrutura de processos/práticas é herdada
+ * da metodologia base do modelo (não copiada). Schema do tenant.
+ */
+@Entity
+@Table(name = "PLANEJAMENTOS")
+@Getter
+@Setter
+public class PlanejamentoModel {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "PLN_COD")
+    private Long plnCod;
+
+    @Column(name = "NOME", nullable = false)
+    private String nome;
+
+    @Column(name = "CIC_COD", nullable = false)
+    private Long cicCod;
+
+    /** Modelo de origem (publicado). Fonte da estrutura e das atividades iniciais. */
+    @Column(name = "MOD_COD")
+    private Long modCod;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS", nullable = false)
+    private EStatusPlanejamento status = EStatusPlanejamento.PUBLICADO;
+
+    @Column(name = "INICIO")
+    private LocalDate inicio;
+
+    @Column(name = "FIM")
+    private LocalDate fim;
+
+    /** Responsável do plano → {@code PESSOAS(PES_COD)}. Opcional. */
+    @Column(name = "RESP_PES_COD")
+    private Long respPesCod;
+}
