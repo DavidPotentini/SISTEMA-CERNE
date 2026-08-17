@@ -1,0 +1,71 @@
+.grid {
+  display: flex;
+  flex-direction: column;
+  min-width: 420px;
+  padding: 0.8rem;
+}
+
+.grid mat-form-field {
+  width: 100%;
+}
+
+.arquivo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.arquivo .rotulo {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.85rem;
+}
+
+.anexo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.anexo .nome {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.motivo {
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.8rem;
+  border-left: 3px solid #b3261e;
+  border-radius: 4px;
+  background: rgba(176, 32, 32, 0.06);
+}
+
+.motivo-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #b3261e;
+}
+
+.motivo-titulo mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.motivo-texto {
+  margin: 0.4rem 0 0;
+  color: rgba(0, 0, 0, 0.8);
+  white-space: pre-wrap;
+}
+
+.erro {
+  color: #b3261e;
+  margin: 0.5rem 0 0;
+}

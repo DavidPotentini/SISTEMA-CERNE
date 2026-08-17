@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>Histórico da evidência</h2>
+<mat-dialog-content>
+  @if (carregando()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (erro()) {
+    <p class="erro">{{ erro() }}</p>
+  }
+
+  <ol class="timeline">
+    @for (v of versoes(); track v.evdCodSeq) {
+      <li class="versao">
+        <div class="cabecalho">
+          <span class="seq">Versão {{ v.evdCodSeq }}</span>
+          <span class="status" [attr.data-status]="v.status">{{ statusLabel[v.status] }}</span>
+        </div>
+
+        <div class="campos">
+          <p><strong>Título:</strong> {{ v.titulo }}</p>
+          <p><strong>Atividade:</strong> {{ v.atividadeNome || '—' }}</p>
+          <p><strong>Registrado por:</strong> {{ v.responsavel || '—' }}</p>
+          @if (v.data) {
+            <p><strong>Data:</strong> {{ v.data | date: 'dd/MM/yyyy HH:mm' }}</p>
+          }
+        </div>
+
+        @if (v.arqCod != null) {
+          <button
+            mat-stroked-button
+            (click)="abrirArquivo(v.arqCod!)"
+            [disabled]="abrindoArquivo()"
+          >
+            <mat-icon>description</mat-icon>
+            {{ v.arquivoNome || 'Abrir arquivo' }}
+          </button>
+        }
+
+        @if (v.motivoCorrecao) {
+          <div class="motivo">
+            <mat-icon>report_problem</mat-icon>
+            <div>
+              <p class="rotulo">Correção solicitada</p>
+              <p class="texto">{{ v.motivoCorrecao }}</p>
+            </div>
+          </div>
+        }
+      </li>
+    }
+  </ol>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Fechar</button>
+</mat-dialog-actions>
