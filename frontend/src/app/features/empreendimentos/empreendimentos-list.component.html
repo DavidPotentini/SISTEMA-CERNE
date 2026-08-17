@@ -1,0 +1,48 @@
+<mat-card class="cartao">
+  <div class="cabecalho">
+    <h2>Empreendimentos</h2>
+    <button mat-flat-button color="primary" (click)="adicionar()">Adicionar empreendimento</button>
+  </div>
+
+  @if (dados.error()) {
+    <p class="erro">Falha ao carregar os empreendimentos.</p>
+  }
+
+  <table mat-table [dataSource]="dados.value() ?? []" class="tabela">
+    <ng-container matColumnDef="nome">
+      <th mat-header-cell *matHeaderCellDef>Nome</th>
+      <td mat-cell *matCellDef="let e">{{ e.nome }}</td>
+    </ng-container>
+    <ng-container matColumnDef="setor">
+      <th mat-header-cell *matHeaderCellDef>Setor</th>
+      <td mat-cell *matCellDef="let e">{{ e.setor || '—' }}</td>
+    </ng-container>
+    <ng-container matColumnDef="estagio">
+      <th mat-header-cell *matHeaderCellDef>Estágio</th>
+      <td mat-cell *matCellDef="let e">{{ estagioLabel(e.estagio) }}</td>
+    </ng-container>
+    <ng-container matColumnDef="situacao">
+      <th mat-header-cell *matHeaderCellDef>Situação</th>
+      <td mat-cell *matCellDef="let e">
+        <span class="chip" [class]="'s-' + e.situacao">{{ situacaoLabel(e.situacao) }}</span>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="responsavel">
+      <th mat-header-cell *matHeaderCellDef>Responsável</th>
+      <td mat-cell *matCellDef="let e">{{ e.responsavelNome || '—' }}</td>
+    </ng-container>
+    <ng-container matColumnDef="acoes">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let e" class="acoes">
+        <button mat-stroked-button (click)="gerenciar(e)">Gerenciar</button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+    <tr mat-row *matRowDef="let row; columns: colunas"></tr>
+  </table>
+
+  @if (!dados.isLoading() && (dados.value()?.length ?? 0) === 0) {
+    <p class="vazio">Nenhum empreendimento cadastrado.</p>
+  }
+</mat-card>

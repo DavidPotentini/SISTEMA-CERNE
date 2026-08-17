@@ -1,0 +1,65 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+  padding-top: 8px;
+}
+.col-2 {
+  grid-column: 1 / -1;
+}
+
+.pessoas {
+  margin-top: 8px;
+}
+.pessoas-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.pessoas-topo h3 {
+  margin: 0;
+}
+
+.cadastro {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px 16px;
+  align-items: start;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.03);
+}
+.cadastro-acoes {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.tabela {
+  width: 100%;
+  background: transparent;
+}
+.tag-principal {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #e2f4e6;
+  color: #1b7a37;
+}
+.acoes {
+  text-align: right;
+  white-space: nowrap;
+}
+.vazio {
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: 8px;
+}
+.erro {
+  color: #b02020;
+  margin-top: 12px;
+}
