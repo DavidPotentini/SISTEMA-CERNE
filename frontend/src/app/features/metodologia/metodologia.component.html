@@ -1,0 +1,27 @@
+<div class="topo">
+  <h1>Metodologia</h1>
+</div>
+
+<mat-tab-group [selectedIndex]="1">
+  <!-- <mat-tab label="Níveis adotados">
+    <p class="placeholder">Em breve.</p>
+  </mat-tab> -->
+
+  <mat-tab label="Processos e Práticas">
+    <ng-template matTabContent>
+      <app-processos-tab />
+    </ng-template>
+  </mat-tab>
+
+  <mat-tab label="Indicadores">
+    <ng-template matTabContent>
+      <app-indicadores-tab />
+    </ng-template>
+  </mat-tab>
+
+  <mat-tab label="Publicação">
+    <ng-template matTabContent>
+      <app-publicacao-tab />
+    </ng-template>
+  </mat-tab>
+</mat-tab-group>

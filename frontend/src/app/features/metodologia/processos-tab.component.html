@@ -1,0 +1,89 @@
+<div class="barra">
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="adicionarProcesso()"
+    [disabled]="verCod() == null"
+  >
+    <mat-icon>add</mat-icon>
+    Adicionar processo
+  </button>
+</div>
+
+@if (processos.isLoading()) {
+  <p class="estado">Carregando…</p>
+} @else if (processos.error()) {
+  <p class="estado erro">Não foi possível carregar os processos.</p>
+} @else {
+  <mat-accordion multi>
+    @for (p of processos.value() ?? []; track p.prcCod) {
+      <mat-expansion-panel [class.inativo]="p.situacao === 'INATIVO'">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="ordem">{{ p.ordem }}</span>
+            {{ p.nome }}
+            @if (p.situacao === 'INATIVO') {
+              <span class="tag-inativo">Inativo</span>
+            }
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ p.praticas.length }} {{ p.praticas.length === 1 ? 'prática' : 'práticas' }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        @if (p.descricao) {
+          <p class="descricao">{{ p.descricao }}</p>
+        }
+
+        <div class="praticas">
+          @for (pr of p.praticas; track pr.prtCod) {
+            <div class="pratica" [class.inativa]="pr.situacao === 'INATIVO'">
+              <div class="pratica-info">
+                <span class="pratica-nome">
+                  {{ pr.nome }}
+                  @if (pr.situacao === 'INATIVO') {
+                    <span class="tag-inativo">Inativo</span>
+                  }
+                </span>
+                @if (pr.descricao) {
+                  <span class="pratica-desc">{{ pr.descricao }}</span>
+                }
+              </div>
+              <div class="pratica-acoes">
+                <button mat-icon-button matTooltip="Editar prática" (click)="editarPratica(p, pr)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  [matTooltip]="pr.situacao === 'ATIVO' ? 'Inativar' : 'Ativar'"
+                  (click)="alternarPratica(p, pr)"
+                >
+                  <mat-icon>{{ pr.situacao === 'ATIVO' ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+          } @empty {
+            <p class="vazio">Nenhuma prática neste processo.</p>
+          }
+        </div>
+
+        <mat-action-row>
+          <button mat-button (click)="editarProcesso(p)">
+            <mat-icon>edit</mat-icon>
+            Editar
+          </button>
+          <button mat-button (click)="alternarProcesso(p)">
+            <mat-icon>{{ p.situacao === 'ATIVO' ? 'block' : 'check_circle' }}</mat-icon>
+            {{ p.situacao === 'ATIVO' ? 'Inativar' : 'Ativar' }}
+          </button>
+          <button mat-button color="primary" (click)="adicionarPratica(p)">
+            <mat-icon>add</mat-icon>
+            Adicionar prática
+          </button>
+        </mat-action-row>
+      </mat-expansion-panel>
+    } @empty {
+      <p class="estado">Nenhum processo cadastrado. Use "Adicionar processo" para começar.</p>
+    }
+  </mat-accordion>
+}

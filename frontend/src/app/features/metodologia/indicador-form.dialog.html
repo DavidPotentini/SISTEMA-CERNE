@@ -1,0 +1,51 @@
+<h2 mat-dialog-title>{{ edicao ? 'Editar indicador' : 'Novo indicador' }}</h2>
+<mat-dialog-content>
+  <div class="grid">
+    <mat-form-field appearance="outline" class="col-2">
+      <mat-label>Vínculo metodológico (prática)</mat-label>
+      <mat-select [ngModel]="prtCod()" (ngModelChange)="prtCod.set($event)" required>
+        @for (proc of processos.value() ?? []; track proc.prcCod) {
+          <mat-optgroup [label]="proc.ordem + '. ' + proc.nome">
+            @for (pr of proc.praticas; track pr.prtCod) {
+              <mat-option [value]="pr.prtCod">{{ pr.nome }}</mat-option>
+            }
+          </mat-optgroup>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-2">
+      <mat-label>Nome</mat-label>
+      <input matInput [ngModel]="nome()" (ngModelChange)="nome.set($event)" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Unidade</mat-label>
+      <input matInput [ngModel]="unidade()" (ngModelChange)="unidade.set($event)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Periodicidade</mat-label>
+      <mat-select [ngModel]="periodicidade()" (ngModelChange)="periodicidade.set($event)">
+        @for (p of periodicidades; track p[0]) {
+          <mat-option [value]="p[0]">{{ p[1] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  @if (erro()) {
+    <p class="erro">{{ erro() }}</p>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="salvando()">Cancelar</button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="salvar()"
+    [disabled]="salvando() || !nome().trim() || prtCod() == null"
+  >
+    {{ edicao ? 'Salvar' : 'Criar indicador' }}
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,76 @@
+<mat-card class="cartao">
+  <div class="cabecalho">
+    <h2>Indicadores</h2>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="adicionar()"
+      [disabled]="verCod() == null"
+    >
+      <mat-icon>add</mat-icon>
+      Adicionar Indicador
+    </button>
+  </div>
+
+  @if (indicadores.isLoading()) {
+    <p class="estado">Carregando…</p>
+  } @else if (indicadores.error()) {
+    <p class="estado erro">Não foi possível carregar os indicadores.</p>
+  } @else if ((indicadores.value() ?? []).length === 0) {
+    <p class="estado">Nenhum indicador cadastrado.</p>
+  } @else {
+    <table mat-table [dataSource]="indicadores.value() ?? []">
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Indicador</th>
+        <td mat-cell *matCellDef="let i">{{ i.nome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="vinculo">
+        <th mat-header-cell *matHeaderCellDef>Vínculo metodológico</th>
+        <td mat-cell *matCellDef="let i">{{ i.vinculoMetodologico || '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="unidade">
+        <th mat-header-cell *matHeaderCellDef>Unidade</th>
+        <td mat-cell *matCellDef="let i">{{ i.unidade || '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="periodicidade">
+        <th mat-header-cell *matHeaderCellDef>Periodicidade</th>
+        <td mat-cell *matCellDef="let i">{{ periodicidadeLabel(i.periodicidade) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="situacao">
+        <th mat-header-cell *matHeaderCellDef>Situação</th>
+        <td mat-cell *matCellDef="let i">
+          <span class="chip" [class]="'s-' + i.situacao">
+            {{ i.situacao === 'ATIVO' ? 'Ativo' : 'Inativo' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef aria-label="Ações"></th>
+        <td mat-cell *matCellDef="let i" class="acoes">
+          <button mat-icon-button matTooltip="Editar" (click)="editar(i)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            [matTooltip]="i.situacao === 'ATIVO' ? 'Desativar' : 'Ativar'"
+            (click)="alternar(i)"
+          >
+            <mat-icon>{{ i.situacao === 'ATIVO' ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: colunas"
+        [class.inativa]="row.situacao === 'INATIVO'"
+      ></tr>
+    </table>
+  }
+</mat-card>

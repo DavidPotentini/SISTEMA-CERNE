@@ -1,0 +1,14 @@
+.contexto {
+  margin: 0 0 12px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+.erro {
+  color: #b02020;
+  margin-top: 12px;
+}

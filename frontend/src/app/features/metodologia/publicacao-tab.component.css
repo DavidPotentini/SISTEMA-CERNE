@@ -1,0 +1,47 @@
+.cartao {
+  max-width: 100%;
+  margin-bottom: 16px;
+}
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.linha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pendente {
+  color: #b26a00;
+}
+.ok {
+  color: #2e7d32;
+}
+.erro {
+  color: #b02020;
+  margin: 12px 0 0;
+}
+h3 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+table {
+  width: 100%;
+}
+.vazio {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.5);
+}
+.tag-vigente {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: rgba(46, 125, 50, 0.14);
+  color: #2e7d32;
+  font-size: 0.72rem;
+  font-weight: 600;
+}

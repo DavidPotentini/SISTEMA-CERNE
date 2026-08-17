@@ -1,0 +1,88 @@
+.barra {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px 0 16px;
+}
+.estado {
+  padding: 24px 8px;
+  color: rgba(0, 0, 0, 0.5);
+}
+.estado.erro {
+  color: #b02020;
+}
+.ordem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  padding: 0 6px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.descricao {
+  margin: 0 0 12px;
+  color: rgba(0, 0, 0, 0.7);
+}
+.praticas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pratica {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 12px;
+  border-left: 3px solid rgba(63, 81, 181, 0.4);
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 4px;
+}
+.pratica-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.pratica-acoes {
+  display: flex;
+  flex-shrink: 0;
+}
+.pratica-nome {
+  font-weight: 500;
+}
+/* Inativos continuam visíveis, mas atenuados. */
+.pratica.inativa {
+  border-left-color: rgba(0, 0, 0, 0.2);
+}
+.pratica.inativa .pratica-info {
+  opacity: 0.55;
+}
+.tag-inativo {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.72rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+.pratica-desc {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.88rem;
+}
+.vazio {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 0.9rem;
+}
+
+mat-expansion-panel {
+  background-color: #fafafa;
+  margin-bottom: 12px;
+}

@@ -1,0 +1,13 @@
+.grid {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 4px 16px;
+  margin-top: 0.2rem;
+}
+.col-2 {
+  grid-column: 1 / -1;
+}
+.erro {
+  color: #b02020;
+  margin-top: 12px;
+}
