@@ -1,0 +1,72 @@
+<div class="topo">
+  <h1>Incubadoras</h1>
+  <button mat-flat-button color="primary" (click)="nova()">Nova incubadora</button>
+</div>
+
+<div class="filtros">
+  <mat-form-field appearance="outline">
+    <mat-label>Buscar por nome</mat-label>
+    <input matInput [ngModel]="nome()" (ngModelChange)="nome.set($event)" />
+  </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>Status</mat-label>
+    <mat-select [ngModel]="status()" (ngModelChange)="status.set($event)">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="EM_OPERACAO">Em operação</mat-option>
+      <mat-option value="AGUARDANDO_ATIVACAO">Aguardando ativação</mat-option>
+      <mat-option value="SUSPENSA">Suspensa</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (dados.error()) {
+  <p class="erro">Falha ao carregar as incubadoras.</p>
+}
+
+<table mat-table [dataSource]="dados.value() ?? []" class="tabela">
+  <ng-container matColumnDef="nome">
+    <th mat-header-cell *matHeaderCellDef>Incubadora</th>
+    <td mat-cell *matCellDef="let i">{{ i.nome }}</td>
+  </ng-container>
+  <ng-container matColumnDef="mantenedora">
+    <th mat-header-cell *matHeaderCellDef>Mantenedora</th>
+    <td mat-cell *matCellDef="let i">{{ i.mantenedora || '—' }}</td>
+  </ng-container>
+  <ng-container matColumnDef="responsavel">
+    <th mat-header-cell *matHeaderCellDef>Responsável inicial</th>
+    <td mat-cell *matCellDef="let i">{{ i.responsavelNome || '—' }}</td>
+  </ng-container>
+  <ng-container matColumnDef="usuarios">
+    <th mat-header-cell *matHeaderCellDef>Usuários</th>
+    <td mat-cell *matCellDef="let i">{{ i.qtdUsuarios }}</td>
+  </ng-container>
+  <ng-container matColumnDef="status">
+    <th mat-header-cell *matHeaderCellDef>Status</th>
+    <td mat-cell *matCellDef="let i">
+      <span class="chip" [class]="'s-' + i.status">{{ label(i.status) }}</span>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="acoes">
+    <th mat-header-cell *matHeaderCellDef>Ações</th>
+    <td mat-cell *matCellDef="let i" class="acoes">
+      <button mat-button (click)="consultar(i)">Consultar</button>
+      <button mat-button (click)="configurar(i)">Configurar</button>
+      <button mat-stroked-button
+      [ngClass]= "{
+        'btn-suspender': i.status === 'EM_OPERACAO',
+        'btn-ativar': i.status !== 'EM_OPERACAO'
+      }
+      "
+        (click)="alternar(i)">
+        {{ i.status === 'EM_OPERACAO' ? 'Suspender' : 'Ativar' }}
+      </button>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+  <tr mat-row *matRowDef="let row; columns: colunas"></tr>
+</table>
+
+@if (!dados.isLoading() && (dados.value()?.length ?? 0) === 0) {
+  <p class="vazio">Nenhuma incubadora encontrada.</p>
+}

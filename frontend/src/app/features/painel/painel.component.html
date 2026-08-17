@@ -1,0 +1,59 @@
+<div class="topo">
+  <h1>Painel da plataforma</h1>
+  <a mat-flat-button color="primary" routerLink="/admin/incubadoras">Gerenciar</a>
+</div>
+
+<div class="cards">
+  <mat-card class="card">
+    <span class="valor">{{ total() }}</span>
+    <span class="rotulo">Incubadoras</span>
+  </mat-card>
+  <mat-card class="card c-ativas">
+    <span class="valor">{{ ativas() }}</span>
+    <span class="rotulo">Em operação</span>
+  </mat-card>
+  <mat-card class="card c-aguardando">
+    <span class="valor">{{ aguardando() }}</span>
+    <span class="rotulo">Aguardando ativação</span>
+  </mat-card>
+  <mat-card class="card c-suspensas">
+    <span class="valor">{{ suspensas() }}</span>
+    <span class="rotulo">Suspensas</span>
+  </mat-card>
+</div>
+
+@if (dados.error()) {
+  <p class="erro">Falha ao carregar as incubadoras.</p>
+}
+
+<table mat-table [dataSource]="dados.value() ?? []" class="tabela">
+  <ng-container matColumnDef="nome">
+    <th mat-header-cell *matHeaderCellDef>Incubadora</th>
+    <td mat-cell *matCellDef="let i">{{ i.nome }}</td>
+  </ng-container>
+  <ng-container matColumnDef="mantenedora">
+    <th mat-header-cell *matHeaderCellDef>Mantenedora</th>
+    <td mat-cell *matCellDef="let i">{{ i.mantenedora || '—' }}</td>
+  </ng-container>
+  <ng-container matColumnDef="responsavel">
+    <th mat-header-cell *matHeaderCellDef>Responsável inicial</th>
+    <td mat-cell *matCellDef="let i">{{ i.responsavelNome || '—' }}</td>
+  </ng-container>
+  <ng-container matColumnDef="usuarios">
+    <th mat-header-cell *matHeaderCellDef>Usuários</th>
+    <td mat-cell *matCellDef="let i">{{ i.qtdUsuarios }}</td>
+  </ng-container>
+  <ng-container matColumnDef="status">
+    <th mat-header-cell *matHeaderCellDef>Status</th>
+    <td mat-cell *matCellDef="let i">
+      <span class="chip" [class]="'s-' + i.status">{{ label(i.status) }}</span>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+  <tr mat-row *matRowDef="let row; columns: colunas"></tr>
+</table>
+
+@if (!dados.isLoading() && (dados.value()?.length ?? 0) === 0) {
+  <p class="vazio">Nenhuma incubadora encontrada.</p>
+}

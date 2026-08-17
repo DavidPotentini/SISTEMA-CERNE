@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>Incubadora</h2>
+<mat-dialog-content>
+  
+  @if (carregado() && dados) {
+    <dl class="campos">
+      <dt>Nome</dt><dd>{{ dados.nome }}</dd>
+      <dt>CNPJ</dt><dd>{{ dados.cnpj || '—' }}</dd>
+      <dt>Mantenedora</dt><dd>{{ dados.mantenedora || '—' }}</dd>
+      <dt>Responsável</dt><dd>{{ dados.responsavelNome || '—' }}</dd>
+      <dt>E-mail</dt><dd>{{ dados.email || '—' }}</dd>
+      <dt>Telefone</dt><dd>{{ dados.telefone || '—' }}</dd>
+      <dt>Cidade</dt><dd>{{ dados.cidade || '—' }}</dd>
+      <dt>Nível</dt><dd>{{ dados.nivel ? nivelLabel(dados.nivel) : '—' }}</dd>
+      <dt>Status</dt><dd>{{ label(dados.status) }}</dd>
+      <dt>Schema</dt><dd>{{ dados.nomeSchema || '—' }}</dd>
+      <dt>Criada em</dt><dd>{{ dados.criadaEm || '—' }}</dd>
+      <dt>Ativada em</dt><dd>{{ dados.ativadaEm || '—' }}</dd>
+    </dl>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Fechar</button>
+</mat-dialog-actions>

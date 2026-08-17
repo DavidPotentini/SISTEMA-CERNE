@@ -1,0 +1,45 @@
+<h2 mat-dialog-title>{{ novo ? 'Nova incubadora' : 'Configurar incubadora' }}</h2>
+<mat-dialog-content>
+  
+  @if (carregado() && dados) {
+    <div class="grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome</mat-label>
+        <input matInput [(ngModel)]="dados.nome" required />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>CNPJ</mat-label>
+        <input matInput [(ngModel)]="dados.cnpj" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Mantenedora</mat-label>
+        <input matInput [(ngModel)]="dados.mantenedora" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>E-mail</mat-label>
+        <input matInput [(ngModel)]="dados.email" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Telefone</mat-label>
+        <input matInput [(ngModel)]="dados.telefone" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Cidade</mat-label>
+        <input matInput [(ngModel)]="dados.cidade" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Nível</mat-label>
+        <mat-select [(ngModel)]="dados.nivel">
+          <mat-option [value]="null">—</mat-option>
+          <mat-option value="CERNE_1">CERNE 1</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="salvando()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="salvar()" [disabled]="!carregado() || salvando()">
+    Salvar
+  </button>
+</mat-dialog-actions>
