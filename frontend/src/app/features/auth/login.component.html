@@ -1,0 +1,108 @@
+<div class="tela">
+  <mat-card class="cartao">
+    <h1>CERNE</h1>
+    <p class="sub">{{ modo() === 'entrar' ? 'Acesso à plataforma' : 'Ativar conta' }}</p>
+
+    @if (modo() === 'entrar') {
+      <form (ngSubmit)="entrar()">
+        <mat-form-field appearance="outline">
+          <mat-label>E-mail</mat-label>
+          <input
+            matInput
+            type="email"
+            name="email"
+            autocomplete="username"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
+            required
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Senha</mat-label>
+          <input
+            matInput
+            type="password"
+            name="senha"
+            autocomplete="current-password"
+            [ngModel]="senha()"
+            (ngModelChange)="senha.set($event)"
+            required
+          />
+        </mat-form-field>
+
+        @if (sucesso()) {
+          <p class="sucesso">{{ sucesso() }}</p>
+        }
+        @if (erro()) {
+          <p class="erro">{{ erro() }}</p>
+        }
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          [disabled]="carregando() || !email() || !senha()"
+        >
+          Entrar
+        </button>
+        <button mat-button type="button" (click)="trocar('ativar')">Ativar conta</button>
+      </form>
+    } @else {
+      <form (ngSubmit)="ativar()">
+        <mat-form-field appearance="outline">
+          <mat-label>E-mail cadastrado</mat-label>
+          <input
+            matInput
+            type="email"
+            name="email"
+            autocomplete="username"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
+            required
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nova senha</mat-label>
+          <input
+            matInput
+            type="password"
+            name="senha"
+            autocomplete="new-password"
+            [ngModel]="senha()"
+            (ngModelChange)="senha.set($event)"
+            required
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Confirmar senha</mat-label>
+          <input
+            matInput
+            type="password"
+            name="confirmar"
+            autocomplete="new-password"
+            [ngModel]="confirmar()"
+            (ngModelChange)="confirmar.set($event)"
+            required
+          />
+        </mat-form-field>
+
+        @if (erro()) {
+          <p class="erro">{{ erro() }}</p>
+        }
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          [disabled]="carregando() || !email() || !senha() || !confirmar()"
+        >
+          Ativar conta
+        </button>
+        <button mat-button type="button" (click)="trocar('entrar')">Voltar ao login</button>
+      </form>
+    }
+  </mat-card>
+</div>

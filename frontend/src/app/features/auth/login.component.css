@@ -1,0 +1,39 @@
+.tela {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.cartao {
+  width: 100%;
+  max-width: 380px;
+  padding: 28px;
+}
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.04em;
+}
+.sub {
+  margin: 4px 0 20px;
+  color: rgba(0, 0, 0, 0.6);
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+button {
+  margin-top: 8px;
+}
+.erro {
+  color: #b02020;
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+}
+.sucesso {
+  color: #1b7a37;
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+}
