@@ -1,0 +1,55 @@
+<div class="topo">
+  <h1>Usuários da plataforma</h1>
+  <button mat-flat-button color="primary" (click)="adicionar()">Adicionar usuário</button>
+</div>
+
+@if (dados.error()) {
+  <p class="erro">Falha ao carregar os usuários.</p>
+}
+
+<table mat-table [dataSource]="dados.value() ?? []" class="tabela">
+  <ng-container matColumnDef="nome">
+    <th mat-header-cell *matHeaderCellDef>Nome</th>
+    <td mat-cell *matCellDef="let u">{{ u.nome }}</td>
+  </ng-container>
+  <ng-container matColumnDef="email">
+    <th mat-header-cell *matHeaderCellDef>E-mail</th>
+    <td mat-cell *matCellDef="let u">{{ u.email }}</td>
+  </ng-container>
+  <ng-container matColumnDef="incubadora">
+    <th mat-header-cell *matHeaderCellDef>Incubadora</th>
+    <td mat-cell *matCellDef="let u">{{ u.incubadora || '—' }}</td>
+  </ng-container>
+  <ng-container matColumnDef="papel">
+    <th mat-header-cell *matHeaderCellDef>Papel</th>
+    <td mat-cell *matCellDef="let u">{{ u.papel || '—' }}</td>
+  </ng-container>
+  <ng-container matColumnDef="status">
+    <th mat-header-cell *matHeaderCellDef>Status</th>
+    <td mat-cell *matCellDef="let u">
+      <span class="chip" [class]="'s-' + u.status">{{ label(u.status) }}</span>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="acoes">
+    <th mat-header-cell *matHeaderCellDef>Ações</th>
+    <td mat-cell *matCellDef="let u" class="acoes">
+      <!-- <button mat-button (click)="editar(u)">Editar</button> -->
+      <button mat-stroked-button 
+      [ngClass]= "{
+        'btn-reativar': u.status === 'SUSPENSO',
+        'btn-suspender': u.status !== 'SUSPENSO'
+      }
+      "
+        (click)="alternar(u)">
+        {{ u.status === 'SUSPENSO' ? 'Reativar' : 'Suspender' }}
+      </button>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+  <tr mat-row *matRowDef="let row; columns: colunas"></tr>
+</table>
+
+@if (!dados.isLoading() && (dados.value()?.length ?? 0) === 0) {
+  <p class="vazio">Nenhum usuário encontrado.</p>
+}

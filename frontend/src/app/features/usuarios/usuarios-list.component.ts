@@ -1,0 +1,45 @@
+import { Component, inject } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTableModule } from '@angular/material/table';
+import { UsuarioService } from '../../core/services/usuario/usuario.service';
+import { EStatusConta, STATUS_CONTA_LABEL, UsuarioResumo } from '../../models/usuario/usuario.model';
+import { UsuarioFormDialog } from './usuario-form.dialog';
+import { NgClass } from '@angular/common';
+
+/** Tela "Usuários da plataforma" do administrador: listagem, convidar e suspender/reativar. */
+@Component({
+  selector: 'app-usuarios-list',
+  imports: [MatTableModule, MatButtonModule, MatDialogModule, NgClass],
+  templateUrl: './usuarios-list.component.html',
+  styleUrl: './usuarios-list.component.css',
+})
+export class UsuariosListComponent {
+  private readonly service = inject(UsuarioService);
+  private readonly dialog = inject(MatDialog);
+
+  readonly colunas = ['nome', 'email', 'incubadora', 'papel', 'status', 'acoes'];
+
+  /** Refaz a busca sempre que houver mutação (convidar / suspender / reativar). */
+  readonly dados = rxResource({
+    params: () => ({ versao: this.service.versao() }),
+    stream: () => this.service.listar(),
+  });
+
+  label(s: EStatusConta): string {
+    return STATUS_CONTA_LABEL[s];
+  }
+
+  adicionar(): void {
+    this.dialog.open(UsuarioFormDialog, { data: null, width: '480px' });
+  }
+
+  editar(u: UsuarioResumo): void {
+    this.dialog.open(UsuarioFormDialog, { data: u, width: '480px' });
+  }
+
+  alternar(u: UsuarioResumo): void {
+    this.service.alternarStatus(u.ctaCod).subscribe(() => this.service.recarregar());
+  }
+}
