@@ -1,9 +1,6 @@
-# Contexto antigo (scratch) — não versionar
-ARQUIVOS_DE_CONTEXTO_ANTIGOS/
-
-# IDE
-.idea/
-*.iml
-
-# Dependências / build (redundante com os .gitignore de backend/ e frontend/)
-node_modules/
+# Versionar apenas backend/ e frontend/.
+# Todo o resto da raiz (notas, .docx, .txt, .sql avulsos, contexto antigo) fica fora.
+/*
+!/.gitignore
+!/backend/
+!/frontend/
