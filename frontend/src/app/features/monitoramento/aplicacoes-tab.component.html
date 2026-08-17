@@ -1,0 +1,13 @@
+@if (rodadasRes.isLoading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+} @else if (rodadasRes.error()) {
+  <p class="estado erro">Não foi possível carregar as rodadas.</p>
+} @else if ((rodadasRes.value() ?? []).length === 0) {
+  <p class="estado">Nenhuma rodada planejada. Planeje uma rodada na aba "Rodadas".</p>
+} @else {
+  <div class="rodadas">
+    @for (r of rodadasRes.value() ?? []; track r.rodCod) {
+      <app-rodada-aplicacoes [rodada]="r" />
+    }
+  </div>
+}

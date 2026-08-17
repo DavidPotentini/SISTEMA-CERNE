@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>Planejar rodada</h2>
+<mat-dialog-content>
+  <div class="grid">
+    <mat-form-field appearance="outline" class="col-2">
+      <mat-label>Nome</mat-label>
+      <input matInput [ngModel]="nome()" (ngModelChange)="nome.set($event)" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo</mat-label>
+      <mat-select [ngModel]="tipo()" (ngModelChange)="tipo.set($event)">
+        @for (t of tipos; track t[0]) {
+          <mat-option [value]="t[0]">{{ t[1] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Prazo</mat-label>
+      <input matInput type="date" [ngModel]="prazo()" (ngModelChange)="prazo.set($event)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Responsável</mat-label>
+      <mat-select [ngModel]="respPesCod()" (ngModelChange)="respPesCod.set($event)">
+        <mat-option [value]="null">— Sem responsável —</mat-option>
+        @for (r of responsaveisRes.value() ?? []; track r.pesCod) {
+          <mat-option [value]="r.pesCod">{{ r.nome }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-2">
+      <mat-label>Empreendimentos participantes</mat-label>
+      <mat-select
+        multiple
+        [ngModel]="empCods()"
+        (ngModelChange)="empCods.set($event)"
+        [disabled]="(empreendimentosRes.value() ?? []).length === 0"
+      >
+        @for (e of empreendimentosRes.value() ?? []; track e.empCod) {
+          <mat-option [value]="e.empCod">{{ e.nome }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  @if ((empreendimentosRes.value() ?? []).length === 0 && !empreendimentosRes.isLoading()) {
+    <p class="aviso">Nenhum empreendimento cadastrado. Cadastre-os em "Minha Incubadora" antes de planejar.</p>
+  }
+
+  @if (erro()) {
+    <p class="erro">{{ erro() }}</p>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="salvando()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="salvar()" [disabled]="!podeSalvar">
+    Planejar
+  </button>
+</mat-dialog-actions>

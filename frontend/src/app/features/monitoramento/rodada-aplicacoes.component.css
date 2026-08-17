@@ -1,0 +1,151 @@
+.rodada-cartao {
+  width: 100%;
+}
+.rodada-cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 8px 0 16px;
+}
+.rodada-titulo h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+.rodada-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.88rem;
+}
+.chip {
+  display: inline-block;
+  padding: 1px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: rgba(63, 81, 181, 0.1);
+  color: #3f51b5;
+}
+.chip.concluida {
+  background: rgba(46, 125, 50, 0.12);
+  color: #2e7d32;
+}
+.estado {
+  padding: 16px 4px;
+  color: rgba(0, 0, 0, 0.5);
+}
+.estado.erro {
+  color: #b02020;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+.card {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.012);
+}
+.card.revisado {
+  border-color: rgba(63, 81, 181, 0.35);
+  background: rgba(63, 81, 181, 0.03);
+}
+.card-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.emp-nome {
+  font-weight: 600;
+  font-size: 1rem;
+}
+.status {
+  font-size: 0.76rem;
+  font-weight: 500;
+  padding: 1px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: rgba(230, 160, 30, 0.15);
+  color: #9a6a12;
+}
+.status.concluido {
+  background: rgba(46, 125, 50, 0.12);
+  color: #2e7d32;
+}
+.status.nao-revisado {
+  background: rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.eixos {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.eixo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 2px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.03);
+}
+.eixo-nome {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: rgba(0, 0, 0, 0.55);
+  text-align: center;
+}
+.eixo-nota {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.eixo-nota .max {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.45);
+}
+.eixo-nota.vazio {
+  color: rgba(0, 0, 0, 0.3);
+  font-weight: 400;
+}
+
+.detalhe {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.detalhe dt {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(0, 0, 0, 0.5);
+}
+.detalhe dd {
+  margin: 1px 0 0;
+  font-size: 0.9rem;
+}
+.detalhe .obs dd {
+  color: rgba(0, 0, 0, 0.7);
+  white-space: pre-wrap;
+}
+.card-acoes {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}

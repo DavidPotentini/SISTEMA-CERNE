@@ -1,0 +1,39 @@
+.secao {
+  margin-top: 4px;
+}
+.secao-titulo {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 8px;
+}
+.eixos {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.campo-eixo {
+  min-width: 0;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+  margin-top: 12px;
+}
+.col-2 {
+  grid-column: 1 / -1;
+}
+.erro {
+  color: #b02020;
+  margin: 8px 0 0;
+}
+@media (max-width: 560px) {
+  .eixos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
