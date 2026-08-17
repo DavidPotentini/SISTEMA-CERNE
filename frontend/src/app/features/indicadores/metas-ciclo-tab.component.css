@@ -1,0 +1,40 @@
+.cartao {
+  width: 100%;
+}
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px 0;
+}
+.cabecalho h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+.estado {
+  padding: 20px 4px;
+  color: rgba(0, 0, 0, 0.5);
+}
+.estado.erro {
+  color: #b02020;
+}
+table {
+  width: 100%;
+}
+.acoes {
+  text-align: right;
+  white-space: nowrap;
+}
+.vinculo {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+.vinculo .proc {
+  font-weight: 500;
+}
+.vinculo .prat {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.6);
+}

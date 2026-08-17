@@ -1,0 +1,101 @@
+import { Component, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { IndicadorService } from '../../core/services/indicador/indicador.service';
+import { IndicadorCiclo, PraticaOpcao } from '../../models/indicador/indicador.model';
+import {
+  EPeriodicidade,
+  PERIODICIDADE_LABEL,
+} from '../../models/metodologia/metodologia.model';
+
+/** Item {cod, nome} distinto usado no seletor de processo. */
+interface Opcao {
+  cod: number;
+  nome: string | null;
+}
+
+/**
+ * Modal "Definir complementar": inclui um indicador complementar no ciclo ativo. O vínculo CERNE
+ * (prática da metodologia vigente) é opcional e escolhido em cascata processo → prática — mesmo
+ * padrão do cadastro de evidências.
+ */
+@Component({
+  selector: 'app-indicador-complementar',
+  imports: [
+    FormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+  ],
+  templateUrl: './indicador-complementar.dialog.html',
+  styleUrl: './indicador-complementar.dialog.css',
+})
+export class IndicadorComplementarDialog {
+  private readonly service = inject(IndicadorService);
+  private readonly ref = inject(MatDialogRef<IndicadorComplementarDialog>);
+
+  readonly periodicidades = Object.entries(PERIODICIDADE_LABEL) as [EPeriodicidade, string][];
+
+  readonly opcoes = signal<PraticaOpcao[]>([]);
+  readonly prcCod = signal<number | null>(null);
+
+  /** Processos distintos da lista. */
+  readonly processos = computed<Opcao[]>(() => {
+    const mapa = new Map<number, Opcao>();
+    for (const o of this.opcoes()) {
+      if (!mapa.has(o.prcCod)) mapa.set(o.prcCod, { cod: o.prcCod, nome: o.processoNome });
+    }
+    return [...mapa.values()];
+  });
+
+  /** Práticas do processo selecionado. */
+  readonly praticas = computed<PraticaOpcao[]>(() =>
+    this.opcoes().filter(o => o.prcCod === this.prcCod()),
+  );
+
+  readonly nome = signal('');
+  readonly prtCod = signal<number | null>(null);
+  readonly unidade = signal('');
+  readonly periodicidade = signal<EPeriodicidade>('TRIMESTRAL');
+
+  processoAlterado(): void {
+    this.prtCod.set(null);
+  }
+
+  readonly salvando = signal(false);
+  readonly erro = signal<string | null>(null);
+
+  constructor() {
+    this.service.vinculos().subscribe({
+      next: lista => this.opcoes.set(lista),
+    });
+  }
+
+  salvar(): void {
+    if (!this.nome().trim()) return;
+    this.salvando.set(true);
+    this.erro.set(null);
+    const dto: Partial<IndicadorCiclo> = {
+      nome: this.nome().trim(),
+      prtCod: this.prtCod(),
+      unidade: this.unidade().trim() || null,
+      periodicidade: this.periodicidade(),
+    };
+    this.service.definirComplementar(dto).subscribe({
+      next: () => {
+        this.service.recarregar();
+        this.ref.close(true);
+      },
+      error: e => {
+        this.salvando.set(false);
+        this.erro.set(e?.error?.mensagem ?? 'Falha ao definir o indicador complementar.');
+      },
+    });
+  }
+}

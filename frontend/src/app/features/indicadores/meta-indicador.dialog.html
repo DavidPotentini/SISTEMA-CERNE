@@ -1,0 +1,95 @@
+<h2 mat-dialog-title>Meta do indicador</h2>
+
+<mat-dialog-content>
+  <!-- Indicador (só leitura) -->
+  <section class="indicador">
+    <h3>{{ indicador.nome }}</h3>
+    <dl class="meta-info">
+      <div>
+        <dt>Vínculo CERNE</dt>
+        <dd>
+          <span class="proc">{{ indicador.processoNome || '—' }}</span>
+          <span class="prat">{{ indicador.praticaNome || '—' }}</span>
+        </dd>
+      </div>
+      <div><dt>Periodicidade</dt><dd>{{ periodicidadeLabel(indicador.periodicidade) }}</dd></div>
+      <div><dt>Unidade</dt><dd>{{ indicador.unidade || '—' }}</dd></div>
+    </dl>
+  </section>
+
+  <!-- Períodos -->
+  <section class="periodos">
+    <div class="secao-titulo">Períodos</div>
+
+    @if (carregando()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    } @else if (metas().length === 0) {
+      <p class="vazio">Nenhum período cadastrado.</p>
+    } @else {
+      <div class="lista">
+        @for (m of metas(); track m.metCod) {
+          <div class="periodo" [class.ativo]="editandoCod() === m.metCod">
+            <div class="periodo-dados">
+              <span class="valor">
+                Meta: <strong>{{ m.valor }}</strong>
+                @if (indicador.unidade) {
+                  <span class="unidade">{{ indicador.unidade }}</span>
+                }
+              </span>
+              <span class="janela">
+                Apuração: {{ m.dataInicioApuracao | date: 'dd/MM/yyyy' }} —
+                {{ m.dataFimApuracao | date: 'dd/MM/yyyy' }}
+              </span>
+            </div>
+            <div class="periodo-acoes">
+              <button mat-icon-button matTooltip="Editar" (click)="editar(m)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Remover" (click)="remover(m)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Cadastro / edição de período -->
+    <div class="form">
+      <div class="form-titulo">{{ editando ? 'Editar período' : 'Novo período' }}</div>
+      <div class="grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Meta estipulada</mat-label>
+          <input matInput type="number" [ngModel]="valor()" (ngModelChange)="valor.set($event)" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Início da apuração</mat-label>
+          <input matInput type="date" [ngModel]="inicio()" (ngModelChange)="inicio.set($event)" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fim da apuração</mat-label>
+          <input matInput type="date" [ngModel]="fim()" (ngModelChange)="fim.set($event)" />
+        </mat-form-field>
+      </div>
+
+      <div class="form-acoes">
+        @if (editando) {
+          <button mat-button (click)="cancelarEdicao()" [disabled]="salvando()">Cancelar</button>
+        }
+        <button mat-flat-button color="primary" (click)="salvar()" [disabled]="!podeSalvar">
+          {{ editando ? 'Salvar período' : 'Adicionar período' }}
+        </button>
+      </div>
+    </div>
+
+    @if (erro()) {
+      <p class="erro">{{ erro() }}</p>
+    }
+  </section>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Fechar</button>
+</mat-dialog-actions>

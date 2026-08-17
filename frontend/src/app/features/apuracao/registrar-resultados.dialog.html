@@ -1,0 +1,92 @@
+<h2 mat-dialog-title>Registrar resultados</h2>
+
+<mat-dialog-content>
+  <!-- Indicador (só leitura) -->
+  <section class="indicador">
+    <h3>{{ indicador.nome }}</h3>
+    <dl class="meta-info">
+      <div>
+        <dt>Vínculo CERNE</dt>
+        <dd>
+          <span class="proc">{{ indicador.processoNome || '—' }}</span>
+          <span class="prat">{{ indicador.praticaNome || '—' }}</span>
+        </dd>
+      </div>
+      <div><dt>Periodicidade</dt><dd>{{ periodicidadeLabel(indicador.periodicidade) }}</dd></div>
+      <div><dt>Unidade</dt><dd>{{ indicador.unidade || '—' }}</dd></div>
+    </dl>
+  </section>
+
+  <!-- Períodos -->
+  <section class="periodos">
+    <div class="secao-titulo">Períodos</div>
+
+    @if (periodosRes.isLoading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    } @else if (periodosRes.error()) {
+      <p class="erro">Não foi possível carregar os períodos.</p>
+    } @else if ((periodosRes.value() ?? []).length === 0) {
+      <p class="vazio">Nenhum período cadastrado. Defina metas para este indicador antes de apurar.</p>
+    } @else {
+      <div class="lista">
+        @for (p of periodosRes.value() ?? []; track p.metCod) {
+          <div class="periodo" [class.ativo]="registrandoCod() === p.metCod">
+            <div class="periodo-dados">
+              <span class="linha">
+                <span class="rotulo">Meta:</span> <strong>{{ p.metaValor }}</strong>
+                @if (indicador.unidade) {
+                  <span class="unidade">{{ indicador.unidade }}</span>
+                }
+                <span class="janela">
+                  ({{ p.dataInicioApuracao | date: 'dd/MM/yyyy' }} —
+                  {{ p.dataFimApuracao | date: 'dd/MM/yyyy' }})
+                </span>
+              </span>
+              @if (p.resultadoValor != null) {
+                <span class="linha resultado">
+                  <span class="rotulo">Resultado:</span> <strong>{{ p.resultadoValor }}</strong>
+                  <span class="registro">
+                    · {{ p.registradoPor || '—' }}
+                    @if (p.dataRegistro) {
+                      em {{ p.dataRegistro | date: 'dd/MM/yyyy HH:mm' }}
+                    }
+                  </span>
+                </span>
+              } @else {
+                <span class="linha sem-resultado">Sem resultado</span>
+              }
+            </div>
+
+            <div class="periodo-acoes">
+              @if (registrandoCod() === p.metCod) {
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="campo-valor">
+                  <mat-label>Resultado</mat-label>
+                  <input matInput type="number" [ngModel]="valor()" (ngModelChange)="valor.set($event)" />
+                </mat-form-field>
+                <button mat-icon-button matTooltip="Salvar" [disabled]="!podeSalvar" (click)="salvar(p.metCod)">
+                  <mat-icon>check</mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Cancelar" [disabled]="salvando()" (click)="cancelar()">
+                  <mat-icon>close</mat-icon>
+                </button>
+              } @else {
+                <button mat-stroked-button color="primary" (click)="registrar(p)">
+                  <mat-icon>{{ p.resultadoValor != null ? 'edit' : 'add' }}</mat-icon>
+                  {{ p.resultadoValor != null ? 'Editar' : 'Registrar' }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (erro()) {
+      <p class="erro">{{ erro() }}</p>
+    }
+  </section>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Fechar</button>
+</mat-dialog-actions>

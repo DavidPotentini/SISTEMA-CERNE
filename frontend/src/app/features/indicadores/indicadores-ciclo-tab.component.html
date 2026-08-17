@@ -1,0 +1,79 @@
+<mat-card class="cartao">
+  <div class="cabecalho">
+    <h2>Indicadores do ciclo</h2>
+    <div class="acoes-topo">
+      <button mat-stroked-button (click)="definirComplementar()">
+        <mat-icon>add</mat-icon>
+        Definir complementar
+      </button>
+      <button mat-flat-button color="primary" (click)="gerar()" [disabled]="gerando()">
+        <mat-icon>autorenew</mat-icon>
+        Gerar indicadores do ciclo
+      </button>
+    </div>
+  </div>
+
+  @if (gerando()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+  @if (erroAcao()) {
+    <p class="estado erro">{{ erroAcao() }}</p>
+  }
+
+  @if (indicadoresRes.isLoading()) {
+    <p class="estado">Carregando…</p>
+  } @else if (indicadoresRes.error()) {
+    <p class="estado erro">Não foi possível carregar os indicadores.</p>
+  } @else if ((indicadoresRes.value() ?? []).length === 0) {
+    <p class="estado">
+      Nenhum indicador no ciclo. Use "Gerar indicadores do ciclo" para trazê-los da metodologia
+      vigente ou "Definir complementar".
+    </p>
+  } @else {
+    <table mat-table [dataSource]="indicadoresRes.value() ?? []">
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Indicador</th>
+        <td mat-cell *matCellDef="let i">{{ i.nome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="origem">
+        <th mat-header-cell *matHeaderCellDef>Origem</th>
+        <td mat-cell *matCellDef="let i">
+          <span class="chip" [class]="'o-' + i.origem">{{ rotuloOrigem(i.origem) }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="vinculo">
+        <th mat-header-cell *matHeaderCellDef>Vínculo CERNE</th>
+        <td mat-cell *matCellDef="let i">
+          <div class="vinculo">
+            <span class="proc">{{ i.processoNome || '—' }}</span>
+            <span class="prat">{{ i.praticaNome || '—' }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="unidade">
+        <th mat-header-cell *matHeaderCellDef>Unidade</th>
+        <td mat-cell *matCellDef="let i">{{ i.unidade || '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="periodicidade">
+        <th mat-header-cell *matHeaderCellDef>Periodicidade</th>
+        <td mat-cell *matCellDef="let i">{{ periodicidadeLabel(i.periodicidade) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="situacao">
+        <th mat-header-cell *matHeaderCellDef>Situação</th>
+        <td mat-cell *matCellDef="let i">
+          <span class="chip" [class]="'s-' + i.situacao">
+            {{ i.situacao === 'ATIVO' ? 'Ativo' : 'Inativo' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+      <tr mat-row *matRowDef="let row; columns: colunas" [class.inativa]="row.situacao === 'INATIVO'"></tr>
+    </table>
+  }
+</mat-card>

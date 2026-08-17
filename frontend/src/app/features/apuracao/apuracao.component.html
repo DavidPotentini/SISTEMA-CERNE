@@ -1,0 +1,74 @@
+<div class="topo">
+  <h1>Apuração de indicadores</h1>
+</div>
+
+<mat-card class="cartao">
+  @if (indicadoresRes.isLoading()) {
+    <p class="estado">Carregando…</p>
+  } @else if (indicadoresRes.error()) {
+    <p class="estado erro">Não foi possível carregar os indicadores.</p>
+  } @else if ((indicadoresRes.value() ?? []).length === 0) {
+    <p class="estado">
+      Nenhum indicador no ciclo. Defina indicadores e metas antes de apurar resultados.
+    </p>
+  } @else {
+    <table mat-table [dataSource]="indicadoresRes.value() ?? []">
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Indicador</th>
+        <td mat-cell *matCellDef="let i">{{ i.nome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="vinculo">
+        <th mat-header-cell *matHeaderCellDef>Vínculo CERNE</th>
+        <td mat-cell *matCellDef="let i">
+          <div class="vinculo">
+            <span class="proc">{{ i.processoNome || '—' }}</span>
+            <span class="prat">{{ i.praticaNome || '—' }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="periodicidade">
+        <th mat-header-cell *matHeaderCellDef>Periodicidade</th>
+        <td mat-cell *matCellDef="let i">{{ periodicidadeLabel(i.periodicidade) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="unidade">
+        <th mat-header-cell *matHeaderCellDef>Unidade</th>
+        <td mat-cell *matCellDef="let i">{{ i.unidade || '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="apuracao">
+        <th mat-header-cell *matHeaderCellDef>Apuração</th>
+        <td mat-cell *matCellDef="let i">
+          @if (i.totalPeriodos === 0) {
+            <span class="chip sem-meta">Sem meta</span>
+          } @else {
+            <span
+              class="chip"
+              [class.completo]="i.apurados === i.totalPeriodos"
+            >{{ i.apurados }}/{{ i.totalPeriodos }}</span>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef aria-label="Ações"></th>
+        <td mat-cell *matCellDef="let i" class="acoes">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="registrar(i)"
+            [disabled]="i.totalPeriodos === 0"
+          >
+            <mat-icon>edit_note</mat-icon>
+            Registrar Resultados
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+      <tr mat-row *matRowDef="let row; columns: colunas"></tr>
+    </table>
+  }
+</mat-card>

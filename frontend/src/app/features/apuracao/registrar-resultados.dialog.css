@@ -1,0 +1,113 @@
+.indicador h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+.meta-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin: 0;
+}
+.meta-info dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(0, 0, 0, 0.5);
+}
+.meta-info dd {
+  margin: 2px 0 0;
+  font-weight: 500;
+}
+.meta-info .proc {
+  display: block;
+}
+.meta-info .prat {
+  display: block;
+  font-weight: 400;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.periodos {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+.secao-titulo {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 10px;
+}
+.vazio {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 0.9rem;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.periodo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.015);
+}
+.periodo.ativo {
+  border-color: #3f51b5;
+  background: rgba(63, 81, 181, 0.06);
+}
+.periodo-dados {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+.periodo-dados .linha {
+  font-size: 0.92rem;
+}
+.periodo-dados .rotulo {
+  color: rgba(0, 0, 0, 0.55);
+}
+.periodo-dados .unidade {
+  color: rgba(0, 0, 0, 0.55);
+  margin-left: 4px;
+}
+.periodo-dados .janela {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 0.82rem;
+  margin-left: 4px;
+}
+.periodo-dados .resultado strong {
+  color: #2e7d32;
+}
+.periodo-dados .registro {
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.82rem;
+}
+.periodo-dados .sem-resultado {
+  color: rgba(0, 0, 0, 0.45);
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.periodo-acoes {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.campo-valor {
+  width: 120px;
+}
+.erro {
+  color: #b02020;
+  margin: 12px 0 0;
+}

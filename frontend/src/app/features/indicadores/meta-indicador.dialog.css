@@ -1,0 +1,110 @@
+.indicador h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+.meta-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin: 0;
+}
+.meta-info dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(0, 0, 0, 0.5);
+}
+.meta-info dd {
+  margin: 2px 0 0;
+  font-weight: 500;
+}
+.meta-info .proc {
+  display: block;
+}
+.meta-info .prat {
+  display: block;
+  font-weight: 400;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.periodos {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+.secao-titulo {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 10px;
+}
+.vazio {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 0.9rem;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.periodo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.015);
+}
+.periodo.ativo {
+  border-color: #3f51b5;
+  background: rgba(63, 81, 181, 0.06);
+}
+.periodo-dados {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.periodo-dados .valor {
+  font-weight: 500;
+}
+.periodo-dados .unidade {
+  color: rgba(0, 0, 0, 0.55);
+  font-weight: 400;
+  margin-left: 4px;
+}
+.periodo-dados .janela {
+  font-size: 0.83rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.form {
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+}
+.form-titulo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px 12px;
+}
+.form-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+.erro {
+  color: #b02020;
+  margin: 12px 0 0;
+}
