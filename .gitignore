@@ -1,0 +1,9 @@
+# Contexto antigo (scratch) — não versionar
+ARQUIVOS_DE_CONTEXTO_ANTIGOS/
+
+# IDE
+.idea/
+*.iml
+
+# Dependências / build (redundante com os .gitignore de backend/ e frontend/)
+node_modules/
