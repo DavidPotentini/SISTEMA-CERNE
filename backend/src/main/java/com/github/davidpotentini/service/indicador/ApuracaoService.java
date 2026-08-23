@@ -5,7 +5,9 @@ import com.github.davidpotentini.comum.erro.RegraNegocioException;
 import com.github.davidpotentini.comum.tenant.SessaoContext;
 import com.github.davidpotentini.dto.indicador.ApuracaoIndicadorDTO;
 import com.github.davidpotentini.dto.indicador.IndicadorCicloDTO;
+import com.github.davidpotentini.dto.indicador.PainelIndicadorDTO;
 import com.github.davidpotentini.dto.indicador.PeriodoApuracaoDTO;
+import com.github.davidpotentini.enums.ESituacaoApuracao;
 import com.github.davidpotentini.model.contas.ContasModel;
 import com.github.davidpotentini.model.indicador.MetaModel;
 import com.github.davidpotentini.model.indicador.ResultadoModel;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,11 +68,11 @@ public class ApuracaoService {
             indCods.add(ind.indCod());
         }
 
-        // metCods por indicador + conjunto de metCods apurados (em lote)
-        Map<Long, List<Long>> metCodsPorInd = new HashMap<>();
+        // períodos (metas) por indicador + conjunto de metCods apurados (em lote)
+        Map<Long, List<MetaModel>> metasPorInd = new HashMap<>();
         List<Long> todosMetCods = new ArrayList<>();
         for (MetaModel m : metas.findByIndCodIn(indCods)) {
-            metCodsPorInd.computeIfAbsent(m.getIndCod(), k -> new ArrayList<>()).add(m.getMetCod());
+            metasPorInd.computeIfAbsent(m.getIndCod(), k -> new ArrayList<>()).add(m);
             todosMetCods.add(m.getMetCod());
         }
         Set<Long> apuradosMetCods = new HashSet<>();
@@ -77,18 +80,81 @@ public class ApuracaoService {
             apuradosMetCods.add(r.getMetCod());
         }
 
+        LocalDate hoje = LocalDate.now();
         List<ApuracaoIndicadorDTO> lista = new ArrayList<>();
         for (IndicadorCicloDTO ind : base) {
-            List<Long> metCods = metCodsPorInd.getOrDefault(ind.indCod(), List.of());
+            List<MetaModel> periodos = metasPorInd.getOrDefault(ind.indCod(), List.of());
             int apurados = 0;
-            for (Long metCod : metCods) {
-                if (apuradosMetCods.contains(metCod)) {
+            boolean atrasado = false;
+            for (MetaModel meta : periodos) {
+                boolean apurado = apuradosMetCods.contains(meta.getMetCod());
+                if (apurado) {
                     apurados++;
+                } else if (meta.getDataFimApuracao() != null && meta.getDataFimApuracao().isBefore(hoje)) {
+                    atrasado = true;
                 }
             }
             lista.add(new ApuracaoIndicadorDTO(
                     ind.indCod(), ind.nome(), ind.processoNome(), ind.praticaNome(),
-                    ind.periodicidade(), ind.unidade(), metCods.size(), apurados));
+                    ind.periodicidade(), ind.unidade(), periodos.size(), apurados,
+                    situacao(periodos.size(), apurados, atrasado), ind.respPesCod()));
+        }
+        return lista;
+    }
+
+    /**
+     * Painel do ciclo: uma linha por indicador com meta e resultado somados de todos os períodos,
+     * mais os sinais de "atingido" (resultado >= meta) e "pendente" (período encerrado sem resultado).
+     */
+    @Transactional(readOnly = true)
+    public List<PainelIndicadorDTO> painel() {
+        List<IndicadorCicloDTO> base = indicadorService.listar();
+        if (base.isEmpty()) {
+            return List.of();
+        }
+        List<Long> indCods = new ArrayList<>();
+        for (IndicadorCicloDTO ind : base) {
+            indCods.add(ind.indCod());
+        }
+
+        // períodos (metas) por indicador + resultado por período (em lote)
+        Map<Long, List<MetaModel>> metasPorInd = new HashMap<>();
+        List<Long> todosMetCods = new ArrayList<>();
+        for (MetaModel m : metas.findByIndCodIn(indCods)) {
+            metasPorInd.computeIfAbsent(m.getIndCod(), k -> new ArrayList<>()).add(m);
+            todosMetCods.add(m.getMetCod());
+        }
+        Map<Long, BigDecimal> resultadoPorMet = new HashMap<>();
+        for (ResultadoModel r : resultados.findByMetCodIn(todosMetCods)) {
+            resultadoPorMet.put(r.getMetCod(), r.getValor());
+        }
+
+        LocalDate hoje = LocalDate.now();
+        List<PainelIndicadorDTO> lista = new ArrayList<>();
+        for (IndicadorCicloDTO ind : base) {
+            List<MetaModel> periodos = metasPorInd.getOrDefault(ind.indCod(), List.of());
+            boolean temMeta = !periodos.isEmpty();
+            BigDecimal metaTotal = BigDecimal.ZERO;
+            BigDecimal atingidoTotal = BigDecimal.ZERO;
+            boolean pendente = false;
+            for (MetaModel m : periodos) {
+                if (m.getValor() != null) {
+                    metaTotal = metaTotal.add(m.getValor());
+                }
+                BigDecimal resultado = resultadoPorMet.get(m.getMetCod());
+                if (resultado != null) {
+                    atingidoTotal = atingidoTotal.add(resultado);
+                }
+                boolean encerrado = m.getDataFimApuracao() != null && m.getDataFimApuracao().isBefore(hoje);
+                if (encerrado && resultado == null) {
+                    pendente = true;
+                }
+            }
+            boolean atingido = temMeta && metaTotal.signum() > 0 && atingidoTotal.compareTo(metaTotal) >= 0;
+            lista.add(new PainelIndicadorDTO(
+                    ind.indCod(), ind.nome(), ind.processoNome(), ind.praticaNome(),
+                    ind.periodicidade(), ind.unidade(),
+                    temMeta, metaTotal, atingidoTotal, atingido, pendente));
         }
         return lista;
     }
@@ -135,6 +201,17 @@ public class ApuracaoService {
     }
 
     // ---- apoio ----
+
+    /** Situação de apuração a partir dos períodos: sem período ⇒ {@code null} (sem meta). */
+    private ESituacaoApuracao situacao(int totalPeriodos, int apurados, boolean atrasado) {
+        if (totalPeriodos == 0) {
+            return null;
+        }
+        if (apurados == totalPeriodos) {
+            return ESituacaoApuracao.CONCLUIDA;
+        }
+        return atrasado ? ESituacaoApuracao.ATRASADA : ESituacaoApuracao.EM_ABERTO;
+    }
 
     private PeriodoApuracaoDTO toDTO(MetaModel meta, ResultadoModel resultado) {
         return new PeriodoApuracaoDTO(

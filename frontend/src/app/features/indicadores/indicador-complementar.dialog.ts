@@ -1,10 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { EmpreendimentoService } from '../../core/services/empreendimento/empreendimento.service';
 import { IndicadorService } from '../../core/services/indicador/indicador.service';
 import { IndicadorCiclo, PraticaOpcao } from '../../models/indicador/indicador.model';
 import {
@@ -38,9 +40,15 @@ interface Opcao {
 })
 export class IndicadorComplementarDialog {
   private readonly service = inject(IndicadorService);
+  private readonly empreendimentoService = inject(EmpreendimentoService);
   private readonly ref = inject(MatDialogRef<IndicadorComplementarDialog>);
 
   readonly periodicidades = Object.entries(PERIODICIDADE_LABEL) as [EPeriodicidade, string][];
+
+  /** Equipe da incubadora — candidatos a responsável pela apuração. */
+  readonly responsaveisRes = rxResource({
+    stream: () => this.empreendimentoService.listarResponsaveis(),
+  });
 
   readonly opcoes = signal<PraticaOpcao[]>([]);
   readonly prcCod = signal<number | null>(null);
@@ -63,6 +71,7 @@ export class IndicadorComplementarDialog {
   readonly prtCod = signal<number | null>(null);
   readonly unidade = signal('');
   readonly periodicidade = signal<EPeriodicidade>('TRIMESTRAL');
+  readonly respPesCod = signal<number | null>(null);
 
   processoAlterado(): void {
     this.prtCod.set(null);
@@ -86,6 +95,7 @@ export class IndicadorComplementarDialog {
       prtCod: this.prtCod(),
       unidade: this.unidade().trim() || null,
       periodicidade: this.periodicidade(),
+      respPesCod: this.respPesCod(),
     };
     this.service.definirComplementar(dto).subscribe({
       next: () => {

@@ -13,8 +13,16 @@ import { PERIODICIDADE_LABEL } from '../../models/metodologia/metodologia.model'
 import {
   AtividadeModelo,
   ModeloPratica,
+  ModeloProcesso,
   STATUS_MODELO_LABEL,
 } from '../../models/modelos/modelo.model';
+import {
+  FILTROS_VAZIO,
+  FiltrosState,
+  FiltrosBarComponent,
+  OpcaoPratica,
+  OpcaoProcesso,
+} from '../../shared/ui/filtros-bar/filtros-bar.component';
 import { AtividadeFormDialog } from './atividade-form.dialog';
 import { ModeloFormDialog } from './modelo-form.dialog';
 
@@ -33,6 +41,7 @@ import { ModeloFormDialog } from './modelo-form.dialog';
     MatIconModule,
     MatTooltipModule,
     MatDialogModule,
+    FiltrosBarComponent,
   ],
   templateUrl: './modelo-editor.component.html',
   styleUrl: './modelo-editor.component.css',
@@ -61,6 +70,47 @@ export class ModeloEditorComponent {
 
   /** Rascunho = editável; publicado = imutável (esconde ações). */
   readonly editavel = computed(() => this.modeloRes.value()?.status === 'RASCUNHO');
+
+  // ---- filtros padrão (só processo/prática) ----
+  readonly filtros = signal<FiltrosState>({ ...FILTROS_VAZIO });
+
+  readonly processoOpcoes = computed<OpcaoProcesso[]>(() =>
+    (this.estruturaRes.value() ?? []).map(p => ({ nome: p.nome })),
+  );
+
+  readonly praticaOpcoes = computed<OpcaoPratica[]>(() => {
+    const out: OpcaoPratica[] = [];
+    for (const proc of this.estruturaRes.value() ?? []) {
+      for (const pr of proc.praticas) {
+        out.push({ nome: pr.nome, processoNome: proc.nome });
+      }
+    }
+    return out;
+  });
+
+  /** Estrutura com os filtros de processo/prática aplicados; sem filtro, devolve a original. */
+  readonly estruturaFiltrada = computed<ModeloProcesso[]>(() => {
+    const f = this.filtros();
+    const procs = this.estruturaRes.value() ?? [];
+    if (f.processo == null && f.pratica == null) {
+      return procs;
+    }
+    const out: ModeloProcesso[] = [];
+    for (const proc of procs) {
+      if (f.processo != null && proc.nome !== f.processo) {
+        continue;
+      }
+      let praticas = proc.praticas;
+      if (f.pratica != null) {
+        praticas = praticas.filter(pr => pr.nome === f.pratica);
+        if (praticas.length === 0) {
+          continue;
+        }
+      }
+      out.push({ ...proc, praticas });
+    }
+    return out;
+  });
 
   voltar(): void {
     this.router.navigate(['/incubadora/modelos']);

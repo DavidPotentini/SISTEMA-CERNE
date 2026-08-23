@@ -103,7 +103,7 @@ public class PlanejamentoService {
     /**
      * Gera o planejamento do ciclo ativo a partir de um modelo publicado. Substitui o vigente, se
      * houver (o anterior vira {@code ENCERRADO}). O responsável do plano é o usuário logado. Copia as
-     * atividades ATIVAS do modelo com os mesmos valores ({@code prtCod}/{@code nome}/{@code descricao}/
+     * atividades ATIVAS do modelo com os mesmos valores ({@code prtCod}/{@code nome}/{@code observacoes}/
      * {@code respPesCod}).
      */
     @Transactional(rollbackFor = Exception.class)
@@ -143,7 +143,7 @@ public class PlanejamentoService {
             atv.setOrigem(EOrigemAtividade.MODELO);
             atv.setPrtCod(base.getPrtCod());
             atv.setNome(base.getNome());
-            atv.setDescricao(base.getDescricao());
+            atv.setObservacoes(base.getObservacoes());
             atv.setRespPesCod(base.getRespPesCod());
             atv.setStatus(EStatusAtividade.PLANEJADA);
             atividades.save(atv);
@@ -155,26 +155,24 @@ public class PlanejamentoService {
 
     /**
      * Estrutura do planejamento vigente do ciclo ativo: processos e práticas ATIVOS da metodologia
-     * base do modelo (só leitura), cada prática com suas atividades planejadas. Sem planejamento,
-     * devolve vazio.
+     * (só leitura), cada prática com suas atividades planejadas. Sem planejamento, devolve vazio.
      */
     @Transactional(readOnly = true)
     public List<PlanProcessoDTO> estrutura() {
         PlanejamentoModel plano = vigenteDoCicloAtivo();
-        if (plano == null || plano.getModCod() == null) {
+        if (plano == null) {
             return List.of();
         }
-        Long verCod = modelos.findById(plano.getModCod())
-                .orElseThrow(() -> new NaoEncontradoException("Modelo", plano.getModCod()))
-                .getVerCod();
 
+        Map<Long, String> nomeResponsavel = new HashMap<>();
         Map<Long, List<AtividadePlanejadaDTO>> porPratica = new HashMap<>();
         for (AtividadePlanejadaModel a : atividades.findByPlnCodOrderByAtpCodAsc(plano.getPlnCod())) {
-            porPratica.computeIfAbsent(a.getPrtCod(), k -> new ArrayList<>()).add(mapper.toDTO(a));
+            porPratica.computeIfAbsent(a.getPrtCod(), k -> new ArrayList<>())
+                    .add(mapper.toDTO(a, rotuloResponsavel(a.getRespPesCod(), nomeResponsavel)));
         }
 
         List<PlanProcessoDTO> arvore = new ArrayList<>();
-        for (ProcessoModel proc : processos.findByVerCodOrderByOrdemAscPrcCodAsc(verCod)) {
+        for (ProcessoModel proc : processos.findAllByOrderByOrdemAscPrcCodAsc()) {
             if (proc.getSituacao() != EAtivoInativo.ATIVO) {
                 continue;
             }
@@ -196,14 +194,14 @@ public class PlanejamentoService {
     @Transactional(rollbackFor = Exception.class)
     public AtividadePlanejadaDTO adicionarComplementar(Long prtCod, AtividadePlanejadaDTO dto) {
         PlanejamentoModel plano = exigirVigente();
-        exigirPraticaNaVersao(plano, prtCod);
+        exigirPraticaExiste(prtCod);
         AtividadePlanejadaModel atv = mapper.toModel(dto);
         atv.setPlnCod(plano.getPlnCod());
         atv.setPrtCod(prtCod);
         atv.setOrigem(EOrigemAtividade.COMPLEMENTAR);
         atv.setStatus(EStatusAtividade.PLANEJADA);
         atividades.save(atv);
-        return mapper.toDTO(atv);
+        return mapper.toDTO(atv, rotuloResponsavel(atv.getRespPesCod()));
     }
 
     /** Ajusta nome/descrição/responsável/prazo de uma atividade (do modelo ou complementar). */
@@ -213,7 +211,7 @@ public class PlanejamentoService {
         AtividadePlanejadaModel atv = buscarAtividade(plano.getPlnCod(), atpCod);
         mapper.atualizar(dto, atv);
         atividades.save(atv);
-        return mapper.toDTO(atv);
+        return mapper.toDTO(atv, rotuloResponsavel(atv.getRespPesCod()));
     }
 
     /** Remove uma atividade complementar (as do modelo não são removidas, só ajustadas). */
@@ -262,17 +260,10 @@ public class PlanejamentoService {
         return atv;
     }
 
-    /** Garante que a prática pertence à metodologia base do planejamento (prática → processo → versão). */
-    private void exigirPraticaNaVersao(PlanejamentoModel plano, Long prtCod) {
-        Long verCod = modelos.findById(plano.getModCod())
-                .orElseThrow(() -> new NaoEncontradoException("Modelo", plano.getModCod()))
-                .getVerCod();
-        PraticaModel pratica = praticas.findById(prtCod)
-                .orElseThrow(() -> new NaoEncontradoException("Prática", prtCod));
-        ProcessoModel processo = processos.findById(pratica.getPrcCod())
-                .orElseThrow(() -> new NaoEncontradoException("Processo", pratica.getPrcCod()));
-        if (!processo.getVerCod().equals(verCod)) {
-            throw new RegraNegocioException("A prática não pertence à metodologia deste planejamento.");
+    /** Garante que a prática existe na metodologia. */
+    private void exigirPraticaExiste(Long prtCod) {
+        if (!praticas.existsById(prtCod)) {
+            throw new NaoEncontradoException("Prática", prtCod);
         }
     }
 
@@ -317,5 +308,18 @@ public class PlanejamentoService {
             return null;
         }
         return contas.findById(pessoa.getCtaCod()).map(ContasModel::getNome).orElse(null);
+    }
+
+    /** Como {@link #rotuloResponsavel(Long)}, memorizando por {@code PES_COD} (evita relê-lo por atividade). */
+    private String rotuloResponsavel(Long pesCod, Map<Long, String> cache) {
+        if (pesCod == null) {
+            return null;
+        }
+        if (cache.containsKey(pesCod)) {
+            return cache.get(pesCod);
+        }
+        String nome = rotuloResponsavel(pesCod);
+        cache.put(pesCod, nome);
+        return nome;
     }
 }

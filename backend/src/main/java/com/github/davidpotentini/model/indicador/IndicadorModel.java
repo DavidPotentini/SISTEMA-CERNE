@@ -44,6 +44,10 @@ public class IndicadorModel {
     @Column(name = "CIC_COD")
     private Long cicCod;
 
+    /** Responsável pela apuração → {@code PESSOAS(PES_COD)}. Opcional; único campo editável nos gerados. */
+    @Column(name = "RESP_PES_COD")
+    private Long respPesCod;
+
     @Column(name = "UNIDADE")
     private String unidade;
 

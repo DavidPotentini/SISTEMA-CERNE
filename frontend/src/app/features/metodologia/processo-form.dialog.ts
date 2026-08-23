@@ -8,12 +8,11 @@ import { MetodologiaService } from '../../core/services/metodologia/metodologia.
 import { Processo } from '../../models/metodologia/metodologia.model';
 
 interface ProcessoFormData {
-  verCod: number;
   /** Presente no modo edição. */
   processo?: Processo;
 }
 
-/** Modal de processo: cria (na versão vigente) ou edita ordem/nome/descrição. Ordem é única na versão. */
+/** Modal de processo: cria ou edita ordem/nome/descrição. Ordem é única na metodologia. */
 @Component({
   selector: 'app-processo-form',
   imports: [FormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],
@@ -23,29 +22,25 @@ interface ProcessoFormData {
 export class ProcessoFormDialog {
   private readonly service = inject(MetodologiaService);
   private readonly ref = inject(MatDialogRef<ProcessoFormDialog>);
-  private readonly data = inject<ProcessoFormData>(MAT_DIALOG_DATA);
+  private readonly data = inject<ProcessoFormData | null>(MAT_DIALOG_DATA);
 
-  readonly edicao = this.data.processo != null;
+  readonly edicao = this.data?.processo != null;
 
   readonly salvando = signal(false);
   readonly erro = signal<string | null>(null);
 
-  readonly nome = signal(this.data.processo?.nome ?? '');
-  readonly ordem = signal<number | null>(this.data.processo?.ordem ?? null);
-  readonly descricao = signal(this.data.processo?.descricao ?? '');
+  readonly nome = signal(this.data?.processo?.nome ?? '');
+  readonly descricao = signal(this.data?.processo?.descricao ?? '');
 
   salvar(): void {
-    const ordem = this.ordem();
-    if (!this.nome().trim() || ordem == null) return;
+    if (!this.nome().trim()) return;
     this.salvando.set(true);
     this.erro.set(null);
     const dto: Partial<Processo> = {
-      verCod: this.data.verCod,
-      ordem,
       nome: this.nome().trim(),
       descricao: this.descricao().trim() || null,
     };
-    const req = this.data.processo
+    const req = this.data?.processo
       ? this.service.editarProcesso(this.data.processo.prcCod, dto)
       : this.service.criarProcesso(dto);
     req.subscribe({

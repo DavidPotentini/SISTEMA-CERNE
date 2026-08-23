@@ -3,11 +3,9 @@ package com.github.davidpotentini.mapper.metodologia;
 import com.github.davidpotentini.dto.metodologia.IndicadorDTO;
 import com.github.davidpotentini.dto.metodologia.PraticaDTO;
 import com.github.davidpotentini.dto.metodologia.ProcessoDTO;
-import com.github.davidpotentini.dto.metodologia.VersaoDTO;
 import com.github.davidpotentini.model.metodologia.IndicadorMetodologiaModel;
 import com.github.davidpotentini.model.metodologia.PraticaModel;
 import com.github.davidpotentini.model.metodologia.ProcessoModel;
-import com.github.davidpotentini.model.metodologia.VersaoMetodologiaModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Mapping;
@@ -15,14 +13,12 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 /**
- * Conversão da metodologia. Versão é só leitura (criada internamente). Na escrita, os códigos e a
- * {@code situacao} ("nasce ATIVO") ficam por conta do service; no processo, o {@code prcCod} vem do
- * banco e as {@code praticas} são carregadas pelo service e passadas prontas ao montar o DTO.
+ * Conversão da metodologia. Na escrita, os códigos e a {@code situacao} ("nasce ATIVO") ficam por
+ * conta do service; no processo, o {@code prcCod} vem do banco e as {@code praticas} são carregadas
+ * pelo service e passadas prontas ao montar o DTO.
  */
 @Mapper(componentModel = "spring")
 public interface MetodologiaMapper {
-
-    VersaoDTO toDTO(VersaoMetodologiaModel versao, String publicadoPor);
 
     PraticaDTO toDTO(PraticaModel pratica);
 
@@ -31,6 +27,7 @@ public interface MetodologiaMapper {
     ProcessoDTO toDTO(ProcessoModel processo, List<PraticaDTO> praticas);
 
     @Mapping(target = "prcCod", ignore = true)
+    @Mapping(target = "ordem", ignore = true)
     @Mapping(target = "situacao", ignore = true)
     ProcessoModel toModel(ProcessoDTO dto);
 
@@ -41,9 +38,9 @@ public interface MetodologiaMapper {
 
     List<PraticaModel> toModelList(List<PraticaDTO> dtos);
 
-    /** Edição de processo: aplica ordem/nome/descrição; preserva código, versão e situação. */
+    /** Edição de processo: aplica nome/descrição; preserva código, ordem (gerida por arrastar) e situação. */
     @Mapping(target = "prcCod", ignore = true)
-    @Mapping(target = "verCod", ignore = true)
+    @Mapping(target = "ordem", ignore = true)
     @Mapping(target = "situacao", ignore = true)
     void atualizar(ProcessoDTO dto, @MappingTarget ProcessoModel processo);
 

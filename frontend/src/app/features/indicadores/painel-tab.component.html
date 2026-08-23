@@ -1,0 +1,85 @@
+@if (painelRes.isLoading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+} @else if (painelRes.error()) {
+  <p class="estado erro">Não foi possível carregar o painel.</p>
+} @else {
+  <!-- Cards -->
+  <div class="cards">
+    <div class="card">
+      <span class="card-num">{{ total() }}</span>
+      <span class="card-rot">Indicadores no ciclo</span>
+    </div>
+    <div class="card">
+      <span class="card-num">{{ comMeta() }}<span class="de">/{{ total() }}</span></span>
+      <span class="card-rot">Com meta definida</span>
+    </div>
+    <div class="card" [class.alerta]="pendentes() > 0">
+      <span class="card-num">{{ pendentes() }}</span>
+      <span class="card-rot">Com resultados pendentes<small>Período já encerrado</small></span>
+    </div>
+  </div>
+
+  @if (total() === 0) {
+    <p class="estado">Nenhum indicador no ciclo. Gere os indicadores na aba "Indicadores do ciclo".</p>
+  } @else {
+    <!-- Listagem por indicador -->
+    <div class="tabela-wrap">
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>Indicador</th>
+            <th>Processo</th>
+            <th>Prática</th>
+            <th>Periodicidade</th>
+            <th class="num">Meta</th>
+            <th class="num">Atingido</th>
+            <th class="num">%</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (i of indicadores(); track i.indCod) {
+            <tr [class.linha-atingida]="i.atingido">
+              <td>{{ i.nome }}</td>
+              <td>{{ i.processoNome || '—' }}</td>
+              <td>{{ i.praticaNome || '—' }}</td>
+              <td>{{ periodicidadeLabel(i.periodicidade) }}</td>
+              <td class="num">
+                @if (i.temMeta) {
+                  {{ i.metaTotal | number: '1.0-2' }} {{ i.unidade }}
+                } @else {
+                  <span class="sem">sem meta</span>
+                }
+              </td>
+              <td class="num">{{ i.atingidoTotal | number: '1.0-2' }} {{ i.unidade }}</td>
+              <td class="num">
+                @if (i.metaTotal > 0) {
+                  <span class="pct" [class.ok]="i.atingido">
+                    {{ (i.atingidoTotal / i.metaTotal) * 100 | number: '1.0-0' }}%
+                  </span>
+                } @else {
+                  —
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Consolidação por processo CERNE -->
+    <section class="consolidacao">
+      <h3>Indicadores atingidos por processo CERNE</h3>
+      @for (c of consolidacao(); track c.processo) {
+        <div class="proc-linha">
+          <div class="proc-cab">
+            <span class="proc-nome">{{ c.processo }}</span>
+            <span class="proc-frac">
+              {{ c.atingidos }} de {{ c.total }} · <strong>{{ c.percentual | number: '1.0-0' }}%</strong>
+            </span>
+          </div>
+          <mat-progress-bar mode="determinate" [value]="c.percentual"></mat-progress-bar>
+        </div>
+      }
+    </section>
+  }
+}

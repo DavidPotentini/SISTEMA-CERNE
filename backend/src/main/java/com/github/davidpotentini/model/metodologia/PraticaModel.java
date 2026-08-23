@@ -14,7 +14,7 @@ import lombok.Setter;
 
 /**
  * Prática de um {@link ProcessoModel} ({@code PRC_COD}). Aparece dentro do accordion do processo na
- * aba "Processos e Práticas". Herda a versão pela cadeia (não carrega {@code VER_COD}). Schema do tenant.
+ * aba "Processos e Práticas". Schema do tenant.
  */
 @Entity
 @Table(name = "PRATICAS")

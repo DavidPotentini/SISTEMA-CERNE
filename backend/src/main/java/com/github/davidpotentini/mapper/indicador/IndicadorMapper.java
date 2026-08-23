@@ -7,15 +7,16 @@ import org.mapstruct.Mapping;
 
 /**
  * Conversão de indicadores do ciclo. Os rótulos do vínculo ({@code processoNome}/{@code praticaNome})
- * são resolvidos no service e passados prontos. Na volta ({@code toModel}) só entram os campos
- * editáveis; id, origem, ciclo e situação nascem no service.
+ * e o nome do responsável ({@code responsavelNome}) são resolvidos no service e passados prontos. Na
+ * volta ({@code toModel}) só entram os campos editáveis; id, origem, ciclo e situação nascem no service.
  */
 @Mapper(componentModel = "spring")
 public interface IndicadorMapper {
 
-    IndicadorCicloDTO toDTO(IndicadorModel indicador, String processoNome, String praticaNome);
+    IndicadorCicloDTO toDTO(IndicadorModel indicador, String processoNome, String praticaNome,
+                            String responsavelNome);
 
-    /** Definir complementar: só nome/prtCod/unidade/periodicidade; o resto é do service. */
+    /** Definir complementar: nome/prtCod/unidade/periodicidade/respPesCod; o resto é do service. */
     @Mapping(target = "indCod", ignore = true)
     @Mapping(target = "origem", ignore = true)
     @Mapping(target = "cicCod", ignore = true)

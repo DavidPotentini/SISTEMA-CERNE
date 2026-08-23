@@ -28,9 +28,7 @@ public interface PlanejamentoMapper {
 
     // ---- atividade planejada ----
 
-    AtividadePlanejadaDTO toDTO(AtividadePlanejadaModel atividade);
-
-    List<AtividadePlanejadaDTO> toDTOList(List<AtividadePlanejadaModel> atividades);
+    AtividadePlanejadaDTO toDTO(AtividadePlanejadaModel atividade, String responsavelNome);
 
     /** Inclusão (complementar): plnCod/prtCod vêm da rota; origem/status nascem no service. */
     @Mapping(target = "atpCod", ignore = true)

@@ -12,7 +12,7 @@ public record AtividadeModeloDTO(
         Long modCod,
         Long prtCod,
         @NotBlank String nome,
-        String descricao,
+        String observacoes,
         Long respPesCod,
         EAtivoInativo situacao
 ) {

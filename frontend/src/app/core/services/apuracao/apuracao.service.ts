@@ -1,7 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { ApuracaoIndicador, PeriodoApuracao } from '../../../models/indicador/indicador.model';
+import {
+  ApuracaoIndicador,
+  PainelIndicador,
+  PeriodoApuracao,
+} from '../../../models/indicador/indicador.model';
 
 /**
  * Apuração de indicadores do ciclo ativo (tenant vem do JWT). Lista os indicadores com o resumo
@@ -21,6 +25,11 @@ export class ApuracaoService {
   /** Indicadores do ciclo com o resumo de apuração. */
   listar() {
     return this.http.get<ApuracaoIndicador[]>(this.base);
+  }
+
+  /** Painel do ciclo: uma linha por indicador com meta/resultado somados e atingido/pendente. */
+  painel() {
+    return this.http.get<PainelIndicador[]>(`${this.base}/painel`);
   }
 
   /** Períodos de um indicador com o resultado apurado (quando houver). */

@@ -7,14 +7,11 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 /**
- * Modelo de planejamento — DTO único de entrada e saída. Na criação, {@code verCod} é resolvido no
- * backend (última metodologia VIGENTE) e {@code status}/{@code publicadoEm} são gerenciados pelo
- * service; da metodologia base, {@code versaoMetodologia} é o rótulo (só leitura).
+ * Modelo de planejamento — DTO único de entrada e saída. {@code status}/{@code publicadoEm} são
+ * gerenciados pelo service; a estrutura de processos/práticas é herdada da metodologia da incubadora.
  */
 public record ModeloDTO(
         Long modCod,
-        Long verCod,
-        String versaoMetodologia,
         @NotBlank String nome,
         EPeriodicidade periodicidade,
         EStatusModelo status,

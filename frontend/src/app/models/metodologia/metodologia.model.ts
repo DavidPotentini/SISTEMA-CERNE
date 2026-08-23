@@ -1,21 +1,4 @@
 export type EAtivoInativo = 'ATIVO' | 'INATIVO';
-export type ESituacaoVersao = 'RASCUNHO' | 'VIGENTE' | 'HISTORICA';
-
-/**
- * Versão da metodologia. As abas editam o RASCUNHO (versão de trabalho) — usam seu `verCod` nas
- * operações; `alterada` indica mudanças não publicadas. No histórico, `publicadoPor` é o nome de
- * quem publicou.
- */
-export interface Versao {
-  verCod: number;
-  versao: string;
-  situacao: ESituacaoVersao;
-  alterada: boolean;
-  publicadaEm: string | null;
-  pubPesCod: number | null;
-  publicadoPor: string | null;
-  resumo: string | null;
-}
 
 /** Prática de um processo (aparece dentro do accordion do processo). */
 export interface Pratica {
@@ -29,7 +12,6 @@ export interface Pratica {
 /** Processo da metodologia (um accordion). Ordenado por `ordem`; traz suas práticas. */
 export interface Processo {
   prcCod: number;
-  verCod: number;
   ordem: number;
   nome: string;
   descricao: string | null;

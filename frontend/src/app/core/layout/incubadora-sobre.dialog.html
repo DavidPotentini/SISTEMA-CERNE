@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Sobre a incubadora</h2>
+
+<mat-dialog-content>
+  <div class="cabecalho">
+    <span class="nome">{{ inc.nome }}</span>
+    <span class="chip" [class]="'s-' + inc.status">{{ statusLabel(inc.status) }}</span>
+  </div>
+
+  <dl class="campos">
+    <dt>CNPJ</dt><dd>{{ inc.cnpj || '—' }}</dd>
+    <dt>Mantenedora</dt><dd>{{ inc.mantenedora || '—' }}</dd>
+    <dt>Responsável</dt><dd>{{ inc.responsavelNome || '—' }}</dd>
+    <dt>E-mail</dt><dd>{{ inc.email || '—' }}</dd>
+    <dt>Telefone</dt><dd>{{ inc.telefone || '—' }}</dd>
+    <dt>Cidade</dt><dd>{{ inc.cidade || '—' }}</dd>
+    <dt>Nível</dt><dd>{{ inc.nivel ? nivelLabel(inc.nivel) : '—' }}</dd>
+  </dl>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Fechar</button>
+</mat-dialog-actions>

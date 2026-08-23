@@ -55,8 +55,15 @@
     @if (estruturaRes.isLoading()) {
       <p class="estado">Carregando estrutura…</p>
     } @else {
+      <app-filtros-bar
+        [(filtros)]="filtros"
+        [processos]="processoOpcoes()"
+        [praticas]="praticaOpcoes()"
+        [comResponsavel]="true"
+      />
+
       <mat-accordion multi>
-        @for (proc of estruturaRes.value() ?? []; track proc.prcCod) {
+        @for (proc of estruturaFiltrada(); track proc.prcCod) {
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title>
@@ -94,12 +101,19 @@
                             <span class="tag-origem">Complementar</span>
                           }
                         </span>
-                        @if (atv.descricao) {
-                          <span class="atividade-desc">{{ atv.descricao }}</span>
+                        @if (atv.observacoes) {
+                          <span class="atividade-desc">{{ atv.observacoes }}</span>
                         }
-                        @if (atv.prazo) {
-                          <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
-                        }
+                        <span class="atividade-meta">
+                          @if (atv.responsavelNome) {
+                            <span class="atividade-resp">
+                              <mat-icon>person</mat-icon>{{ atv.responsavelNome }}
+                            </span>
+                          }
+                          @if (atv.prazo) {
+                            <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
+                          }
+                        </span>
                       </div>
                       @if (editavel()) {
                         <div class="atividade-acoes">

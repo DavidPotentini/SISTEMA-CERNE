@@ -6,12 +6,11 @@ import {
   Indicador,
   Pratica,
   Processo,
-  Versao,
 } from '../../../models/metodologia/metodologia.model';
 
 /**
- * Metodologia da própria incubadora (schema do tenant vem do JWT). O front busca a versão vigente e
- * envia o `verCod` ao listar/criar processos. Aba "Processos e Práticas".
+ * Metodologia da própria incubadora (schema do tenant vem do JWT). Documento vivo, sem versionamento:
+ * as abas listam e editam a metodologia direto.
  */
 @Injectable({ providedIn: 'root' })
 export class MetodologiaService {
@@ -24,23 +23,8 @@ export class MetodologiaService {
     this.versao.update(v => v + 1);
   }
 
-  /** Versão de trabalho (RASCUNHO) — a que as abas editam. */
-  versaoDeTrabalho() {
-    return this.http.get<Versao>(`${this.base}/versoes/trabalho`);
-  }
-
-  /** Histórico de publicações (VIGENTE + HISTORICA), mais recentes primeiro. */
-  listarVersoes() {
-    return this.http.get<Versao[]>(`${this.base}/versoes`);
-  }
-
-  /** Publica o rascunho como nova versão (só se houver alterações pendentes). */
-  publicar() {
-    return this.http.post<Versao>(`${this.base}/versoes/publicar`, null);
-  }
-
-  listarProcessos(verCod: number) {
-    return this.http.get<Processo[]>(`${this.base}/processos`, { params: { verCod } });
+  listarProcessos() {
+    return this.http.get<Processo[]>(`${this.base}/processos`);
   }
 
   criarProcesso(dto: Partial<Processo>) {
@@ -49,6 +33,11 @@ export class MetodologiaService {
 
   editarProcesso(prcCod: number, dto: Partial<Processo>) {
     return this.http.put<Processo>(`${this.base}/processos/${prcCod}`, dto);
+  }
+
+  /** Reordena os processos (arrastar-e-soltar): envia a sequência de `prcCod`. */
+  reordenarProcessos(prcCods: number[]) {
+    return this.http.put<Processo[]>(`${this.base}/processos/ordem`, prcCods);
   }
 
   /** Ativa/inativa o processo (inativo continua visível, mas fora da criação de modelos). */
@@ -76,8 +65,8 @@ export class MetodologiaService {
 
   // ---- indicadores ----
 
-  listarIndicadores(verCod: number) {
-    return this.http.get<Indicador[]>(`${this.base}/indicadores`, { params: { verCod } });
+  listarIndicadores() {
+    return this.http.get<Indicador[]>(`${this.base}/indicadores`);
   }
 
   criarIndicador(dto: Partial<Indicador>) {

@@ -64,6 +64,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'painel-operacional',
+        loadComponent: () =>
+          import('./features/painel-operacional/painel-operacional.component').then(
+            m => m.PainelOperacionalComponent,
+          ),
+      },
+      {
         path: 'planejamento',
         loadComponent: () =>
           import('./features/planejamento/planejamento.component').then(

@@ -3,7 +3,6 @@ package com.github.davidpotentini.controller.metodologia;
 import com.github.davidpotentini.dto.metodologia.PraticaDTO;
 import com.github.davidpotentini.dto.metodologia.ProcessoDTO;
 import com.github.davidpotentini.dto.metodologia.IndicadorDTO;
-import com.github.davidpotentini.dto.metodologia.VersaoDTO;
 import com.github.davidpotentini.enums.EAtivoInativo;
 import com.github.davidpotentini.service.metodologia.MetodologiaService;
 import jakarta.validation.Valid;
@@ -23,8 +22,7 @@ import java.util.List;
 
 /**
  * Metodologia da própria incubadora (usuário logado, não admin). O tenant vem do JWT — basta estar
- * autenticado. Aba "Processos e Práticas": o front busca a versão vigente e envia o {@code verCod}
- * nas operações de processo.
+ * autenticado. Documento vivo, sem versionamento: as abas editam a metodologia direto.
  */
 @RestController
 @RequestMapping("/incubadora/metodologia")
@@ -36,27 +34,9 @@ public class MetodologiaController {
         this.service = service;
     }
 
-    /** Versão de trabalho (RASCUNHO) — a que as abas editam; criada na primeira vez, se necessário. */
-    @GetMapping("/versoes/trabalho")
-    public VersaoDTO versaoDeTrabalho() {
-        return service.versaoDeTrabalho();
-    }
-
-    /** Histórico de publicações (VIGENTE + HISTORICA), mais recentes primeiro. */
-    @GetMapping("/versoes")
-    public List<VersaoDTO> listarVersoes() {
-        return service.listarVersoes();
-    }
-
-    /** Publica o rascunho como uma nova versão (clona a árvore); só se houver alterações pendentes. */
-    @PostMapping("/versoes/publicar")
-    public VersaoDTO publicar() {
-        return service.publicar();
-    }
-
     @GetMapping("/processos")
-    public List<ProcessoDTO> listarProcessos(@RequestParam Long verCod) {
-        return service.listarProcessos(verCod);
+    public List<ProcessoDTO> listarProcessos() {
+        return service.listarProcessos();
     }
 
     @PostMapping("/processos")
@@ -68,6 +48,12 @@ public class MetodologiaController {
     @PutMapping("/processos/{prcCod}")
     public ProcessoDTO editarProcesso(@PathVariable Long prcCod, @Valid @RequestBody ProcessoDTO dto) {
         return service.editarProcesso(prcCod, dto);
+    }
+
+    /** Reordena os processos (arrastar-e-soltar): o corpo é a sequência de {@code prcCod}. */
+    @PutMapping("/processos/ordem")
+    public List<ProcessoDTO> reordenarProcessos(@RequestBody List<Long> prcCods) {
+        return service.reordenarProcessos(prcCods);
     }
 
     /** Ativa/inativa o processo (inativo continua visível, mas fora da criação de modelos). */
@@ -98,8 +84,8 @@ public class MetodologiaController {
     // ---- indicadores ----
 
     @GetMapping("/indicadores")
-    public List<IndicadorDTO> listarIndicadores(@RequestParam Long verCod) {
-        return service.listarIndicadores(verCod);
+    public List<IndicadorDTO> listarIndicadores() {
+        return service.listarIndicadores();
     }
 
     @PostMapping("/indicadores")

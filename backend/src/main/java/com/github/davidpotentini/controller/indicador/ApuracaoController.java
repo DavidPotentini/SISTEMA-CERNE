@@ -1,6 +1,7 @@
 package com.github.davidpotentini.controller.indicador;
 
 import com.github.davidpotentini.dto.indicador.ApuracaoIndicadorDTO;
+import com.github.davidpotentini.dto.indicador.PainelIndicadorDTO;
 import com.github.davidpotentini.dto.indicador.PeriodoApuracaoDTO;
 import com.github.davidpotentini.dto.indicador.ResultadoEntradaDTO;
 import com.github.davidpotentini.service.indicador.ApuracaoService;
@@ -32,6 +33,12 @@ public class ApuracaoController {
     @GetMapping
     public List<ApuracaoIndicadorDTO> listar() {
         return service.listar();
+    }
+
+    /** Painel do ciclo: uma linha por indicador com meta/resultado somados e os sinais de atingido/pendente. */
+    @GetMapping("/painel")
+    public List<PainelIndicadorDTO> painel() {
+        return service.painel();
     }
 
     /** Períodos de um indicador com o resultado apurado (quando houver). */

@@ -1,5 +1,7 @@
 .rodada-cartao {
   width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 .rodada-cabecalho {
   display: flex;
@@ -90,7 +92,7 @@
 
 .eixos {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6px;
 }
 .eixo {
@@ -101,6 +103,7 @@
   padding: 6px 2px;
   border-radius: 6px;
   background: rgba(0, 0, 0, 0.03);
+  min-width: 0;
 }
 .eixo-nome {
   font-size: 0.62rem;
@@ -108,6 +111,7 @@
   letter-spacing: 0.02em;
   color: rgba(0, 0, 0, 0.55);
   text-align: center;
+  overflow-wrap: anywhere;
 }
 .eixo-nota {
   font-size: 1.05rem;

@@ -82,7 +82,8 @@ export class RodadaAplicacoesComponent {
 
   revisar(aplicacao: Aplicacao): void {
     this.dialog.open(RevisarAplicacaoDialog, {
-      width: '620px',
+      width: '90vw',
+      maxWidth: '1200px',
       data: { rodCod: this.rodada().rodCod, aplicacao },
     });
   }

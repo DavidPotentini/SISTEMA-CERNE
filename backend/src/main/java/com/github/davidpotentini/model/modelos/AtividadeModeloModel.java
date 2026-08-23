@@ -37,8 +37,8 @@ public class AtividadeModeloModel {
     @Column(name = "NOME", nullable = false)
     private String nome;
 
-    @Column(name = "DESCRICAO")
-    private String descricao;
+    @Column(name = "OBSERVACOES")
+    private String observacoes;
 
     /** Responsável padrão → {@code PESSOAS(PES_COD)}. Opcional; guardado como código. */
     @Column(name = "RESP_PES_COD")

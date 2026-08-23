@@ -38,6 +38,12 @@ export class IndicadorService {
     return this.http.post<IndicadorCiclo>(`${this.base}/complementares`, dto);
   }
 
+  /** Define (ou desvincula, com `respPesCod` null) o responsável pela apuração do indicador. */
+  definirResponsavel(indCod: number, respPesCod: number | null) {
+    const params: Record<string, number> = respPesCod == null ? {} : { respPesCod };
+    return this.http.put<IndicadorCiclo>(`${this.base}/${indCod}/responsavel`, null, { params });
+  }
+
   // ---- metas (períodos) de um indicador ----
 
   /** Períodos (metas) de um indicador, em ordem do início de apuração. */

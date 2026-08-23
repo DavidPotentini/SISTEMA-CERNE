@@ -2,15 +2,14 @@ import { Component } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { IndicadoresTabComponent } from './indicadores-tab.component';
 import { ProcessosTabComponent } from './processos-tab.component';
-import { PublicacaoTabComponent } from './publicacao-tab.component';
 
 /**
- * Tela "Metodologia": abas Processos e Práticas, Indicadores e Publicação. Todas editam o rascunho;
- * a aba Publicação materializa uma nova versão publicada.
+ * Tela "Metodologia": abas Processos e Práticas e Indicadores. Documento vivo — as edições valem na
+ * hora (sem versionamento/publicação).
  */
 @Component({
   selector: 'app-metodologia',
-  imports: [MatTabsModule, ProcessosTabComponent, IndicadoresTabComponent, PublicacaoTabComponent],
+  imports: [MatTabsModule, ProcessosTabComponent, IndicadoresTabComponent],
   templateUrl: './metodologia.component.html',
   styleUrl: './metodologia.component.css',
 })

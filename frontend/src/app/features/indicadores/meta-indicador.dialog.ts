@@ -8,7 +8,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { addMonths, format, parseISO } from 'date-fns';
+import { CicloService } from '../../core/services/ciclo/ciclo.service';
 import { IndicadorService } from '../../core/services/indicador/indicador.service';
+import { Ciclo } from '../../models/ciclo/ciclo.model';
 import { IndicadorCiclo, Meta } from '../../models/indicador/indicador.model';
 import {
   EPeriodicidade,
@@ -18,6 +21,15 @@ import {
 interface MetaIndicadorData {
   indicador: IndicadorCiclo;
 }
+
+/** Duração de um período em meses, por periodicidade. POR_CICLO/NAO_SE_APLICA não têm passo fixo. */
+const MESES_POR_PERIODICIDADE: Partial<Record<EPeriodicidade, number>> = {
+  MENSAL: 1,
+  BIMESTRAL: 2,
+  TRIMESTRAL: 3,
+  SEMESTRAL: 6,
+  ANUAL: 12,
+};
 
 /**
  * Modal de meta: mostra o indicador (só leitura) e a lista de períodos, cada um com a meta estipulada
@@ -41,6 +53,7 @@ interface MetaIndicadorData {
 })
 export class MetaIndicadorDialog {
   private readonly service = inject(IndicadorService);
+  private readonly cicloService = inject(CicloService);
   private readonly data = inject<MetaIndicadorData>(MAT_DIALOG_DATA);
 
   readonly indicador = this.data.indicador;
@@ -49,6 +62,9 @@ export class MetaIndicadorDialog {
   readonly metas = signal<Meta[]>([]);
   readonly erro = signal<string | null>(null);
 
+  /** Ciclo ativo — usado para inferir o período quando a periodicidade é POR_CICLO. */
+  private readonly cicloAtivo = signal<Ciclo | null>(null);
+
   // formulário de período (novo ou edição)
   readonly editandoCod = signal<number | null>(null);
   readonly valor = signal<number | null>(null);
@@ -56,12 +72,76 @@ export class MetaIndicadorDialog {
   readonly fim = signal<string | null>(null);
   readonly salvando = signal(false);
 
+  /** Último fim sugerido automaticamente; quando o usuário altera para outro valor, pedimos confirmação. */
+  private readonly fimSugerido = signal<string | null>(null);
+
   constructor() {
     this.carregar();
+    this.cicloService.listar().subscribe(lista => {
+      this.cicloAtivo.set(lista.find(c => c.status === 'ATIVO') ?? null);
+      this.prefillPorCiclo();
+    });
+  }
+
+  /** Em POR_CICLO, ao abrir um período novo, pré-preenche a janela com o período do ciclo ativo. */
+  private prefillPorCiclo(): void {
+    if (this.indicador.periodicidade !== 'POR_CICLO' || this.editando) return;
+    const ciclo = this.cicloAtivo();
+    if (!ciclo) return;
+    if (this.inicio() == null && ciclo.inicio) this.inicio.set(ciclo.inicio);
+    if (this.fim() == null && ciclo.fim) {
+      this.fim.set(ciclo.fim);
+      this.fimSugerido.set(ciclo.fim);
+    }
   }
 
   periodicidadeLabel(p: EPeriodicidade): string {
     return PERIODICIDADE_LABEL[p];
+  }
+
+  /**
+   * Ao informar o início da apuração, sugere o fim somando os meses da periodicidade
+   * (bimestral → +2 meses). POR_CICLO (janela do ciclo, ver {@link prefillPorCiclo}) e
+   * NAO_SE_APLICA não têm passo fixo — o fim fica manual. É só sugestão: o fim continua editável.
+   */
+  sugerirFim(valor: string | null): void {
+    this.inicio.set(valor || null);
+
+    const meses = MESES_POR_PERIODICIDADE[this.indicador.periodicidade];
+    if (!valor || meses == null) {
+      this.fimSugerido.set(null);
+      return;
+    }
+    const fim = format(addMonths(parseISO(valor), meses), 'yyyy-MM-dd');
+    this.fim.set(fim);
+    this.fimSugerido.set(fim);
+  }
+
+  /**
+   * Handler do campo Fim: se o usuário mudar a data sugerida automaticamente, pede confirmação.
+   * Ao confirmar, mantém o valor digitado; ao cancelar, restaura a sugestão.
+   */
+  aoMudarFim(valor: string | null): void {
+    const novo = valor || null;
+    const sugerido = this.fimSugerido();
+    if (sugerido != null && novo != null && novo !== sugerido) {
+      const ok = window.confirm(
+        `O fim sugerido pela periodicidade é ${this.formatarBR(sugerido)}. ` +
+          `Confirmar a alteração para ${this.formatarBR(novo)}?`,
+      );
+      if (!ok) {
+        // restaura a sugestão (novo → sugerido é mudança real, reflete no campo)
+        this.fim.set(novo);
+        this.fim.set(sugerido);
+        return;
+      }
+      this.fimSugerido.set(null); // alteração aceita: não perguntar de novo
+    }
+    this.fim.set(novo);
+  }
+
+  private formatarBR(iso: string): string {
+    return format(parseISO(iso), 'dd/MM/yyyy');
   }
 
   private carregar(): void {
@@ -93,6 +173,7 @@ export class MetaIndicadorDialog {
     this.valor.set(m.valor);
     this.inicio.set(m.dataInicioApuracao);
     this.fim.set(m.dataFimApuracao);
+    this.fimSugerido.set(null); // valores existentes: sem sugestão a confirmar
     this.erro.set(null);
   }
 
@@ -142,5 +223,7 @@ export class MetaIndicadorDialog {
     this.valor.set(null);
     this.inicio.set(null);
     this.fim.set(null);
+    this.fimSugerido.set(null);
+    this.prefillPorCiclo();
   }
 }

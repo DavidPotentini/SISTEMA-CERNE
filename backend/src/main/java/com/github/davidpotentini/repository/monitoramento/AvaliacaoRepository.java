@@ -10,5 +10,7 @@ public interface AvaliacaoRepository extends JpaRepository<AvaliacaoModel, Long>
 
     List<AvaliacaoModel> findByRodCod(Long rodCod);
 
+    List<AvaliacaoModel> findByEmpCod(Long empCod);
+
     Optional<AvaliacaoModel> findByRodCodAndEmpCod(Long rodCod, Long empCod);
 }

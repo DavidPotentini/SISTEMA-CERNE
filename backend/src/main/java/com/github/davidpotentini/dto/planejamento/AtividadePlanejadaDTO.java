@@ -9,7 +9,8 @@ import java.time.LocalDate;
 /**
  * Atividade planejada — DTO único de entrada e saída. O vínculo ({@code plnCod}, {@code prtCod}) e a
  * {@code origem} vêm da rota/geração; {@code status} é gerenciado na execução. Ao ajustar/incluir,
- * entram {@code nome}, {@code descricao}, {@code respPesCod} e {@code prazo}.
+ * entram {@code nome}, {@code observacoes}, {@code respPesCod} e {@code prazo}. O
+ * {@code responsavelNome} é rótulo de saída (nome do responsável), resolvido no service.
  */
 public record AtividadePlanejadaDTO(
         Long atpCod,
@@ -17,10 +18,11 @@ public record AtividadePlanejadaDTO(
         EOrigemAtividade origem,
         Long prtCod,
         @NotBlank String nome,
-        String descricao,
+        String observacoes,
         Long respPesCod,
         LocalDate prazo,
         EStatusAtividade status,
-        Long empCod
+        Long empCod,
+        String responsavelNome
 ) {
 }

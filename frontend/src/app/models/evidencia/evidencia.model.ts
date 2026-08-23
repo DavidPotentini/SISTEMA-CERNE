@@ -39,6 +39,8 @@ export interface Evidencia {
   titulo: string;
   atpCod: number;
   atividadeNome: string | null;
+  processoNome: string | null;
+  praticaNome: string | null;
   arqCod: number | null;
   arquivoNome: string | null;
   status: EStatusEvidencia;

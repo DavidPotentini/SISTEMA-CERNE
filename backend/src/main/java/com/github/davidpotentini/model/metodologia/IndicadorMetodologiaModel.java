@@ -14,8 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Indicador da metodologia — pertence a uma {@link PraticaModel} ({@code PRT_COD}). Herda a versão
- * pela cadeia (prática → processo → versão); não carrega {@code VER_COD}. Schema do tenant.
+ * Indicador da metodologia — pertence a uma {@link PraticaModel} ({@code PRT_COD}). Schema do tenant.
  */
 @Entity
 @Table(name = "INDICADORES_METODOLOGIA")

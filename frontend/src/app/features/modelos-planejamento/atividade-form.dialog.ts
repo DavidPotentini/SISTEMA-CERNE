@@ -16,7 +16,7 @@ interface AtividadeFormData {
   atividade?: AtividadeModelo;
 }
 
-/** Modal de atividade: adiciona ou edita nome/descrição na prática de onde foi aberta. */
+/** Modal de atividade: adiciona ou edita nome/observação na prática de onde foi aberta. */
 @Component({
   selector: 'app-atividade-form',
   imports: [FormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],
@@ -35,7 +35,7 @@ export class AtividadeFormDialog {
   readonly erro = signal<string | null>(null);
 
   readonly nome = signal(this.data.atividade?.nome ?? '');
-  readonly descricao = signal(this.data.atividade?.descricao ?? '');
+  readonly observacoes = signal(this.data.atividade?.observacoes ?? '');
 
   salvar(): void {
     if (!this.nome().trim()) return;
@@ -43,7 +43,7 @@ export class AtividadeFormDialog {
     this.erro.set(null);
     const dto: Partial<AtividadeModelo> = {
       nome: this.nome().trim(),
-      descricao: this.descricao().trim() || null,
+      observacoes: this.observacoes().trim() || null,
     };
     const req = this.data.atividade
       ? this.service.editarAtividade(this.data.modCod, this.data.atividade.atmCod, dto)

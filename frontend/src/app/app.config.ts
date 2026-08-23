@@ -15,6 +15,6 @@ export const appConfig: ApplicationConfig = {
       routes,
       withRouterConfig({ paramsInheritanceStrategy: 'always' }),
     ),
-    provideHttpClient(withInterceptors([jwtInterceptor, tenantInterceptor]))
+    provideHttpClient(withInterceptors([jwtInterceptor, tenantInterceptor])),
   ]
 };

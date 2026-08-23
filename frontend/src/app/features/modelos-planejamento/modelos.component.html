@@ -24,11 +24,6 @@
       <td mat-cell *matCellDef="let m">{{ periodicidadeLabel(m.periodicidade) }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="metodologia">
-      <th mat-header-cell *matHeaderCellDef>Metodologia</th>
-      <td mat-cell *matCellDef="let m">{{ m.versaoMetodologia || '—' }}</td>
-    </ng-container>
-
     <ng-container matColumnDef="status">
       <th mat-header-cell *matHeaderCellDef>Status</th>
       <td mat-cell *matCellDef="let m">

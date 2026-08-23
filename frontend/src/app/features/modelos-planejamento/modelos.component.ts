@@ -25,7 +25,7 @@ export class ModelosComponent {
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
 
-  readonly colunas = ['nome', 'periodicidade', 'metodologia', 'status', 'publicado'];
+  readonly colunas = ['nome', 'periodicidade', 'status', 'publicado'];
 
   readonly modelos = rxResource({
     params: () => ({ v: this.service.versao() }),

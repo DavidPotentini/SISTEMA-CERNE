@@ -10,18 +10,23 @@
 .estado.erro {
   color: #b02020;
 }
-.ordem {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 24px;
-  margin-right: 10px;
-  padding: 0 6px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.08);
-  font-size: 0.8rem;
-  font-weight: 600;
+.arrastar {
+  margin-right: 8px;
+  color: rgba(0, 0, 0, 0.4);
+  cursor: grab;
+}
+.arrastar:active {
+  cursor: grabbing;
+}
+/* Enquanto arrasta, o painel segue o cursor acima dos demais. */
+.cdk-drag-preview {
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.24);
+}
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+.cdk-drag-animating {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
 }
 .descricao {
   margin: 0 0 12px;

@@ -1,0 +1,24 @@
+<div class="filtro">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Empreendimento</mat-label>
+    <mat-select [ngModel]="empCod()" (ngModelChange)="empCod.set($event)">
+      @for (e of empreendimentosRes.value() ?? []; track e.empCod) {
+        <mat-option [value]="e.empCod">{{ e.nome }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (empCod() == null) {
+  <p class="estado">Selecione um empreendimento para ver a evolução por eixo.</p>
+} @else if (evolucaoRes.isLoading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+} @else if (evolucaoRes.error()) {
+  <p class="estado erro">Não foi possível carregar a evolução.</p>
+} @else if (semDados()) {
+  <p class="estado">Este empreendimento ainda não foi avaliado em nenhuma rodada.</p>
+} @else {
+  <div class="grafico">
+    <canvas baseChart type="radar" [data]="chartData()" [options]="chartOptions"></canvas>
+  </div>
+}

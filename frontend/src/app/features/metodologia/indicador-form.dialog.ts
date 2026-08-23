@@ -14,14 +14,13 @@ import {
 } from '../../models/metodologia/metodologia.model';
 
 interface IndicadorFormData {
-  verCod: number;
   /** Presente no modo edição. */
   indicador?: Indicador;
 }
 
 /**
  * Modal de indicador: cria ou edita. O "Vínculo metodológico" é a prática, escolhida num seletor
- * agrupado por processo (carregado da versão vigente).
+ * agrupado por processo (carregado da metodologia).
  */
 @Component({
   selector: 'app-indicador-form',
@@ -39,22 +38,22 @@ interface IndicadorFormData {
 export class IndicadorFormDialog {
   private readonly service = inject(MetodologiaService);
   private readonly ref = inject(MatDialogRef<IndicadorFormDialog>);
-  private readonly data = inject<IndicadorFormData>(MAT_DIALOG_DATA);
+  private readonly data = inject<IndicadorFormData | null>(MAT_DIALOG_DATA);
 
-  readonly edicao = this.data.indicador != null;
+  readonly edicao = this.data?.indicador != null;
   readonly periodicidades = Object.entries(PERIODICIDADE_LABEL) as [EPeriodicidade, string][];
 
-  /** Processos (com práticas) da versão, para o seletor de vínculo. */
-  readonly processos = rxResource({ stream: () => this.service.listarProcessos(this.data.verCod) });
+  /** Processos (com práticas) da metodologia, para o seletor de vínculo. */
+  readonly processos = rxResource({ stream: () => this.service.listarProcessos() });
 
   readonly salvando = signal(false);
   readonly erro = signal<string | null>(null);
 
-  readonly prtCod = signal<number | null>(this.data.indicador?.prtCod ?? null);
-  readonly nome = signal(this.data.indicador?.nome ?? '');
-  readonly unidade = signal(this.data.indicador?.unidade ?? '');
+  readonly prtCod = signal<number | null>(this.data?.indicador?.prtCod ?? null);
+  readonly nome = signal(this.data?.indicador?.nome ?? '');
+  readonly unidade = signal(this.data?.indicador?.unidade ?? '');
   readonly periodicidade = signal<EPeriodicidade>(
-    this.data.indicador?.periodicidade ?? 'NAO_SE_APLICA',
+    this.data?.indicador?.periodicidade ?? 'NAO_SE_APLICA',
   );
 
   salvar(): void {
@@ -68,7 +67,7 @@ export class IndicadorFormDialog {
       unidade: this.unidade().trim() || null,
       periodicidade: this.periodicidade(),
     };
-    const req = this.data.indicador
+    const req = this.data?.indicador
       ? this.service.editarIndicador(this.data.indicador.inmCod, dto)
       : this.service.criarIndicador(dto);
     req.subscribe({

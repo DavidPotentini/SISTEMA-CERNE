@@ -210,14 +210,27 @@ public class EvidenciaService {
         }
     }
 
+    /** Rótulos da evidência, incluindo a cadeia atividade → prática → processo. */
     private EvidenciaDTO toDTO(EvidenciaModel e) {
-        return mapper.toDTO(e, rotuloAtividade(e.getAtpCod()), rotuloArquivo(e.getArqCod()),
-                rotuloResponsavel(e.getRegPesCod()));
-    }
-
-    private String rotuloAtividade(Long atpCod) {
-        return atpCod == null ? null
-                : atividades.findById(atpCod).map(AtividadePlanejadaModel::getNome).orElse(null);
+        String atividadeNome = null;
+        String praticaNome = null;
+        String processoNome = null;
+        if (e.getAtpCod() != null) {
+            AtividadePlanejadaModel atividade = atividades.findById(e.getAtpCod()).orElse(null);
+            if (atividade != null) {
+                atividadeNome = atividade.getNome();
+                PraticaModel pratica = praticas.findById(atividade.getPrtCod()).orElse(null);
+                if (pratica != null) {
+                    praticaNome = pratica.getNome();
+                    ProcessoModel processo = processos.findById(pratica.getPrcCod()).orElse(null);
+                    if (processo != null) {
+                        processoNome = processo.getNome();
+                    }
+                }
+            }
+        }
+        return mapper.toDTO(e, atividadeNome, processoNome, praticaNome,
+                rotuloArquivo(e.getArqCod()), rotuloResponsavel(e.getRegPesCod()));
     }
 
     private String rotuloArquivo(Long arqCod) {

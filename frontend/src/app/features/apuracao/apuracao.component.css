@@ -55,3 +55,15 @@ table {
   color: rgba(0, 0, 0, 0.45);
   font-style: italic;
 }
+.chip.situacao[data-situacao='CONCLUIDA'] {
+  background: rgba(46, 125, 50, 0.14);
+  color: #2e7d32;
+}
+.chip.situacao[data-situacao='EM_ABERTO'] {
+  background: rgba(21, 101, 192, 0.12);
+  color: #1565c0;
+}
+.chip.situacao[data-situacao='ATRASADA'] {
+  background: rgba(176, 32, 32, 0.12);
+  color: #b02020;
+}

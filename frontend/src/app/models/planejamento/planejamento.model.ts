@@ -57,11 +57,12 @@ export interface AtividadePlanejada {
   origem: EOrigemAtividade;
   prtCod: number;
   nome: string;
-  descricao: string | null;
+  observacoes: string | null;
   respPesCod: number | null;
   prazo: string | null;
   status: EStatusAtividade;
   empCod: number | null;
+  responsavelNome: string | null;
 }
 
 /** Prática dentro da estrutura do planejamento — só leitura (da metodologia) + atividades. */

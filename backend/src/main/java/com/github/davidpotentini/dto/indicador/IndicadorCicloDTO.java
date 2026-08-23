@@ -9,9 +9,10 @@ import jakarta.validation.constraints.NotBlank;
  * Indicador de um ciclo (entrada + saída).
  *
  * <p><b>Entrada</b> (definir complementar): {@code nome}, {@code prtCod} (vínculo CERNE opcional),
- * {@code unidade}, {@code periodicidade}. <b>Saída</b>: acrescenta {@code indCod}, {@code origem},
- * {@code situacao} e os rótulos do "Vínculo CERNE" ({@code processoNome}/{@code praticaNome}). A
- * {@code origem} e o ciclo são definidos no service — não pelo cliente.
+ * {@code unidade}, {@code periodicidade}, {@code respPesCod} (responsável — único campo editável nos
+ * gerados da metodologia). <b>Saída</b>: acrescenta {@code indCod}, {@code origem}, {@code situacao},
+ * os rótulos do "Vínculo CERNE" ({@code processoNome}/{@code praticaNome}) e o nome do responsável
+ * ({@code responsavelNome}). A {@code origem} e o ciclo são definidos no service — não pelo cliente.
  */
 public record IndicadorCicloDTO(
         Long indCod,
@@ -21,6 +22,8 @@ public record IndicadorCicloDTO(
         String unidade,
         EPeriodicidade periodicidade,
         EAtivoInativo situacao,
+        Long respPesCod,
         String processoNome,
-        String praticaNome) {
+        String praticaNome,
+        String responsavelNome) {
 }

@@ -1,9 +1,9 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,20 +12,30 @@ import { PlanejamentoService } from '../../core/services/planejamento/planejamen
 import {
   AtividadePlanejada,
   EStatusAtividade,
+  PlanPratica,
   PlanProcesso,
   STATUS_ATIVIDADE_LABEL,
   STATUS_PLANEJAMENTO_LABEL,
 } from '../../models/planejamento/planejamento.model';
+import {
+  FILTROS_VAZIO,
+  FiltrosState,
+  FiltrosBarComponent,
+  OpcaoPratica,
+  OpcaoProcesso,
+  OpcaoStatus,
+} from '../../shared/ui/filtros-bar/filtros-bar.component';
 import { AtividadeRegistroDialog } from './atividade-registro.dialog';
 
-/** Estados que podem ser filtrados/definidos manualmente (ATRASADA é derivado do prazo). */
+/** Estados que podem ser filtrados (ATRASADA é derivado do prazo). */
 const STATUS_FILTRAVEIS: EStatusAtividade[] = ['PLANEJADA', 'EM_ANDAMENTO', 'CONCLUIDA', 'ATRASADA'];
 
 /**
  * Tela "Acompanhamento de execução": mesma estrutura do planejamento (cabeçalho + accordion de
  * processos/práticas/atividades), porém só leitura da estrutura. Cada processo mostra o total de
- * atividades e quantas estão concluídas; um filtro por status recorta as atividades exibidas; o botão
- * "Registrar" de cada atividade abre o modal para mudar o status e avaliar as evidências.
+ * atividades e quantas estão concluídas; a barra de filtros padrão (Processo/Prática/Responsável/
+ * Status) recorta a árvore exibida; o botão "Registrar" de cada atividade abre o modal para mudar o
+ * status e avaliar as evidências.
  */
 @Component({
   selector: 'app-acompanhamento',
@@ -35,9 +45,9 @@ const STATUS_FILTRAVEIS: EStatusAtividade[] = ['PLANEJADA', 'EM_ANDAMENTO', 'CON
     MatExpansionModule,
     MatButtonModule,
     MatIconModule,
-    MatChipsModule,
     MatProgressBarModule,
     MatDialogModule,
+    FiltrosBarComponent,
   ],
   templateUrl: './acompanhamento.component.html',
   styleUrl: './acompanhamento.component.css',
@@ -45,13 +55,13 @@ const STATUS_FILTRAVEIS: EStatusAtividade[] = ['PLANEJADA', 'EM_ANDAMENTO', 'CON
 export class AcompanhamentoComponent {
   private readonly service = inject(PlanejamentoService);
   private readonly dialog = inject(MatDialog);
+  private readonly route = inject(ActivatedRoute);
+
+  /** Deep-link do Painel Operacional já tratado? (evita reabrir quando a estrutura recarrega). */
+  private registroAberto = false;
 
   readonly statusPlanoLabel = STATUS_PLANEJAMENTO_LABEL;
   readonly statusLabel = STATUS_ATIVIDADE_LABEL;
-  readonly statusFiltraveis = STATUS_FILTRAVEIS;
-
-  /** Status selecionado no filtro (null = todas). */
-  readonly filtro = signal<EStatusAtividade | null>(null);
 
   readonly atualRes = rxResource({
     params: () => ({ v: this.service.versao() }),
@@ -64,26 +74,96 @@ export class AcompanhamentoComponent {
 
   readonly plano = computed(() => this.atualRes.value()?.planejamento ?? null);
 
-  filtrar(status: EStatusAtividade): void {
-    this.filtro.set(this.filtro() === status ? null : status);
-  }
+  // ---- filtros padrão ----
+  readonly filtros = signal<FiltrosState>({ ...FILTROS_VAZIO });
 
-  /** Atividades da prática já aplicado o filtro de status. */
-  visiveis(atividades: AtividadePlanejada[]): AtividadePlanejada[] {
-    const status = this.filtro();
-    return status ? atividades.filter(a => a.status === status) : atividades;
+  readonly statusOpcoes: OpcaoStatus[] = STATUS_FILTRAVEIS.map(s => ({
+    value: s,
+    label: STATUS_ATIVIDADE_LABEL[s],
+  }));
+
+  readonly processoOpcoes = computed<OpcaoProcesso[]>(() =>
+    (this.estruturaRes.value() ?? []).map(p => ({ nome: p.nome })),
+  );
+
+  readonly praticaOpcoes = computed<OpcaoPratica[]>(() => {
+    const out: OpcaoPratica[] = [];
+    for (const proc of this.estruturaRes.value() ?? []) {
+      for (const pr of proc.praticas) {
+        out.push({ nome: pr.nome, processoNome: proc.nome });
+      }
+    }
+    return out;
+  });
+
+  /** Árvore com os filtros aplicados; sem filtro, devolve a estrutura original (mantém práticas vazias). */
+  readonly estruturaFiltrada = computed<PlanProcesso[]>(() => {
+    const f = this.filtros();
+    const procs = this.estruturaRes.value() ?? [];
+    const algum =
+      f.processo != null || f.pratica != null || f.respPesCod != null || f.status != null;
+    if (!algum) {
+      return procs;
+    }
+    const out: PlanProcesso[] = [];
+    for (const proc of procs) {
+      if (f.processo != null && proc.nome !== f.processo) {
+        continue;
+      }
+      const praticas: PlanPratica[] = [];
+      for (const pr of proc.praticas) {
+        if (f.pratica != null && pr.nome !== f.pratica) {
+          continue;
+        }
+        const atividades = pr.atividades.filter(
+          a =>
+            (f.respPesCod == null || a.respPesCod === f.respPesCod) &&
+            (f.status == null || a.status === f.status),
+        );
+        if (atividades.length > 0) {
+          praticas.push({ ...pr, atividades });
+        }
+      }
+      if (praticas.length > 0) {
+        out.push({ ...proc, praticas });
+      }
+    }
+    return out;
+  });
+
+  constructor() {
+    // Vindo do Painel Operacional (?registrar=atpCod): abre o modal da atividade quando a estrutura
+    // estiver carregada. Só uma vez — recarregar a estrutura não deve reabrir o modal.
+    effect(() => {
+      const processos = this.estruturaRes.value();
+      if (!processos || this.registroAberto) {
+        return;
+      }
+      const atpCod = Number(this.route.snapshot.queryParamMap.get('registrar'));
+      if (!atpCod) {
+        return;
+      }
+      const atividade = processos
+        .flatMap(p => p.praticas)
+        .flatMap(pr => pr.atividades)
+        .find(a => a.atpCod === atpCod);
+      if (atividade) {
+        this.registroAberto = true;
+        this.registrar(atividade);
+      }
+    });
   }
 
   private atividadesDe(proc: PlanProcesso): AtividadePlanejada[] {
     return proc.praticas.flatMap(pr => pr.atividades);
   }
 
-  /** Total de atividades do processo (independente do filtro). */
+  /** Total de atividades exibidas no processo (reflete os filtros ativos). */
   total(proc: PlanProcesso): number {
     return this.atividadesDe(proc).length;
   }
 
-  /** Atividades concluídas do processo (numerador exibido no cabeçalho). */
+  /** Atividades concluídas exibidas no processo (numerador do cabeçalho). */
   concluidas(proc: PlanProcesso): number {
     return this.atividadesDe(proc).filter(a => a.status === 'CONCLUIDA').length;
   }

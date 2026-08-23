@@ -38,6 +38,14 @@ export interface Aplicacao {
   pontuacoes: Pontuacao[];
 }
 
+/** Uma rodada avaliada de um empreendimento — série do radar de evolução (notas por eixo). */
+export interface EvolucaoRodada {
+  rodCod: number;
+  rodadaNome: string | null;
+  data: string | null;
+  pontuacoes: Pontuacao[];
+}
+
 export const TIPO_RODADA_LABEL: Record<ETipoRodada, string> = {
   DIAGNOSTICO_INICIAL: 'Diagnóstico inicial',
   PERIODICO: 'Periódico',

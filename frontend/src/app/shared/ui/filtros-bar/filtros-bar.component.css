@@ -1,0 +1,13 @@
+.filtros {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.filtro {
+  width: 200px;
+}
+.limpar {
+  color: rgba(0, 0, 0, 0.6);
+}

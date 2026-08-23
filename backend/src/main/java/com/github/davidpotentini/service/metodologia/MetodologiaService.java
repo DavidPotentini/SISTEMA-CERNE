@@ -2,148 +2,107 @@ package com.github.davidpotentini.service.metodologia;
 
 import com.github.davidpotentini.comum.erro.NaoEncontradoException;
 import com.github.davidpotentini.comum.erro.RegraNegocioException;
-import com.github.davidpotentini.comum.tenant.SessaoContext;
 import com.github.davidpotentini.dto.metodologia.IndicadorDTO;
 import com.github.davidpotentini.dto.metodologia.PraticaDTO;
 import com.github.davidpotentini.dto.metodologia.ProcessoDTO;
-import com.github.davidpotentini.dto.metodologia.VersaoDTO;
 import com.github.davidpotentini.enums.EAtivoInativo;
-import com.github.davidpotentini.enums.ESituacaoVersao;
 import com.github.davidpotentini.mapper.metodologia.MetodologiaMapper;
-import com.github.davidpotentini.model.contas.ContasModel;
 import com.github.davidpotentini.model.metodologia.IndicadorMetodologiaModel;
 import com.github.davidpotentini.model.metodologia.PraticaModel;
 import com.github.davidpotentini.model.metodologia.ProcessoModel;
-import com.github.davidpotentini.model.metodologia.VersaoMetodologiaModel;
-import com.github.davidpotentini.model.pessoas.PessoasModel;
-import com.github.davidpotentini.repository.contas.ContasRepository;
 import com.github.davidpotentini.repository.metodologia.IndicadorMetodologiaRepository;
 import com.github.davidpotentini.repository.metodologia.PraticaRepository;
 import com.github.davidpotentini.repository.metodologia.ProcessoRepository;
-import com.github.davidpotentini.repository.metodologia.VersaoMetodologiaRepository;
-import com.github.davidpotentini.repository.pessoas.PessoasRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
  * Metodologia CERNE da incubadora logada. Roda no schema do próprio tenant (o JWT já deixou o
  * {@code TenantContext} ativo), então as tabelas são lidas/gravadas direto.
  *
- * <p>Versionamento (copy-on-publish): as abas editam sempre o RASCUNHO — a única versão de trabalho.
- * Qualquer mutação liga o flag {@code alterada}. Publicar clona a árvore
- * ({@code versão → processos → práticas → indicadores}) numa nova VIGENTE imutável, rebaixa a VIGENTE
- * anterior para HISTORICA e zera {@code alterada}. A criação de modelos consome a última VIGENTE.
+ * <p>Documento vivo (sem versionamento): a árvore {@code processos → práticas → indicadores} é única
+ * e sempre editável. Qualquer correção passa a valer na hora para os modelos e planos que a leem ao
+ * vivo. A criação de modelos e a geração de indicadores do ciclo consomem esta metodologia.
  */
 @Service
 public class MetodologiaService {
 
-    private final VersaoMetodologiaRepository versoes;
     private final ProcessoRepository processos;
     private final PraticaRepository praticas;
     private final IndicadorMetodologiaRepository indicadores;
-    private final PessoasRepository pessoas;
-    private final ContasRepository contas;
     private final MetodologiaMapper mapper;
 
-    public MetodologiaService(VersaoMetodologiaRepository versoes, ProcessoRepository processos,
-                              PraticaRepository praticas, IndicadorMetodologiaRepository indicadores,
-                              PessoasRepository pessoas, ContasRepository contas,
-                              MetodologiaMapper mapper) {
-        this.versoes = versoes;
+    public MetodologiaService(ProcessoRepository processos, PraticaRepository praticas,
+                              IndicadorMetodologiaRepository indicadores, MetodologiaMapper mapper) {
         this.processos = processos;
         this.praticas = praticas;
         this.indicadores = indicadores;
-        this.pessoas = pessoas;
-        this.contas = contas;
         this.mapper = mapper;
-    }
-
-    // ---- versão / publicação ----
-
-    /** Versão de trabalho (RASCUNHO) — a que as abas editam; criada na primeira vez. */
-    @Transactional(rollbackFor = Exception.class)
-    public VersaoDTO versaoDeTrabalho() {
-        return mapper.toDTO(obterOuCriarRascunho(), null);
-    }
-
-    /** Histórico de publicações (VIGENTE + HISTORICA), mais recentes primeiro. */
-    @Transactional(readOnly = true)
-    public List<VersaoDTO> listarVersoes() {
-        List<VersaoDTO> lista = new ArrayList<>();
-        for (VersaoMetodologiaModel v :
-                versoes.findBySituacaoInOrderByVerCodDesc(List.of(ESituacaoVersao.VIGENTE, ESituacaoVersao.HISTORICA))) {
-            lista.add(mapper.toDTO(v, nomePessoa(v.getPubPesCod())));
-        }
-        return lista;
-    }
-
-    /**
-     * Publica o rascunho: clona a árvore numa nova VIGENTE, rebaixa a VIGENTE anterior para HISTORICA
-     * e zera {@code alterada}. Só publica se houver alterações pendentes.
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public VersaoDTO publicar() {
-        VersaoMetodologiaModel rascunho = obterOuCriarRascunho();
-        if (!rascunho.isAlterada()) {
-            throw new RegraNegocioException("Não há alterações para publicar.");
-        }
-        Long pubPesCod = pessoaAtual();
-        String rotulo = "v" + (versoes.countBySituacaoNot(ESituacaoVersao.RASCUNHO) + 1);
-
-        versoes.findFirstBySituacaoOrderByVerCodDesc(ESituacaoVersao.VIGENTE).ifPresent(vigente -> {
-            vigente.setSituacao(ESituacaoVersao.HISTORICA);
-            versoes.saveAndFlush(vigente);
-        });
-
-        VersaoMetodologiaModel publicada = clonarComoVigente(rascunho, rotulo, pubPesCod);
-        rascunho.setAlterada(false);
-        versoes.save(rascunho);
-        return mapper.toDTO(publicada, nomePessoa(pubPesCod));
     }
 
     // ---- processos ----
 
-    /** Processos da versão (accordions ordenados por {@code ordem}), cada um com suas práticas. */
+    /** Processos da metodologia (accordions ordenados por {@code ordem}), cada um com suas práticas. */
     @Transactional(readOnly = true)
-    public List<ProcessoDTO> listarProcessos(Long verCod) {
+    public List<ProcessoDTO> listarProcessos() {
         List<ProcessoDTO> lista = new ArrayList<>();
-        for (ProcessoModel processo : processos.findByVerCodOrderByOrdemAscPrcCodAsc(verCod)) {
+        for (ProcessoModel processo : processos.findAllByOrderByOrdemAscPrcCodAsc()) {
             lista.add(montarProcesso(processo));
         }
         return lista;
     }
 
-    /** Novo processo na versão informada; {@code ordem} é única — 409 se já usada. */
+    /** Novo processo, anexado no fim (a ordem é definida depois por arrastar). */
     @Transactional(rollbackFor = Exception.class)
     public ProcessoDTO criarProcesso(ProcessoDTO dto) {
-        exigirVersao(dto.verCod());
-        if (processos.existsByVerCodAndOrdem(dto.verCod(), dto.ordem())) {
-            throw new RegraNegocioException("Já existe um processo com a ordem " + dto.ordem() + ".");
-        }
         ProcessoModel processo = mapper.toModel(dto);
+        processo.setOrdem(proximaOrdem());
         processo.setSituacao(EAtivoInativo.ATIVO);
         processos.save(processo);
-        marcarRascunhoAlterado();
         return mapper.toDTO(processo, List.of());
     }
 
-    /** Edita ordem/nome/descrição do processo; a {@code ordem} segue única na versão (409 se colidir). */
+    /** Edita nome/descrição do processo (a ordem é gerida por arrastar). */
     @Transactional(rollbackFor = Exception.class)
     public ProcessoDTO editarProcesso(Long prcCod, ProcessoDTO dto) {
         ProcessoModel processo = buscarProcesso(prcCod);
-        if (processos.existsByVerCodAndOrdemAndPrcCodNot(processo.getVerCod(), dto.ordem(), prcCod)) {
-            throw new RegraNegocioException("Já existe um processo com a ordem " + dto.ordem() + ".");
-        }
         mapper.atualizar(dto, processo);
         processos.save(processo);
-        marcarRascunhoAlterado();
         return montarProcesso(processo);
+    }
+
+    /**
+     * Reordena os processos conforme a sequência de {@code prcCods} (arrastar-e-soltar): a posição na
+     * lista vira a nova {@code ordem}. A lista deve conter exatamente os processos existentes.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public List<ProcessoDTO> reordenarProcessos(List<Long> prcCods) {
+        List<ProcessoModel> todos = processos.findAllByOrderByOrdemAscPrcCodAsc();
+        Map<Long, ProcessoModel> porId = new HashMap<>();
+        for (ProcessoModel processo : todos) {
+            porId.put(processo.getPrcCod(), processo);
+        }
+        if (prcCods == null || prcCods.size() != todos.size()) {
+            throw new RegraNegocioException("A ordenação deve conter exatamente os processos existentes.");
+        }
+        int ordem = 1;
+        Set<Long> vistos = new HashSet<>();
+        for (Long prcCod : prcCods) {
+            ProcessoModel processo = porId.get(prcCod);
+            if (processo == null || !vistos.add(prcCod)) {
+                throw new RegraNegocioException("A ordenação deve conter exatamente os processos existentes.");
+            }
+            processo.setOrdem(ordem++);
+        }
+        processos.saveAll(todos);
+        return listarProcessos();
     }
 
     /** Ativa/inativa o processo. Inativo continua visível, mas não entra na criação de modelos. */
@@ -152,8 +111,12 @@ public class MetodologiaService {
         ProcessoModel processo = buscarProcesso(prcCod);
         processo.setSituacao(situacao);
         processos.save(processo);
-        marcarRascunhoAlterado();
         return montarProcesso(processo);
+    }
+
+    private int proximaOrdem() {
+        ProcessoModel ultimo = processos.findFirstByOrderByOrdemDesc().orElse(null);
+        return ultimo == null ? 1 : ultimo.getOrdem() + 1;
     }
 
     // ---- práticas ----
@@ -166,7 +129,6 @@ public class MetodologiaService {
         pratica.setPrcCod(prcCod);
         pratica.setSituacao(EAtivoInativo.ATIVO);
         praticas.save(pratica);
-        marcarRascunhoAlterado();
         return mapper.toDTO(pratica);
     }
 
@@ -176,7 +138,6 @@ public class MetodologiaService {
         PraticaModel pratica = buscarPratica(prcCod, prtCod);
         mapper.atualizar(dto, pratica);
         praticas.save(pratica);
-        marcarRascunhoAlterado();
         return mapper.toDTO(pratica);
     }
 
@@ -186,26 +147,29 @@ public class MetodologiaService {
         PraticaModel pratica = buscarPratica(prcCod, prtCod);
         pratica.setSituacao(situacao);
         praticas.save(pratica);
-        marcarRascunhoAlterado();
         return mapper.toDTO(pratica);
     }
 
     // ---- indicadores ----
 
     /**
-     * Indicadores da versão. O indicador aponta para uma prática (PRT_COD), então reúno as práticas
-     * da versão (processos → práticas) e busco os indicadores delas numa só query; o mesmo mapa de
+     * Indicadores da metodologia. O indicador aponta para uma prática (PRT_COD), então reúno as
+     * práticas (processos → práticas) e busco os indicadores delas numa só query; o mesmo mapa de
      * nomes preenche o "Vínculo metodológico".
      */
     @Transactional(readOnly = true)
-    public List<IndicadorDTO> listarIndicadores(Long verCod) {
-        List<Long> prcCods = processos.findByVerCodOrderByOrdemAscPrcCodAsc(verCod).stream()
-                .map(ProcessoModel::getPrcCod).toList();
+    public List<IndicadorDTO> listarIndicadores() {
+        List<Long> prcCods = new ArrayList<>();
+        for (ProcessoModel processo : processos.findAllByOrderByOrdemAscPrcCodAsc()) {
+            prcCods.add(processo.getPrcCod());
+        }
         if (prcCods.isEmpty()) {
             return List.of();
         }
-        Map<Long, String> nomePorPratica = praticas.findByPrcCodIn(prcCods).stream()
-                .collect(Collectors.toMap(PraticaModel::getPrtCod, PraticaModel::getNome));
+        Map<Long, String> nomePorPratica = new HashMap<>();
+        for (PraticaModel pratica : praticas.findByPrcCodIn(prcCods)) {
+            nomePorPratica.put(pratica.getPrtCod(), pratica.getNome());
+        }
         List<IndicadorDTO> lista = new ArrayList<>();
         for (IndicadorMetodologiaModel ind : indicadores.findByPrtCodInOrderByNomeAsc(nomePorPratica.keySet())) {
             lista.add(mapper.toDTO(ind, nomePorPratica.get(ind.getPrtCod())));
@@ -219,7 +183,6 @@ public class MetodologiaService {
         IndicadorMetodologiaModel indicador = mapper.toModel(dto);
         indicador.setSituacao(EAtivoInativo.ATIVO);
         indicadores.save(indicador);
-        marcarRascunhoAlterado();
         return mapper.toDTO(indicador, pratica.getNome());
     }
 
@@ -229,7 +192,6 @@ public class MetodologiaService {
         PraticaModel pratica = buscarPraticaPorId(dto.prtCod());
         mapper.atualizar(dto, indicador);
         indicadores.save(indicador);
-        marcarRascunhoAlterado();
         return mapper.toDTO(indicador, pratica.getNome());
     }
 
@@ -239,103 +201,11 @@ public class MetodologiaService {
         IndicadorMetodologiaModel indicador = buscarIndicador(inmCod);
         indicador.setSituacao(situacao);
         indicadores.save(indicador);
-        marcarRascunhoAlterado();
         String vinculo = buscarPraticaPorId(indicador.getPrtCod()).getNome();
         return mapper.toDTO(indicador, vinculo);
     }
 
-    // ---- apoio: versão ----
-
-    private VersaoMetodologiaModel obterOuCriarRascunho() {
-        return versoes.findFirstBySituacaoOrderByVerCodDesc(ESituacaoVersao.RASCUNHO)
-                .orElseGet(() -> {
-                    VersaoMetodologiaModel v = new VersaoMetodologiaModel();
-                    v.setVersao("rascunho");
-                    v.setSituacao(ESituacaoVersao.RASCUNHO);
-                    v.setAlterada(false);
-                    return versoes.save(v);
-                });
-    }
-
-    /** Liga o flag de "alterações não publicadas" no rascunho (chamado após cada mutação). */
-    private void marcarRascunhoAlterado() {
-        versoes.findFirstBySituacaoOrderByVerCodDesc(ESituacaoVersao.RASCUNHO).ifPresent(rascunho -> {
-            if (!rascunho.isAlterada()) {
-                rascunho.setAlterada(true);
-                versoes.save(rascunho);
-            }
-        });
-    }
-
-    /** Deep-copy da árvore do rascunho para uma nova versão VIGENTE (imutável). */
-    private VersaoMetodologiaModel clonarComoVigente(VersaoMetodologiaModel rascunho, String rotulo,
-                                                     Long pubPesCod) {
-        VersaoMetodologiaModel publicada = new VersaoMetodologiaModel();
-        publicada.setVersao(rotulo);
-        publicada.setSituacao(ESituacaoVersao.VIGENTE);
-        publicada.setPublicadaEm(LocalDateTime.now());
-        publicada.setPubPesCod(pubPesCod);
-        versoes.save(publicada);
-
-        for (ProcessoModel proc : processos.findByVerCodOrderByOrdemAscPrcCodAsc(rascunho.getVerCod())) {
-            ProcessoModel np = new ProcessoModel();
-            np.setVerCod(publicada.getVerCod());
-            np.setOrdem(proc.getOrdem());
-            np.setNome(proc.getNome());
-            np.setDescricao(proc.getDescricao());
-            np.setSituacao(proc.getSituacao());
-            processos.save(np);
-
-            for (PraticaModel pr : praticas.findByPrcCodOrderByPrtCodAsc(proc.getPrcCod())) {
-                PraticaModel npr = new PraticaModel();
-                npr.setPrcCod(np.getPrcCod());
-                npr.setNome(pr.getNome());
-                npr.setDescricao(pr.getDescricao());
-                npr.setSituacao(pr.getSituacao());
-                praticas.save(npr);
-
-                for (IndicadorMetodologiaModel ind : indicadores.findByPrtCod(pr.getPrtCod())) {
-                    IndicadorMetodologiaModel nind = new IndicadorMetodologiaModel();
-                    nind.setPrtCod(npr.getPrtCod());
-                    nind.setNome(ind.getNome());
-                    nind.setUnidade(ind.getUnidade());
-                    nind.setPeriodicidade(ind.getPeriodicidade());
-                    nind.setSituacao(ind.getSituacao());
-                    indicadores.save(nind);
-                }
-            }
-        }
-        return publicada;
-    }
-
-    private void exigirVersao(Long verCod) {
-        if (!versoes.existsById(verCod)) {
-            throw new NaoEncontradoException("Versão da metodologia", verCod);
-        }
-    }
-
-    /** Pessoa (PES_COD) do usuário logado neste tenant, ou {@code null} se não resolvível. */
-    private Long pessoaAtual() {
-        Long ctaCod = SessaoContext.contaAtual();
-        if (ctaCod == null) {
-            return null;
-        }
-        return pessoas.findByCtaCod(ctaCod).map(PessoasModel::getPesCod).orElse(null);
-    }
-
-    /** Nome de quem publicou (pessoa → conta), ou {@code null}. */
-    private String nomePessoa(Long pesCod) {
-        if (pesCod == null) {
-            return null;
-        }
-        PessoasModel pessoa = pessoas.findById(pesCod).orElse(null);
-        if (pessoa == null) {
-            return null;
-        }
-        return contas.findById(pessoa.getCtaCod()).map(ContasModel::getNome).orElse(null);
-    }
-
-    // ---- apoio: processos/práticas/indicadores ----
+    // ---- apoio ----
 
     private ProcessoModel buscarProcesso(Long prcCod) {
         return processos.findById(prcCod)

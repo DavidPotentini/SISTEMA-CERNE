@@ -4,9 +4,22 @@
       <div class="brand">Incubadora</div>
 
       <mat-nav-list class="menu">
+        <div class="grupo-menu">Visão Geral</div>
+        
+        <a mat-list-item routerLink="/incubadora/painel-operacional" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>checklist</mat-icon>
+          <span matListItemTitle>Painel Operacional</span>
+        </a>
+
+        <div class="grupo-menu">Empreendimentos Apoiados</div>
+        
+        <a mat-list-item routerLink="/incubadora/monitoramento" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>monitoring</mat-icon>
+          <span matListItemTitle>Monitoramento dos empreendimentos</span>
+        </a>
 
         <div class="grupo-menu">Operação</div>
-        
+
         <a mat-list-item routerLink="/incubadora/planejamento" routerLinkActive="ativo">
           <mat-icon matListItemIcon>event_note</mat-icon>
           <span matListItemTitle>Planejamento institucional</span>
@@ -27,11 +40,6 @@
           <mat-icon matListItemIcon>assessment</mat-icon>
           <span matListItemTitle>Apuração de indicadores</span>
         </a>
-        <a mat-list-item routerLink="/incubadora/monitoramento" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>monitoring</mat-icon>
-          <span matListItemTitle>Monitoramento dos empreendimentos</span>
-        </a>
-
 
         <div class="grupo-menu">Configuração</div>
 
@@ -51,12 +59,18 @@
       </mat-nav-list>
 
       <div class="rodape">
-        @if (incubadora.value(); as inc) {
-          <div class="identidade">
-            <span class="nome">{{ inc.nome }}</span>
-            <span class="nivel">{{ inc.nivel ? nivelLabel(inc.nivel) : '—' }}</span>
-          </div>
-        }
+        <div class="rodape-inicio">
+          @if (incubadora.value(); as inc) {
+            <div class="identidade">
+              <span class="nome">{{ inc.nome }}</span>
+              <span class="nivel">{{ inc.nivel ? nivelLabel(inc.nivel) : '—' }}</span>
+            </div>
+            <button mat-icon-button class="sobre" (click)="sobre()"
+                    title="Sobre a incubadora" aria-label="Sobre a incubadora">
+              <mat-icon>info</mat-icon>
+            </button>
+          }
+        </div>
         <button mat-button (click)="sair()">Sair</button>
       </div>
     </div>

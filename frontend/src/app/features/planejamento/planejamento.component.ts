@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -13,8 +13,16 @@ import {
   AtividadePlanejada,
   Planejamento,
   PlanPratica,
+  PlanProcesso,
   STATUS_PLANEJAMENTO_LABEL,
 } from '../../models/planejamento/planejamento.model';
+import {
+  FILTROS_VAZIO,
+  FiltrosState,
+  FiltrosBarComponent,
+  OpcaoPratica,
+  OpcaoProcesso,
+} from '../../shared/ui/filtros-bar/filtros-bar.component';
 import { AtividadePlanejadaFormDialog } from './atividade-planejada-form.dialog';
 import { ConsultarPublicacaoDialog } from './consultar-publicacao.dialog';
 import { GerarModeloDialog } from './gerar-modelo.dialog';
@@ -37,6 +45,7 @@ import { GerarModeloDialog } from './gerar-modelo.dialog';
     MatTooltipModule,
     MatProgressBarModule,
     MatDialogModule,
+    FiltrosBarComponent,
   ],
   templateUrl: './planejamento.component.html',
   styleUrl: './planejamento.component.css',
@@ -59,6 +68,63 @@ export class PlanejamentoComponent {
   readonly plano = computed(() => this.atualRes.value()?.planejamento ?? null);
   /** Publicado = ciclo vigente, atividades editáveis. */
   readonly editavel = computed(() => this.plano()?.status === 'PUBLICADO');
+
+  // ---- filtros padrão (sem status) ----
+  readonly filtros = signal<FiltrosState>({ ...FILTROS_VAZIO });
+
+  readonly processoOpcoes = computed<OpcaoProcesso[]>(() =>
+    (this.estruturaRes.value() ?? []).map(p => ({ nome: p.nome })),
+  );
+
+  readonly praticaOpcoes = computed<OpcaoPratica[]>(() => {
+    const out: OpcaoPratica[] = [];
+    for (const proc of this.estruturaRes.value() ?? []) {
+      for (const pr of proc.praticas) {
+        out.push({ nome: pr.nome, processoNome: proc.nome });
+      }
+    }
+    return out;
+  });
+
+  /**
+   * Árvore com os filtros aplicados. Processo/prática recortam a estrutura (mantendo práticas vazias,
+   * para ainda permitir incluir atividade); o filtro de responsável recorta atividades e esconde
+   * práticas/processos que ficam sem atividade. Sem filtro, devolve a estrutura original.
+   */
+  readonly estruturaFiltrada = computed<PlanProcesso[]>(() => {
+    const f = this.filtros();
+    const procs = this.estruturaRes.value() ?? [];
+    const algum = f.processo != null || f.pratica != null || f.respPesCod != null;
+    if (!algum) {
+      return procs;
+    }
+    const filtrarAtividade = f.respPesCod != null;
+    const out: PlanProcesso[] = [];
+    for (const proc of procs) {
+      if (f.processo != null && proc.nome !== f.processo) {
+        continue;
+      }
+      const praticas: PlanPratica[] = [];
+      for (const pr of proc.praticas) {
+        if (f.pratica != null && pr.nome !== f.pratica) {
+          continue;
+        }
+        let atividades = pr.atividades;
+        if (filtrarAtividade) {
+          atividades = atividades.filter(a => a.respPesCod === f.respPesCod);
+          if (atividades.length === 0) {
+            continue;
+          }
+        }
+        praticas.push({ ...pr, atividades });
+      }
+      if (praticas.length === 0) {
+        continue;
+      }
+      out.push({ ...proc, praticas });
+    }
+    return out;
+  });
 
   gerar(): void {
     const atual = this.atualRes.value();

@@ -13,9 +13,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Processo da metodologia — pertence a uma {@link VersaoMetodologiaModel} ({@code VER_COD}) e agrupa
- * práticas. Exibido como accordion na aba "Processos e Práticas", ordenado por {@code ordem}
- * ({@code ORDEM} é UNIQUE no banco). Schema do tenant.
+ * Processo da metodologia (documento vivo da incubadora) — agrupa práticas. Exibido como accordion na
+ * aba "Processos e Práticas", ordenado por {@code ordem} ({@code ORDEM} é UNIQUE no banco). Schema do
+ * tenant.
  */
 @Entity
 @Table(name = "PROCESSOS")
@@ -27,9 +27,6 @@ public class ProcessoModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PRC_COD")
     private Long prcCod;
-
-    @Column(name = "VER_COD", nullable = false)
-    private Long verCod;
 
     @Column(name = "ORDEM", nullable = false)
     private Integer ordem;

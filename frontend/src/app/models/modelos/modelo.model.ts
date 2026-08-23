@@ -8,14 +8,11 @@ export const STATUS_MODELO_LABEL: Record<EStatusModelo, string> = {
 };
 
 /**
- * Modelo de planejamento. `verCod`/`versaoMetodologia` é a metodologia base (resolvida no backend na
- * criação, a partir da última VIGENTE). Enquanto `RASCUNHO` as atividades são editáveis; `PUBLICADO`
- * é imutável.
+ * Modelo de planejamento. Herda a estrutura da metodologia da incubadora (lida ao vivo). Enquanto
+ * `RASCUNHO` as atividades são editáveis; `PUBLICADO` é imutável.
  */
 export interface Modelo {
   modCod: number;
-  verCod: number;
-  versaoMetodologia: string | null;
   nome: string;
   periodicidade: EPeriodicidade;
   status: EStatusModelo;
@@ -29,7 +26,7 @@ export interface AtividadeModelo {
   modCod: number;
   prtCod: number;
   nome: string;
-  descricao: string | null;
+  observacoes: string | null;
   respPesCod: number | null;
   situacao: EAtivoInativo;
 }

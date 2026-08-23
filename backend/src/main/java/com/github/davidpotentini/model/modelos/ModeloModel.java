@@ -16,9 +16,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * Modelo de planejamento — baseado numa versão da metodologia ({@code VER_COD}, a VIGENTE no momento
- * da criação). A estrutura de processos/práticas é herdada dessa versão (não é copiada); o que o
- * modelo guarda são as {@link AtividadeModeloModel atividades} de cada prática.
+ * Modelo de planejamento — herda a estrutura de processos/práticas da metodologia da incubadora (não
+ * copia — só lê ao vivo); o que o modelo guarda são as {@link AtividadeModeloModel atividades} de cada
+ * prática.
  *
  * <p>Enquanto {@code RASCUNHO} as atividades podem ser editadas; ao {@code PUBLICADO} o modelo fica
  * imutável. Schema do tenant.
@@ -33,10 +33,6 @@ public class ModeloModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MOD_COD")
     private Long modCod;
-
-    /** Versão da metodologia base (a VIGENTE no momento da criação). */
-    @Column(name = "VER_COD", nullable = false)
-    private Long verCod;
 
     @Column(name = "NOME", nullable = false)
     private String nome;

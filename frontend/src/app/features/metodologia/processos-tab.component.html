@@ -1,10 +1,5 @@
 <div class="barra">
-  <button
-    mat-flat-button
-    color="primary"
-    (click)="adicionarProcesso()"
-    [disabled]="verCod() == null"
-  >
+  <button mat-flat-button color="primary" (click)="adicionarProcesso()">
     <mat-icon>add</mat-icon>
     Adicionar processo
   </button>
@@ -15,12 +10,30 @@
 } @else if (processos.error()) {
   <p class="estado erro">Não foi possível carregar os processos.</p>
 } @else {
-  <mat-accordion multi>
-    @for (p of processos.value() ?? []; track p.prcCod) {
-      <mat-expansion-panel [class.inativo]="p.situacao === 'INATIVO'">
+  <app-filtros-bar
+    [(filtros)]="filtros"
+    [processos]="processoOpcoes()"
+    [praticas]="praticaOpcoes()"
+  />
+
+  <mat-accordion
+    multi
+    cdkDropList
+    [cdkDropListDisabled]="algumFiltro()"
+    (cdkDropListDropped)="reordenar($event)"
+  >
+    @for (p of processosFiltrados(); track p.prcCod) {
+      <mat-expansion-panel cdkDrag [class.inativo]="p.situacao === 'INATIVO'">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <span class="ordem">{{ p.ordem }}</span>
+            <mat-icon
+              class="arrastar"
+              cdkDragHandle
+              matTooltip="Arrastar para ordenar"
+              (click)="$event.stopPropagation()"
+            >
+              drag_indicator
+            </mat-icon>
             {{ p.nome }}
             @if (p.situacao === 'INATIVO') {
               <span class="tag-inativo">Inativo</span>

@@ -43,19 +43,21 @@
       </div>
     </mat-card>
 
-    <mat-chip-listbox class="filtros" [value]="filtro()">
-      @for (s of statusFiltraveis; track s) {
-        <mat-chip-option [selected]="filtro() === s" (click)="filtrar(s)">
-          {{ statusLabel[s] }}
-        </mat-chip-option>
-      }
-    </mat-chip-listbox>
+    <app-filtros-bar
+      [(filtros)]="filtros"
+      [processos]="processoOpcoes()"
+      [praticas]="praticaOpcoes()"
+      [comResponsavel]="true"
+      [comStatus]="true"
+      [statusOpcoes]="statusOpcoes"
+      statusLabel="Status"
+    />
 
     @if (estruturaRes.isLoading()) {
       <p class="estado">Carregando estrutura…</p>
     } @else {
       <mat-accordion multi>
-        @for (proc of estruturaRes.value() ?? []; track proc.prcCod) {
+        @for (proc of estruturaFiltrada(); track proc.prcCod) {
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title>
@@ -78,7 +80,7 @@
                 </div>
 
                 <div class="atividades">
-                  @for (atv of visiveis(pr.atividades); track atv.atpCod) {
+                  @for (atv of pr.atividades; track atv.atpCod) {
                     <div class="atividade">
                       <div class="atividade-info">
                         <span class="atividade-nome">
@@ -87,9 +89,16 @@
                             {{ statusLabel[atv.status] }}
                           </span>
                         </span>
-                        @if (atv.prazo) {
-                          <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
-                        }
+                        <span class="atividade-meta">
+                          @if (atv.responsavelNome) {
+                            <span class="atividade-resp">
+                              <mat-icon>person</mat-icon>{{ atv.responsavelNome }}
+                            </span>
+                          }
+                          @if (atv.prazo) {
+                            <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
+                          }
+                        </span>
                       </div>
                       <button mat-stroked-button color="primary" (click)="registrar(atv)">
                         <mat-icon>edit_note</mat-icon>

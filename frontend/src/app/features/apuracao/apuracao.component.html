@@ -12,7 +12,20 @@
       Nenhum indicador no ciclo. Defina indicadores e metas antes de apurar resultados.
     </p>
   } @else {
-    <table mat-table [dataSource]="indicadoresRes.value() ?? []">
+    <app-filtros-bar
+      [(filtros)]="filtros"
+      [processos]="processoOpcoes()"
+      [praticas]="praticaOpcoes()"
+      [comResponsavel]="true"
+      [comStatus]="true"
+      [statusOpcoes]="statusOpcoes"
+      statusLabel="Situação"
+    />
+
+    @if (indicadores().length === 0) {
+      <p class="estado">Nenhum indicador com esses filtros.</p>
+    } @else {
+    <table mat-table [dataSource]="indicadores()">
       <ng-container matColumnDef="nome">
         <th mat-header-cell *matHeaderCellDef>Indicador</th>
         <td mat-cell *matCellDef="let i">{{ i.nome }}</td>
@@ -52,6 +65,19 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="situacao">
+        <th mat-header-cell *matHeaderCellDef>Situação</th>
+        <td mat-cell *matCellDef="let i">
+          @if (i.situacao) {
+            <span class="chip situacao" [attr.data-situacao]="i.situacao">
+              {{ situacaoLabel(i.situacao) }}
+            </span>
+          } @else {
+            <span class="chip sem-meta">Sem meta</span>
+          }
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="acoes">
         <th mat-header-cell *matHeaderCellDef aria-label="Ações"></th>
         <td mat-cell *matCellDef="let i" class="acoes">
@@ -70,5 +96,6 @@
       <tr mat-header-row *matHeaderRowDef="colunas"></tr>
       <tr mat-row *matRowDef="let row; columns: colunas"></tr>
     </table>
+    }
   }
 </mat-card>

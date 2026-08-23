@@ -1,7 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { Aplicacao, Rodada } from '../../../models/monitoramento/monitoramento.model';
+import {
+  Aplicacao,
+  EvolucaoRodada,
+  Rodada,
+} from '../../../models/monitoramento/monitoramento.model';
 
 /**
  * Monitoramento das incubadas (tenant vem do JWT). Rodadas (planejar/listar/concluir) e aplicações
@@ -39,5 +43,10 @@ export class MonitoramentoService {
       `${this.base}/rodadas/${rodCod}/empreendimentos/${empCod}/avaliacao`,
       dto,
     );
+  }
+
+  /** Série do radar de evolução: rodadas avaliadas do empreendimento, com notas por eixo. */
+  evolucao(empCod: number) {
+    return this.http.get<EvolucaoRodada[]>(`${this.base}/empreendimentos/${empCod}/evolucao`);
   }
 }

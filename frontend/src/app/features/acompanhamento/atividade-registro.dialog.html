@@ -4,8 +4,8 @@
   <!-- Atividade (só leitura) -->
   <section class="atividade">
     <h3>{{ atividade().nome }}</h3>
-    @if (atividade().descricao) {
-      <p class="desc">{{ atividade().descricao }}</p>
+    @if (atividade().observacoes) {
+      <p class="desc">{{ atividade().observacoes }}</p>
     }
   </section>
 

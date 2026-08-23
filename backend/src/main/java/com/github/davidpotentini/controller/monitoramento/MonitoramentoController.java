@@ -1,6 +1,7 @@
 package com.github.davidpotentini.controller.monitoramento;
 
 import com.github.davidpotentini.dto.monitoramento.AplicacaoDTO;
+import com.github.davidpotentini.dto.monitoramento.EvolucaoRodadaDTO;
 import com.github.davidpotentini.dto.monitoramento.RodadaDTO;
 import com.github.davidpotentini.service.monitoramento.MonitoramentoService;
 import jakarta.validation.Valid;
@@ -56,5 +57,10 @@ public class MonitoramentoController {
     public AplicacaoDTO revisar(@PathVariable Long rodCod, @PathVariable Long empCod,
                                 @Valid @RequestBody AplicacaoDTO dto) {
         return service.revisar(rodCod, empCod, dto);
+    }
+
+    @GetMapping("/empreendimentos/{empCod}/evolucao")
+    public List<EvolucaoRodadaDTO> evolucao(@PathVariable Long empCod) {
+        return service.evolucao(empCod);
     }
 }

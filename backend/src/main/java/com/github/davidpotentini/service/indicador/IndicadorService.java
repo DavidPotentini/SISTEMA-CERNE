@@ -7,30 +7,30 @@ import com.github.davidpotentini.dto.indicador.PraticaOpcaoDTO;
 import com.github.davidpotentini.enums.EAtivoInativo;
 import com.github.davidpotentini.enums.EOrigemIndicador;
 import com.github.davidpotentini.enums.EStatusCiclo;
-import com.github.davidpotentini.enums.ESituacaoVersao;
 import com.github.davidpotentini.mapper.indicador.IndicadorMapper;
 import com.github.davidpotentini.model.ciclos.CiclosModel;
+import com.github.davidpotentini.model.contas.ContasModel;
 import com.github.davidpotentini.model.indicador.IndicadorModel;
 import com.github.davidpotentini.model.metodologia.IndicadorMetodologiaModel;
 import com.github.davidpotentini.model.metodologia.PraticaModel;
 import com.github.davidpotentini.model.metodologia.ProcessoModel;
-import com.github.davidpotentini.model.metodologia.VersaoMetodologiaModel;
+import com.github.davidpotentini.model.pessoas.PessoasModel;
 import com.github.davidpotentini.repository.ciclos.CiclosRepository;
+import com.github.davidpotentini.repository.contas.ContasRepository;
 import com.github.davidpotentini.repository.indicador.IndicadorRepository;
 import com.github.davidpotentini.repository.metodologia.IndicadorMetodologiaRepository;
 import com.github.davidpotentini.repository.metodologia.PraticaRepository;
 import com.github.davidpotentini.repository.metodologia.ProcessoRepository;
-import com.github.davidpotentini.repository.metodologia.VersaoMetodologiaRepository;
+import com.github.davidpotentini.repository.pessoas.PessoasRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Indicadores do ciclo ativo (schema do tenant vem do JWT). "Gerar indicadores do ciclo" copia os
@@ -42,23 +42,26 @@ import java.util.stream.Collectors;
 public class IndicadorService {
 
     private final IndicadorRepository indicadores;
-    private final VersaoMetodologiaRepository versoes;
     private final ProcessoRepository processos;
     private final PraticaRepository praticas;
     private final IndicadorMetodologiaRepository indicadoresMetodologia;
     private final CiclosRepository ciclos;
+    private final PessoasRepository pessoas;
+    private final ContasRepository contas;
     private final IndicadorMapper mapper;
 
-    public IndicadorService(IndicadorRepository indicadores, VersaoMetodologiaRepository versoes,
+    public IndicadorService(IndicadorRepository indicadores,
                             ProcessoRepository processos, PraticaRepository praticas,
                             IndicadorMetodologiaRepository indicadoresMetodologia,
-                            CiclosRepository ciclos, IndicadorMapper mapper) {
+                            CiclosRepository ciclos, PessoasRepository pessoas,
+                            ContasRepository contas, IndicadorMapper mapper) {
         this.indicadores = indicadores;
-        this.versoes = versoes;
         this.processos = processos;
         this.praticas = praticas;
         this.indicadoresMetodologia = indicadoresMetodologia;
         this.ciclos = ciclos;
+        this.pessoas = pessoas;
+        this.contas = contas;
         this.mapper = mapper;
     }
 
@@ -73,21 +76,17 @@ public class IndicadorService {
     }
 
     /**
-     * Gera os indicadores do ciclo a partir da metodologia vigente: copia os indicadores ATIVOS das
-     * práticas ATIVAS, com origem {@code METODOLOGIA_CERNE}. Substitui os gerados anteriormente (os
+     * Gera os indicadores do ciclo a partir da metodologia: copia os indicadores ATIVOS das práticas
+     * ATIVAS, com origem {@code METODOLOGIA_CERNE}. Substitui os gerados anteriormente (os
      * complementares permanecem).
      */
     @Transactional(rollbackFor = Exception.class)
     public List<IndicadorCicloDTO> gerarDoCiclo() {
         CiclosModel ciclo = cicloAtivoObrigatorio();
-        VersaoMetodologiaModel vigente = versoes
-                .findFirstBySituacaoOrderByVerCodDesc(ESituacaoVersao.VIGENTE)
-                .orElseThrow(() -> new RegraNegocioException(
-                        "Publique uma versão da metodologia antes de gerar os indicadores."));
 
         indicadores.deleteByCicCodAndOrigem(ciclo.getCicCod(), EOrigemIndicador.METODOLOGIA_CERNE);
 
-        Set<Long> praticasAtivas = praticasAtivasDaVersao(vigente.getVerCod());
+        Set<Long> praticasAtivas = praticasAtivas();
         if (!praticasAtivas.isEmpty()) {
             for (IndicadorMetodologiaModel base
                     : indicadoresMetodologia.findByPrtCodInOrderByNomeAsc(praticasAtivas)) {
@@ -113,7 +112,7 @@ public class IndicadorService {
     public IndicadorCicloDTO definirComplementar(IndicadorCicloDTO dto) {
         CiclosModel ciclo = cicloAtivoObrigatorio();
         if (dto.prtCod() != null) {
-            exigirPraticaNaVigente(dto.prtCod());
+            exigirPraticaExiste(dto.prtCod());
         }
         IndicadorModel ind = mapper.toModel(dto);
         ind.setOrigem(EOrigemIndicador.COMPLEMENTAR);
@@ -123,16 +122,24 @@ public class IndicadorService {
         return comLabels(List.of(ind)).get(0);
     }
 
-    /** Práticas ATIVAS da metodologia vigente (para o seletor de vínculo do complementar). */
+    /**
+     * Define o responsável pela apuração de um indicador do ciclo. É o único campo editável dos
+     * indicadores gerados da metodologia; {@code respPesCod} nulo desvincula o responsável.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public IndicadorCicloDTO definirResponsavel(Long indCod, Long respPesCod) {
+        IndicadorModel ind = indicadores.findById(indCod)
+                .orElseThrow(() -> new NaoEncontradoException("Indicador", indCod));
+        ind.setRespPesCod(respPesCod);
+        indicadores.save(ind);
+        return comLabels(List.of(ind)).get(0);
+    }
+
+    /** Práticas ATIVAS da metodologia (para o seletor de vínculo do complementar). */
     @Transactional(readOnly = true)
     public List<PraticaOpcaoDTO> vinculos() {
-        VersaoMetodologiaModel vigente = versoes
-                .findFirstBySituacaoOrderByVerCodDesc(ESituacaoVersao.VIGENTE).orElse(null);
-        if (vigente == null) {
-            return List.of();
-        }
         Map<Long, String> nomeProcesso = new HashMap<>();
-        for (ProcessoModel proc : processos.findByVerCodOrderByOrdemAscPrcCodAsc(vigente.getVerCod())) {
+        for (ProcessoModel proc : processos.findAllByOrderByOrdemAscPrcCodAsc()) {
             if (proc.getSituacao() == EAtivoInativo.ATIVO) {
                 nomeProcesso.put(proc.getPrcCod(), proc.getNome());
             }
@@ -150,55 +157,79 @@ public class IndicadorService {
 
     // ---- apoio ----
 
-    private Set<Long> praticasAtivasDaVersao(Long verCod) {
-        List<Long> prcCods = processos.findByVerCodOrderByOrdemAscPrcCodAsc(verCod).stream()
-                .filter(p -> p.getSituacao() == EAtivoInativo.ATIVO)
-                .map(ProcessoModel::getPrcCod)
-                .toList();
-        if (prcCods.isEmpty()) {
-            return Set.of();
+    private Set<Long> praticasAtivas() {
+        List<Long> prcCods = new ArrayList<>();
+        for (ProcessoModel proc : processos.findAllByOrderByOrdemAscPrcCodAsc()) {
+            if (proc.getSituacao() == EAtivoInativo.ATIVO) {
+                prcCods.add(proc.getPrcCod());
+            }
         }
-        return praticas.findByPrcCodIn(prcCods).stream()
-                .filter(pr -> pr.getSituacao() == EAtivoInativo.ATIVO)
-                .map(PraticaModel::getPrtCod)
-                .collect(Collectors.toSet());
+        Set<Long> prtCods = new HashSet<>();
+        if (prcCods.isEmpty()) {
+            return prtCods;
+        }
+        for (PraticaModel pr : praticas.findByPrcCodIn(prcCods)) {
+            if (pr.getSituacao() == EAtivoInativo.ATIVO) {
+                prtCods.add(pr.getPrtCod());
+            }
+        }
+        return prtCods;
     }
 
-    /** Resolve os rótulos do "Vínculo CERNE" (processo/prática) em lote e monta os DTOs. */
+    /** Resolve os rótulos do "Vínculo CERNE" (processo/prática) e o responsável em lote e monta os DTOs. */
     private List<IndicadorCicloDTO> comLabels(List<IndicadorModel> lista) {
-        Set<Long> prtCods = lista.stream()
-                .map(IndicadorModel::getPrtCod).filter(Objects::nonNull).collect(Collectors.toSet());
+        Set<Long> prtCods = new HashSet<>();
+        for (IndicadorModel ind : lista) {
+            if (ind.getPrtCod() != null) {
+                prtCods.add(ind.getPrtCod());
+            }
+        }
         Map<Long, PraticaModel> praticaPorId = new HashMap<>();
+        Set<Long> prcCods = new HashSet<>();
         for (PraticaModel pr : praticas.findAllById(prtCods)) {
             praticaPorId.put(pr.getPrtCod(), pr);
+            prcCods.add(pr.getPrcCod());
         }
-        Set<Long> prcCods = praticaPorId.values().stream()
-                .map(PraticaModel::getPrcCod).collect(Collectors.toSet());
         Map<Long, String> nomeProcesso = new HashMap<>();
         for (ProcessoModel proc : processos.findAllById(prcCods)) {
             nomeProcesso.put(proc.getPrcCod(), proc.getNome());
         }
+        Map<Long, String> nomeResponsavel = new HashMap<>();
         List<IndicadorCicloDTO> out = new ArrayList<>();
         for (IndicadorModel ind : lista) {
             PraticaModel pratica = ind.getPrtCod() == null ? null : praticaPorId.get(ind.getPrtCod());
             String praticaNome = pratica == null ? null : pratica.getNome();
             String processoNome = pratica == null ? null : nomeProcesso.get(pratica.getPrcCod());
-            out.add(mapper.toDTO(ind, processoNome, praticaNome));
+            out.add(mapper.toDTO(ind, processoNome, praticaNome,
+                    rotuloResponsavel(ind.getRespPesCod(), nomeResponsavel)));
         }
         return out;
     }
 
-    /** Garante que a prática pertence à metodologia vigente (prática → processo → versão VIGENTE). */
-    private void exigirPraticaNaVigente(Long prtCod) {
-        VersaoMetodologiaModel vigente = versoes
-                .findFirstBySituacaoOrderByVerCodDesc(ESituacaoVersao.VIGENTE)
-                .orElseThrow(() -> new RegraNegocioException("Não há metodologia vigente."));
-        PraticaModel pratica = praticas.findById(prtCod)
-                .orElseThrow(() -> new NaoEncontradoException("Prática", prtCod));
-        ProcessoModel processo = processos.findById(pratica.getPrcCod())
-                .orElseThrow(() -> new NaoEncontradoException("Processo", pratica.getPrcCod()));
-        if (!processo.getVerCod().equals(vigente.getVerCod())) {
-            throw new RegraNegocioException("A prática não pertence à metodologia vigente.");
+    /** Nome do responsável (PESSOAS → public.CONTAS), memorizado por {@code PES_COD}; {@code null} se não resolvível. */
+    private String rotuloResponsavel(Long pesCod, Map<Long, String> cache) {
+        if (pesCod == null) {
+            return null;
+        }
+        if (cache.containsKey(pesCod)) {
+            return cache.get(pesCod);
+        }
+        String nome = null;
+        PessoasModel pessoa = pessoas.findById(pesCod).orElse(null);
+        if (pessoa != null) {
+            ContasModel conta = contas.findById(pessoa.getCtaCod()).orElse(null);
+            if (conta != null) {
+                nome = conta.getNome();
+            }
+        }
+        cache.put(pesCod, nome);
+        return nome;
+    }
+
+    /** Garante que a prática existe na metodologia. */
+    private void exigirPraticaExiste(Long prtCod) {
+        if (!praticas.existsById(prtCod)) {
+            throw new NaoEncontradoException("Prática", prtCod);
         }
     }
 

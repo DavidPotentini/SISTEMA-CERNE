@@ -1,0 +1,86 @@
+<div class="topo">
+  <h1>Painel Operacional</h1>
+  <button mat-stroked-button (click)="atualizar()" [disabled]="pendenciasRes.isLoading()">
+    <mat-icon>refresh</mat-icon>
+    Atualizar
+  </button>
+</div>
+
+@if (pendenciasRes.isLoading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+} @else if (pendenciasRes.error()) {
+  <p class="estado erro">Não foi possível carregar as pendências.</p>
+} @else {
+  <!-- Cards-resumo -->
+  <div class="cards">
+    @for (c of resumo(); track c.tipo) {
+      <div class="card" [class.tipo-atrasada]="c.tipo === 'ATIVIDADE_ATRASADA'"
+           [class.vazio]="c.quantidade === 0">
+        <mat-icon>{{ c.icone }}</mat-icon>
+        <span class="card-num">{{ c.quantidade }}</span>
+        <span class="card-rot">{{ c.rotulo }}</span>
+      </div>
+    }
+  </div>
+
+  @if (total() === 0) {
+    <p class="estado ok">
+      <mat-icon>task_alt</mat-icon>
+      Nenhuma pendência no ciclo ativo.
+    </p>
+  } @else {
+    <app-filtros-bar
+      [(filtros)]="filtros"
+      [processos]="processoOpcoes()"
+      [praticas]="praticaOpcoes()"
+      [comResponsavel]="true"
+      [comStatus]="true"
+      [statusOpcoes]="statusOpcoes"
+      statusLabel="Tipo"
+    />
+
+    @if (secoes().length === 0) {
+      <p class="estado">Nenhuma pendência com esses filtros.</p>
+    } @else {
+    <!-- Seções por tipo -->
+    <mat-accordion multi>
+      @for (s of secoes(); track s.tipo) {
+        <mat-expansion-panel expanded>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon class="secao-icone" [class.tipo-atrasada]="s.tipo === 'ATIVIDADE_ATRASADA'">
+                {{ s.icone }}
+              </mat-icon>
+              {{ s.rotulo }}
+            </mat-panel-title>
+            <mat-panel-description>{{ s.itens.length }}</mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <ul class="itens">
+            @for (p of s.itens; track p.referenciaId) {
+              <li class="item" (click)="abrir(p)" tabindex="0"
+                  (keydown.enter)="abrir(p)" (keydown.space)="abrir(p)">
+                <div class="item-corpo">
+                  <span class="item-titulo">{{ p.titulo }}</span>
+                  @if (p.processoNome || p.praticaNome) {
+                    <span class="item-contexto">
+                      {{ p.processoNome || '—' }} · {{ p.praticaNome || '—' }}
+                    </span>
+                  }
+                  @if (p.detalhe) {
+                    <span class="item-detalhe">{{ p.detalhe }}</span>
+                  }
+                </div>
+                @if (p.prazo) {
+                  <span class="item-prazo">venc. {{ formatarData(p.prazo) }}</span>
+                }
+                <mat-icon class="item-seta">chevron_right</mat-icon>
+              </li>
+            }
+          </ul>
+        </mat-expansion-panel>
+      }
+    </mat-accordion>
+    }
+  }
+}

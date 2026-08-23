@@ -1,0 +1,28 @@
+:host {
+  display: block;
+  padding: 16px 4px;
+}
+
+.filtro {
+  max-width: 360px;
+  margin-bottom: 12px;
+}
+.filtro mat-form-field {
+  width: 100%;
+}
+
+.grafico {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  height: 460px;
+  margin: 0 auto;
+}
+
+.estado {
+  padding: 16px 4px;
+  color: rgba(0, 0, 0, 0.5);
+}
+.estado.erro {
+  color: #b02020;
+}

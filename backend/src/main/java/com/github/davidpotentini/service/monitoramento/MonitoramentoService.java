@@ -3,6 +3,7 @@ package com.github.davidpotentini.service.monitoramento;
 import com.github.davidpotentini.comum.erro.NaoEncontradoException;
 import com.github.davidpotentini.comum.erro.RegraNegocioException;
 import com.github.davidpotentini.dto.monitoramento.AplicacaoDTO;
+import com.github.davidpotentini.dto.monitoramento.EvolucaoRodadaDTO;
 import com.github.davidpotentini.dto.monitoramento.PontuacaoDTO;
 import com.github.davidpotentini.dto.monitoramento.RodadaDTO;
 import com.github.davidpotentini.enums.EStatusCiclo;
@@ -203,6 +204,55 @@ public class MonitoramentoService {
 
         String empNome = empreendimentos.findById(empCod).map(EmpreendimentosModel::getNome).orElse(null);
         return montarAplicacao(empCod, empNome, avaliacao, pts);
+    }
+
+    // ---- radar de evolução ----
+
+    /**
+     * Série do radar de evolução de um empreendimento: uma entrada por rodada em que ele foi avaliado,
+     * com as notas por eixo ({@code pontuacoes}, cada uma com {@code dimensao}), em ordem cronológica
+     * (rodada mais antiga primeiro). Sem avaliações → lista vazia.
+     */
+    @Transactional(readOnly = true)
+    public List<EvolucaoRodadaDTO> evolucao(Long empCod) {
+        if (!empreendimentos.existsById(empCod)) {
+            throw new NaoEncontradoException("Empreendimento", empCod);
+        }
+        List<AvaliacaoModel> avs = new ArrayList<>(avaliacoes.findByEmpCod(empCod));
+        if (avs.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> avaCods = new ArrayList<>();
+        List<Long> rodCods = new ArrayList<>();
+        for (AvaliacaoModel av : avs) {
+            avaCods.add(av.getAvaCod());
+            rodCods.add(av.getRodCod());
+        }
+
+        Map<Long, String> nomeRodada = new HashMap<>();
+        for (RodadaModel r : rodadas.findAllById(rodCods)) {
+            nomeRodada.put(r.getRodCod(), r.getNome());
+        }
+        Map<Long, List<PontuacaoModel>> pontuacoesPorAva = new HashMap<>();
+        for (PontuacaoModel pt : pontuacoes.findByAvaCodIn(avaCods)) {
+            pontuacoesPorAva.computeIfAbsent(pt.getAvaCod(), k -> new ArrayList<>()).add(pt);
+        }
+
+        avs.sort(Comparator
+                .comparing(AvaliacaoModel::getData, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(AvaliacaoModel::getRodCod));
+
+        List<EvolucaoRodadaDTO> serie = new ArrayList<>();
+        for (AvaliacaoModel av : avs) {
+            List<PontuacaoModel> pts = pontuacoesPorAva.getOrDefault(av.getAvaCod(), List.of());
+            serie.add(new EvolucaoRodadaDTO(
+                    av.getRodCod(),
+                    nomeRodada.get(av.getRodCod()),
+                    av.getData(),
+                    mapper.toDTOList(pts)));
+        }
+        return serie;
     }
 
     // ---- apoio ----

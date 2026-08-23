@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -6,7 +6,6 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { of } from 'rxjs';
 import { MetodologiaService } from '../../core/services/metodologia/metodologia.service';
 import {
   EPeriodicidade,
@@ -16,7 +15,7 @@ import {
 import { IndicadorFormDialog } from './indicador-form.dialog';
 
 /**
- * Aba "Indicadores": lista os indicadores da versão vigente (nome, vínculo metodológico, unidade,
+ * Aba "Indicadores": lista os indicadores da metodologia (nome, vínculo metodológico, unidade,
  * periodicidade), com editar e ativar/inativar por item, e "Adicionar Indicador" no topo direito.
  */
 @Component({
@@ -38,13 +37,9 @@ export class IndicadoresTabComponent {
 
   readonly colunas = ['nome', 'vinculo', 'unidade', 'periodicidade', 'situacao', 'acoes'];
 
-  readonly versaoRes = rxResource({ stream: () => this.service.versaoDeTrabalho() });
-  readonly verCod = computed(() => this.versaoRes.value()?.verCod ?? null);
-
   readonly indicadores = rxResource({
-    params: () => ({ verCod: this.verCod(), v: this.service.versao() }),
-    stream: ({ params }) =>
-      params.verCod == null ? of<Indicador[]>([]) : this.service.listarIndicadores(params.verCod),
+    params: () => ({ v: this.service.versao() }),
+    stream: () => this.service.listarIndicadores(),
   });
 
   periodicidadeLabel(p: EPeriodicidade): string {
@@ -52,15 +47,11 @@ export class IndicadoresTabComponent {
   }
 
   adicionar(): void {
-    const verCod = this.verCod();
-    if (verCod == null) return;
-    this.dialog.open(IndicadorFormDialog, { width: '560px', data: { verCod } });
+    this.dialog.open(IndicadorFormDialog, { width: '560px' });
   }
 
   editar(i: Indicador): void {
-    const verCod = this.verCod();
-    if (verCod == null) return;
-    this.dialog.open(IndicadorFormDialog, { width: '560px', data: { verCod, indicador: i } });
+    this.dialog.open(IndicadorFormDialog, { width: '560px', data: { indicador: i } });
   }
 
   alternar(i: Indicador): void {

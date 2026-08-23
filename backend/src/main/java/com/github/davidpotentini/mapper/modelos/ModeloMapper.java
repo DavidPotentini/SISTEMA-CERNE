@@ -15,19 +15,17 @@ import org.mapstruct.MappingTarget;
 import java.util.List;
 
 /**
- * Conversão de modelos. Na escrita, {@code status}/{@code publicadoEm} e o {@code verCod} (resolvido
- * pela VIGENTE) ficam por conta do service; {@code versaoMetodologia} é derivado (rótulo da versão).
- * A estrutura (processo/prática) é herdada da metodologia — o service carrega práticas/atividades e
+ * Conversão de modelos. Na escrita, {@code status}/{@code publicadoEm} ficam por conta do service. A
+ * estrutura (processo/prática) é herdada da metodologia — o service carrega práticas/atividades e
  * passa prontas ao montar os DTOs de árvore.
  */
 @Mapper(componentModel = "spring")
 public interface ModeloMapper {
 
-    ModeloDTO toDTO(ModeloModel modelo, String versaoMetodologia);
+    ModeloDTO toDTO(ModeloModel modelo);
 
-    /** Criação: verCod/status/publicadoEm são setados no service; periodicidade nasce ANUAL. */
+    /** Criação: status/publicadoEm são setados no service; periodicidade nasce ANUAL. */
     @Mapping(target = "modCod", ignore = true)
-    @Mapping(target = "verCod", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "publicadoEm", ignore = true)
     @Mapping(target = "periodicidade", source = "periodicidade", defaultValue = "ANUAL")
@@ -35,7 +33,6 @@ public interface ModeloMapper {
 
     /** Edição do cabeçalho (só no RASCUNHO): nome/periodicidade/descrição; preserva o resto. */
     @Mapping(target = "modCod", ignore = true)
-    @Mapping(target = "verCod", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "publicadoEm", ignore = true)
     @Mapping(target = "periodicidade", source = "periodicidade", defaultValue = "ANUAL")

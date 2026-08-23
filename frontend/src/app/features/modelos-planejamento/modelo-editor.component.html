@@ -30,7 +30,6 @@
     </div>
 
     <dl class="meta">
-      <div><dt>Metodologia</dt><dd>{{ m.versaoMetodologia || '—' }}</dd></div>
       <div><dt>Periodicidade</dt><dd>{{ periodicidadeLabel[m.periodicidade] }}</dd></div>
       <div>
         <dt>Publicado em</dt>
@@ -53,8 +52,14 @@
   @if (estruturaRes.isLoading()) {
     <p class="estado">Carregando estrutura…</p>
   } @else {
+    <app-filtros-bar
+      [(filtros)]="filtros"
+      [processos]="processoOpcoes()"
+      [praticas]="praticaOpcoes()"
+    />
+
     <mat-accordion multi>
-      @for (proc of estruturaRes.value() ?? []; track proc.prcCod) {
+      @for (proc of estruturaFiltrada(); track proc.prcCod) {
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title>
@@ -92,8 +97,8 @@
                           <span class="tag-inativo">Inativa</span>
                         }
                       </span>
-                      @if (atv.descricao) {
-                        <span class="atividade-desc">{{ atv.descricao }}</span>
+                      @if (atv.observacoes) {
+                        <span class="atividade-desc">{{ atv.observacoes }}</span>
                       }
                     </div>
                     @if (editavel()) {
