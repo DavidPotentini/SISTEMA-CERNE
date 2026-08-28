@@ -5,8 +5,8 @@ package com.github.davidpotentini.dto.indicador;
  * A UI agrupa por {@code prcCod}/{@code processoNome} para montar o seletor processo → prática.
  */
 public record PraticaOpcaoDTO(
-        Long prtCod,
+        Long prtcCod,
         String praticaNome,
-        Long prcCod,
+        Long prccCod,
         String processoNome) {
 }

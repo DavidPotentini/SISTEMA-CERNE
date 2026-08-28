@@ -8,6 +8,10 @@
     <p class="erro">Falha ao carregar os ciclos.</p>
   }
 
+  @if (erroEncerrar(); as msg) {
+    <p class="erro">{{ msg }}</p>
+  }
+
   @if (dados.value(); as lista) {
     <table mat-table [dataSource]="lista" class="tabela">
       <ng-container matColumnDef="nome">
@@ -34,6 +38,9 @@
         <td mat-cell *matCellDef="let c" class="acoes">
           @if (!c.emFoco) {
             <button mat-button (click)="porEmFoco(c)">Pôr em foco</button>
+          }
+          @if (c.status === 'ATIVO') {
+            <button mat-button color="warn" (click)="encerrar(c)">Encerrar</button>
           }
         </td>
       </ng-container>

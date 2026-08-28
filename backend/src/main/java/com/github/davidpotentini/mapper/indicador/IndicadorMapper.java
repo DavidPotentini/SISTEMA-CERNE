@@ -16,7 +16,7 @@ public interface IndicadorMapper {
     IndicadorCicloDTO toDTO(IndicadorModel indicador, String processoNome, String praticaNome,
                             String responsavelNome);
 
-    /** Definir complementar: nome/prtCod/unidade/periodicidade/respPesCod; o resto é do service. */
+    /** Definir complementar: nome/prtcCod (prática do ciclo)/unidade/periodicidade/respPesCod. */
     @Mapping(target = "indCod", ignore = true)
     @Mapping(target = "origem", ignore = true)
     @Mapping(target = "cicCod", ignore = true)

@@ -23,8 +23,8 @@
         (ngModelChange)="prtCod.set($event)"
         [disabled]="prcCod() == null"
       >
-        @for (pr of praticas(); track pr.prtCod) {
-          <mat-option [value]="pr.prtCod">{{ pr.praticaNome }}</mat-option>
+        @for (pr of praticas(); track pr.prtcCod) {
+          <mat-option [value]="pr.prtcCod">{{ pr.praticaNome }}</mat-option>
         }
       </mat-select>
     </mat-form-field>

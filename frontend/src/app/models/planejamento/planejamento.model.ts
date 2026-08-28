@@ -55,7 +55,7 @@ export interface AtividadePlanejada {
   atpCod: number;
   plnCod: number;
   origem: EOrigemAtividade;
-  prtCod: number;
+  prtcCod: number;
   nome: string;
   observacoes: string | null;
   respPesCod: number | null;
@@ -67,7 +67,7 @@ export interface AtividadePlanejada {
 
 /** Prática dentro da estrutura do planejamento — só leitura (da metodologia) + atividades. */
 export interface PlanPratica {
-  prtCod: number;
+  prtcCod: number;
   nome: string;
   descricao: string | null;
   atividades: AtividadePlanejada[];
@@ -75,7 +75,7 @@ export interface PlanPratica {
 
 /** Processo dentro da estrutura do planejamento — só leitura, ordenado por `ordem`. */
 export interface PlanProcesso {
-  prcCod: number;
+  prccCod: number;
   ordem: number;
   nome: string;
   descricao: string | null;

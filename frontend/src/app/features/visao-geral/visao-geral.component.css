@@ -1,0 +1,209 @@
+.topo {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.topo h1 {
+  margin: 0;
+}
+.ciclo {
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.95rem;
+}
+.estado {
+  padding: 16px 4px;
+  color: rgba(0, 0, 0, 0.5);
+}
+.estado.erro {
+  color: #b02020;
+}
+.vazio-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px;
+  color: rgba(0, 0, 0, 0.55);
+  text-align: center;
+}
+.vazio-card mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: rgba(0, 0, 0, 0.3);
+}
+
+/* Grade de KPIs */
+.grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.cartao {
+  display: flex;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  background: #fff;
+  padding: 18px;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.cartao:hover {
+  border-color: rgba(63, 81, 181, 0.4);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Anel de progresso */
+.anel-cartao {
+  align-items: center;
+  gap: 16px;
+}
+.anel {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+}
+.anel .trilho {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.08);
+  stroke-width: 12;
+}
+.anel .preenchido {
+  fill: none;
+  stroke: #3f51b5;
+  stroke-width: 12;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 60px 60px;
+  transition: stroke-dashoffset 0.4s ease;
+}
+.anel-num {
+  fill: rgba(0, 0, 0, 0.85);
+  font-size: 26px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.anel-legenda {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.anel-legenda .rotulo {
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.85rem;
+}
+.anel-legenda .valor {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cards de contagem */
+.kpi {
+  flex-direction: column;
+  gap: 6px;
+}
+.kpi-icone {
+  color: #3f51b5;
+}
+.kpi-valor {
+  font-size: 1.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.kpi-valor .de {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.45);
+}
+.kpi-rotulo {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.88rem;
+}
+
+/* Fluxo de processos */
+.fluxo-cartao {
+  padding: 18px;
+}
+.fluxo-cartao h2 {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+}
+.fluxo {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.no {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 130px;
+  flex: 1 1 130px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.02);
+}
+.no-nome {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.no-contagem {
+  font-size: 0.82rem;
+  color: rgba(0, 0, 0, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+.no.concluido {
+  border-color: rgba(46, 125, 50, 0.5);
+  background: rgba(46, 125, 50, 0.1);
+}
+.no.andamento {
+  border-color: rgba(230, 160, 30, 0.55);
+  background: rgba(230, 160, 30, 0.12);
+}
+.no.nao-iniciado {
+  border-color: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.03);
+}
+.conector {
+  align-self: center;
+  color: rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+  font-size: 0.82rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+.legenda-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ponto {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.ponto.concluido {
+  background: rgba(46, 125, 50, 0.6);
+}
+.ponto.andamento {
+  background: rgba(230, 160, 30, 0.7);
+}
+.ponto.nao-iniciado {
+  background: rgba(0, 0, 0, 0.2);
+}

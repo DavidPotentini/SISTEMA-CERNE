@@ -6,16 +6,9 @@
         <mat-icon>add</mat-icon>
         Definir complementar
       </button>
-      <button mat-flat-button color="primary" (click)="gerar()" [disabled]="gerando()">
-        <mat-icon>autorenew</mat-icon>
-        Gerar indicadores do ciclo
-      </button>
     </div>
   </div>
 
-  @if (gerando()) {
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-  }
   @if (erroAcao()) {
     <p class="estado erro">{{ erroAcao() }}</p>
   }
@@ -26,8 +19,8 @@
     <p class="estado erro">Não foi possível carregar os indicadores.</p>
   } @else if (todos().length === 0) {
     <p class="estado">
-      Nenhum indicador no ciclo. Use "Gerar indicadores do ciclo" para trazê-los da metodologia
-      vigente ou "Definir complementar".
+      Nenhum indicador no ciclo. Use "Publicar metodologia para o ciclo de planejamento" na Metodologia para trazê-los, ou
+      "Definir complementar".
     </p>
   } @else {
     <app-filtros-bar

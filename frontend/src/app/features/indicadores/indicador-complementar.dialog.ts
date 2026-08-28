@@ -57,14 +57,14 @@ export class IndicadorComplementarDialog {
   readonly processos = computed<Opcao[]>(() => {
     const mapa = new Map<number, Opcao>();
     for (const o of this.opcoes()) {
-      if (!mapa.has(o.prcCod)) mapa.set(o.prcCod, { cod: o.prcCod, nome: o.processoNome });
+      if (!mapa.has(o.prccCod)) mapa.set(o.prccCod, { cod: o.prccCod, nome: o.processoNome });
     }
     return [...mapa.values()];
   });
 
   /** Práticas do processo selecionado. */
   readonly praticas = computed<PraticaOpcao[]>(() =>
-    this.opcoes().filter(o => o.prcCod === this.prcCod()),
+    this.opcoes().filter(o => o.prccCod === this.prcCod()),
   );
 
   readonly nome = signal('');
@@ -92,7 +92,7 @@ export class IndicadorComplementarDialog {
     this.erro.set(null);
     const dto: Partial<IndicadorCiclo> = {
       nome: this.nome().trim(),
-      prtCod: this.prtCod(),
+      prtcCod: this.prtCod(),
       unidade: this.unidade().trim() || null,
       periodicidade: this.periodicidade(),
       respPesCod: this.respPesCod(),

@@ -7,6 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { ApuracaoService } from '../../core/services/apuracao/apuracao.service';
+import { CicloReadonlyBannerComponent } from '../ciclos/ciclo-readonly-banner.component';
 import {
   ApuracaoIndicador,
   ESituacaoApuracao,
@@ -42,6 +43,7 @@ import { RegistrarResultadosDialog } from './registrar-resultados.dialog';
     MatIconModule,
     MatDialogModule,
     FiltrosBarComponent,
+    CicloReadonlyBannerComponent,
   ],
   templateUrl: './apuracao.component.html',
   styleUrl: './apuracao.component.css',
@@ -130,6 +132,9 @@ export class ApuracaoComponent {
   }
 
   registrar(indicador: ApuracaoIndicador): void {
-    this.dialog.open(RegistrarResultadosDialog, { width: '720px', data: { indicador } });
+    this.dialog.open(RegistrarResultadosDialog, { 
+      width: '90vw',
+      maxWidth: '1200px',
+      data: { indicador } });
   }
 }

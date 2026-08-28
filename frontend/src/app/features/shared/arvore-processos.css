@@ -1,0 +1,154 @@
+/* ============================================================================
+   Esqueleto compartilhado da árvore Processos → Práticas → Atividades.
+   Usado por Metodologia (aba Processos e Práticas), Planejamento e Acompanhamento
+   de execução — telas separadas, mas com o MESMO layout/estrutura.
+
+   Incluído via `styleUrls` de cada componente; o Angular reescopa as regras por
+   componente (não vaza). Para manter a semelhança, os três templates usam as
+   MESMAS classes definidas aqui; o que é específico de cada tela (cabeçalho do
+   plano, chips de status, drag-and-drop) fica no CSS próprio do componente.
+   ============================================================================ */
+
+/* Painel do processo (accordion externo). */
+mat-expansion-panel {
+  background-color: #fafafa;
+  margin-bottom: 12px;
+}
+
+/* Número/ordem do processo no cabeçalho. */
+.ordem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  padding: 0 6px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.proc-desc {
+  margin: 0 0 12px;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+/* Práticas: accordion aninhado, cada prática recolhível individualmente. */
+.praticas {
+  display: block;
+  margin-top: 8px;
+}
+.pratica {
+  border-left: 3px solid rgba(63, 81, 181, 0.4);
+  margin-bottom: 8px;
+  background: rgba(0, 0, 0, 0.015);
+}
+.pratica-nome {
+  font-weight: 500;
+}
+/* Inativos continuam visíveis, mas atenuados. */
+.pratica.inativa {
+  border-left-color: rgba(0, 0, 0, 0.2);
+}
+.pratica.inativa .pratica-nome {
+  opacity: 0.55;
+}
+.pratica-desc {
+  margin: 0 0 12px;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+/* Atividades sob a prática, uma separada da outra por linha. */
+.atividades {
+  display: flex;
+  flex-direction: column;
+}
+.atividade {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+.atividade:last-child {
+  border-bottom: none;
+}
+.atividade-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.atividade-nome {
+  font-size: 0.92rem;
+}
+.atividade-desc {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.84rem;
+  margin-top: 2px;
+}
+.atividade-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 4px;
+}
+.atividade-resp {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.8rem;
+}
+.atividade-resp mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.n-atividade-resp {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #a16207;
+  font-size: 0.8rem;
+}
+.n-atividade-resp mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+.atividade-prazo {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 0.8rem;
+}
+.n-atividade-prazo {
+  color: #a16207;
+  font-size: 0.8rem;
+}
+.atividade-acoes {
+  display: flex;
+  flex-shrink: 0;
+}
+.atividade.inativa .atividade-info {
+  opacity: 0.55;
+}
+
+.vazio {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 0.9rem;
+}
+.tag-inativo {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.72rem;
+  font-weight: 600;
+  vertical-align: middle;
+}

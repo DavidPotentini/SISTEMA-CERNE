@@ -1,12 +1,13 @@
+<app-ciclo-readonly-banner />
+
 <div class="topo">
   <h1>Acompanhamento de execução</h1>
 </div>
 
-@if (atualRes.isLoading()) {
-  <p class="estado">Carregando…</p>
-} @else if (atualRes.error()) {
+@if (atualRes.error()) {
   <p class="estado erro">Não foi possível carregar o acompanhamento.</p>
 } @else if (atualRes.value(); as atual) {
+  <!-- Renderiza enquanto houver valor (mesmo durante reload): preserva o estado dos painéis. -->
   @if (!atual.cicloAtivo) {
     <mat-card class="vazio-card">
       <mat-icon>event_busy</mat-icon>
@@ -53,11 +54,11 @@
       statusLabel="Status"
     />
 
-    @if (estruturaRes.isLoading()) {
-      <p class="estado">Carregando estrutura…</p>
-    } @else {
+    @if (estruturaRes.error()) {
+      <p class="estado erro">Não foi possível carregar a estrutura.</p>
+    } @else if (estruturaRes.hasValue()) {
       <mat-accordion multi>
-        @for (proc of estruturaFiltrada(); track proc.prcCod) {
+        @for (proc of estruturaFiltrada(); track proc.prccCod) {
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title>
@@ -73,51 +74,61 @@
               <p class="proc-desc">{{ proc.descricao }}</p>
             }
 
-            @for (pr of proc.praticas; track pr.prtCod) {
-              <div class="pratica">
-                <div class="pratica-topo">
-                  <span class="pratica-nome">{{ pr.nome }}</span>
-                </div>
+            <mat-accordion class="praticas" multi>
+              @for (pr of proc.praticas; track pr.prtcCod) {
+                <mat-expansion-panel class="pratica">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      <span class="pratica-nome">{{ pr.nome }}</span>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                      {{ pr.atividades.length }}
+                      {{ pr.atividades.length === 1 ? 'atividade' : 'atividades' }}
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
 
-                <div class="atividades">
-                  @for (atv of pr.atividades; track atv.atpCod) {
-                    <div class="atividade">
-                      <div class="atividade-info">
-                        <span class="atividade-nome">
-                          {{ atv.nome }}
-                          <span class="status-atv" [attr.data-status]="atv.status">
-                            {{ statusLabel[atv.status] }}
-                          </span>
-                        </span>
-                        <span class="atividade-meta">
-                          @if (atv.responsavelNome) {
-                            <span class="atividade-resp">
-                              <mat-icon>person</mat-icon>{{ atv.responsavelNome }}
+                  <div class="atividades">
+                    @for (atv of pr.atividades; track atv.atpCod) {
+                      <div class="atividade">
+                        <div class="atividade-info">
+                          <span class="atividade-nome">
+                            {{ atv.nome }}
+                            <span class="status-atv" [attr.data-status]="atv.status">
+                              {{ statusLabel[atv.status] }}
                             </span>
-                          }
-                          @if (atv.prazo) {
-                            <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
-                          }
-                        </span>
+                          </span>
+                          <span class="atividade-meta">
+                            @if (atv.responsavelNome) {
+                              <span class="atividade-resp">
+                                <mat-icon>person</mat-icon>{{ atv.responsavelNome }}
+                              </span>
+                            }
+                            @if (atv.prazo) {
+                              <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
+                            }
+                          </span>
+                        </div>
+                        <button mat-stroked-button color="primary" (click)="registrar(atv)">
+                          <mat-icon>edit_note</mat-icon>
+                          Registrar
+                        </button>
                       </div>
-                      <button mat-stroked-button color="primary" (click)="registrar(atv)">
-                        <mat-icon>edit_note</mat-icon>
-                        Registrar
-                      </button>
-                    </div>
-                  } @empty {
-                    <p class="vazio">Nenhuma atividade nesta prática.</p>
-                  }
-                </div>
-              </div>
-            } @empty {
-              <p class="vazio">Nenhuma prática ativa neste processo.</p>
-            }
+                    } @empty {
+                      <p class="vazio">Nenhuma atividade nesta prática.</p>
+                    }
+                  </div>
+                </mat-expansion-panel>
+              } @empty {
+                <p class="vazio">Nenhuma prática ativa neste processo.</p>
+              }
+            </mat-accordion>
           </mat-expansion-panel>
         } @empty {
           <p class="estado">A metodologia base não tem processos ativos.</p>
         }
       </mat-accordion>
+    } @else {
+      <p class="estado">Carregando estrutura…</p>
     }
   } @else {
     <mat-card class="vazio-card">
@@ -125,4 +136,6 @@
       <p>Ainda não há planejamento para o ciclo <strong>{{ atual.cicloNome }}</strong>.</p>
     </mat-card>
   }
+} @else {
+  <p class="estado">Carregando…</p>
 }

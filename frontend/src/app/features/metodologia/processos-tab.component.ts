@@ -7,7 +7,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MetodologiaService } from '../../core/services/metodologia/metodologia.service';
-import { Pratica, Processo } from '../../models/metodologia/metodologia.model';
+import { AtividadeMetodologia, Pratica, Processo } from '../../models/metodologia/metodologia.model';
 import {
   FILTROS_VAZIO,
   FiltrosState,
@@ -17,11 +17,13 @@ import {
 } from '../../shared/ui/filtros-bar/filtros-bar.component';
 import { ProcessoFormDialog } from './processo-form.dialog';
 import { PraticaFormDialog } from './pratica-form.dialog';
+import { AtividadeFormDialog } from './atividade-form.dialog';
 
 /**
  * Aba "Processos e Práticas": accordions cuja ordem é definida arrastando (a ordem não aparece). Ao
- * expandir, veem-se as práticas e o botão de adicionar prática àquele processo. No topo, adicionar
- * novo processo. Edita a metodologia direto (sem versionamento).
+ * expandir, veem-se as práticas — cada uma com suas atividades-padrão agrupadas embaixo — e os botões
+ * de adicionar prática e atividade. No topo, adicionar novo processo. Edita a metodologia direto (sem
+ * versionamento).
  */
 @Component({
   selector: 'app-processos-tab',
@@ -35,7 +37,7 @@ import { PraticaFormDialog } from './pratica-form.dialog';
     FiltrosBarComponent,
   ],
   templateUrl: './processos-tab.component.html',
-  styleUrl: './processos-tab.component.css',
+  styleUrls: ['./processos-tab.component.css', '../shared/arvore-processos.css'],
 })
 export class ProcessosTabComponent {
   private readonly service = inject(MetodologiaService);
@@ -46,6 +48,30 @@ export class ProcessosTabComponent {
     params: () => ({ v: this.service.versao() }),
     stream: () => this.service.listarProcessos(),
   });
+
+  /** Atividades-padrão da metodologia; agrupadas por prática no template. */
+  readonly atividades = rxResource({
+    params: () => ({ v: this.service.versao() }),
+    stream: () => this.service.listarAtividades(),
+  });
+
+  /** Atividades indexadas por `prtCod`, para renderizar sob cada prática. */
+  readonly atividadesPorPratica = computed<Map<number, AtividadeMetodologia[]>>(() => {
+    const mapa = new Map<number, AtividadeMetodologia[]>();
+    for (const a of this.atividades.value() ?? []) {
+      const lista = mapa.get(a.prtCod);
+      if (lista != null) {
+        lista.push(a);
+      } else {
+        mapa.set(a.prtCod, [a]);
+      }
+    }
+    return mapa;
+  });
+
+  atividadesDa(prtCod: number): AtividadeMetodologia[] {
+    return this.atividadesPorPratica().get(prtCod) ?? [];
+  }
 
   // ---- filtros padrão (só processo/prática) ----
   readonly filtros = signal<FiltrosState>({ ...FILTROS_VAZIO });
@@ -136,5 +162,24 @@ export class ProcessosTabComponent {
     this.service
       .alterarSituacaoPratica(p.prcCod, pr.prtCod, situacao)
       .subscribe(() => this.service.recarregar());
+  }
+
+  adicionarAtividade(pr: Pratica): void {
+    this.dialog.open(AtividadeFormDialog, { width: '560px', data: { prtCod: pr.prtCod } });
+  }
+
+  editarAtividade(a: AtividadeMetodologia): void {
+    this.dialog.open(AtividadeFormDialog, { width: '560px', data: { atividade: a } });
+  }
+
+  alternarAtividade(a: AtividadeMetodologia): void {
+    const situacao = a.situacao === 'ATIVO' ? 'INATIVO' : 'ATIVO';
+    this.service.alterarSituacaoAtividade(a.ameCod, situacao).subscribe(() => this.service.recarregar());
+  }
+
+  excluirAtividade(a: AtividadeMetodologia): void {
+    const ok = window.confirm(`Excluir a atividade "${a.nome}"? Esta ação não pode ser desfeita.`);
+    if (!ok) return;
+    this.service.excluirAtividade(a.ameCod).subscribe(() => this.service.recarregar());
   }
 }

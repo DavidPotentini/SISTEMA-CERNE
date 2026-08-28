@@ -40,6 +40,9 @@ export class MetasCicloTabComponent {
   }
 
   abrirMeta(indicador: IndicadorCiclo): void {
-    this.dialog.open(MetaIndicadorDialog, { width: '680px', data: { indicador } });
+    this.dialog.open(MetaIndicadorDialog, { 
+      width: '90vw',
+      maxWidth: '1200px', 
+      data: { indicador } });
   }
 }

@@ -1,15 +1,27 @@
-<mat-card class="rodada-cartao">
+<section class="rodada" [class.aberta]="expandida()">
   <div class="rodada-cabecalho">
-    <div class="rodada-titulo">
-      <h2>{{ rodada().nome }}</h2>
-      <div class="rodada-meta">
-        <span>{{ tipoLabel(rodada().tipo) }}</span>
-        @if (rodada().responsavelNome) {
-          <span>· {{ rodada().responsavelNome }}</span>
-        }
-        <span class="chip" [class.concluida]="concluida">{{ situacaoLabel(rodada().situacao) }}</span>
+    <button
+      type="button"
+      class="rodada-toggle"
+      (click)="alternarSecao()"
+      [attr.aria-expanded]="expandida()"
+    >
+      <mat-icon class="chevron">{{ expandida() ? 'expand_more' : 'chevron_right' }}</mat-icon>
+      <div class="rodada-titulo">
+        <span class="rodada-nome">{{ rodada().nome }}</span>
+        <span class="rodada-meta">
+          <span>{{ tipoLabel(rodada().tipo) }}</span>
+          @if (rodada().responsavelNome) {
+            <span>· {{ rodada().responsavelNome }}</span>
+          }
+          <span class="chip" [class.concluida]="concluida">{{ situacaoLabel(rodada().situacao) }}</span>
+          @if (!aplicacoesRes.isLoading()) {
+            <span class="contagem">{{ linhas().length }} empreend.</span>
+          }
+        </span>
       </div>
-    </div>
+    </button>
+
     <button
       mat-stroked-button
       color="primary"
@@ -21,61 +33,68 @@
     </button>
   </div>
 
-  @if (aplicacoesRes.isLoading()) {
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-  } @else if (aplicacoesRes.error()) {
-    <p class="estado erro">Não foi possível carregar as aplicações.</p>
-  } @else if ((aplicacoesRes.value() ?? []).length === 0) {
-    <p class="estado">Nenhum empreendimento nesta rodada.</p>
-  } @else {
-    <div class="cards">
-      @for (a of aplicacoesRes.value() ?? []; track a.empCod) {
-        <div class="card" [class.revisado]="a.avaCod != null">
-          <div class="card-topo">
-            <span class="emp-nome">{{ a.empNome || '—' }}</span>
-            @if (a.status != null) {
-              <span class="status" [class.concluido]="a.status === 'CONCLUIDO'">
-                {{ statusLabel(a.status) }}
-              </span>
-            } @else {
-              <span class="status nao-revisado">Não revisado</span>
-            }
-          </div>
-
-          <div class="eixos">
-            @for (eixo of eixos; track eixo) {
-              <div class="eixo">
-                <span class="eixo-nome">{{ eixoLabel(eixo) }}</span>
-                @if (notaDoEixo(a, eixo) != null) {
-                  <span class="eixo-nota">{{ notaDoEixo(a, eixo) }}<span class="max">/5</span></span>
-                } @else {
-                  <span class="eixo-nota vazio">—</span>
+  @if (expandida()) {
+    @if (aplicacoesRes.isLoading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    } @else if (aplicacoesRes.error()) {
+      <p class="estado erro">Não foi possível carregar as aplicações.</p>
+    } @else if (linhas().length === 0) {
+      <p class="estado">Nenhum empreendimento nesta rodada.</p>
+    } @else {
+      <div class="tabela-wrap">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th class="col-nome">Empreendimento</th>
+              @for (eixo of eixos; track eixo) {
+                <th class="col-nota">{{ eixoLabel(eixo) }}</th>
+              }
+              <th class="col-recom">Recomendação</th>
+              <th class="col-status">Status</th>
+              <th class="col-acao" aria-label="Ações"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of linhas(); track a.empCod) {
+              <tr [class.nao-revisada]="a.status == null">
+                <td class="col-nome">{{ a.empNome || '—' }}</td>
+                @for (eixo of eixos; track eixo) {
+                  <td class="col-nota">
+                    @if (notaDoEixo(a, eixo) != null) {
+                      {{ notaDoEixo(a, eixo) }}
+                    } @else {
+                      <span class="vazio">—</span>
+                    }
+                  </td>
                 }
-              </div>
+                <td class="col-recom">
+                  {{ a.recomendacao != null ? recomendacaoLabel(a.recomendacao) : '—' }}
+                </td>
+                <td class="col-status">
+                  @if (a.status != null) {
+                    <span class="status" [class.concluido]="a.status === 'CONCLUIDO'">
+                      {{ statusLabel(a.status) }}
+                    </span>
+                  } @else {
+                    <span class="status nao-revisado">Não revisado</span>
+                  }
+                </td>
+                <td class="col-acao">
+                  <button
+                    mat-icon-button
+                    color="primary"
+                    matTooltip="Revisar"
+                    (click)="revisar(a)"
+                    [disabled]="concluida"
+                  >
+                    <mat-icon>rate_review</mat-icon>
+                  </button>
+                </td>
+              </tr>
             }
-          </div>
-
-          <dl class="detalhe">
-            <div>
-              <dt>Recomendação</dt>
-              <dd>{{ a.recomendacao != null ? recomendacaoLabel(a.recomendacao) : '—' }}</dd>
-            </div>
-            @if (a.observacao) {
-              <div class="obs">
-                <dt>Observação</dt>
-                <dd>{{ a.observacao }}</dd>
-              </div>
-            }
-          </dl>
-
-          <div class="card-acoes">
-            <button mat-stroked-button color="primary" (click)="revisar(a)" [disabled]="concluida">
-              <mat-icon>rate_review</mat-icon>
-              Revisar
-            </button>
-          </div>
-        </div>
-      }
-    </div>
+          </tbody>
+        </table>
+      </div>
+    }
   }
-</mat-card>
+</section>

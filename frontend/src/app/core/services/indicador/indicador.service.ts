@@ -4,8 +4,8 @@ import { environment } from '../../../../environments/environment';
 import { IndicadorCiclo, Meta, PraticaOpcao } from '../../../models/indicador/indicador.model';
 
 /**
- * Indicadores do ciclo ativo (tenant vem do JWT). "Gerar" copia os indicadores da metodologia
- * vigente (substitui os gerados, mantém complementares); "Definir complementar" inclui um manual.
+ * Indicadores do ciclo ativo (tenant vem do JWT). Os indicadores da metodologia entram pelo "Gerar do
+ * ciclo" (Metodologia); aqui "Definir complementar" inclui um manual e define-se o responsável/metas.
  */
 @Injectable({ providedIn: 'root' })
 export class IndicadorService {
@@ -26,11 +26,6 @@ export class IndicadorService {
   /** Práticas da metodologia vigente para o seletor de vínculo (cascata processo → prática). */
   vinculos() {
     return this.http.get<PraticaOpcao[]>(`${this.base}/vinculos`);
-  }
-
-  /** Gera (ou regenera) os indicadores do ciclo a partir da metodologia vigente. */
-  gerar() {
-    return this.http.post<IndicadorCiclo[]>(`${this.base}/gerar`, null);
   }
 
   /** Define um indicador complementar no ciclo ativo. */

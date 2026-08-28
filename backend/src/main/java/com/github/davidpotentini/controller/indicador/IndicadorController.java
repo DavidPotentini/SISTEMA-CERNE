@@ -1,5 +1,6 @@
 package com.github.davidpotentini.controller.indicador;
 
+import com.github.davidpotentini.comum.ciclo.EscopoCiclo;
 import com.github.davidpotentini.dto.indicador.IndicadorCicloDTO;
 import com.github.davidpotentini.dto.indicador.PraticaOpcaoDTO;
 import com.github.davidpotentini.service.indicador.IndicadorService;
@@ -18,11 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * Indicadores do ciclo ativo (tenant vem do JWT). Listagem da aba "Indicadores do ciclo"; "Gerar"
- * copia os indicadores da metodologia vigente; "Definir complementar" inclui um indicador manual.
- * {@code /vinculos} alimenta o seletor processo → prática do cadastro complementar.
+ * Indicadores do ciclo ativo (tenant vem do JWT). Listagem da aba "Indicadores do ciclo"; a geração a
+ * partir da metodologia é feita no "Gerar do ciclo" (Metodologia). "Definir complementar" inclui um
+ * indicador manual. {@code /vinculos} alimenta o seletor processo → prática do cadastro complementar.
  */
 @RestController
+@EscopoCiclo
 @RequestMapping("/incubadora/indicadores")
 public class IndicadorController {
 
@@ -42,12 +44,6 @@ public class IndicadorController {
     @GetMapping("/vinculos")
     public List<PraticaOpcaoDTO> vinculos() {
         return service.vinculos();
-    }
-
-    /** Gera (ou regenera) os indicadores do ciclo a partir da metodologia vigente. */
-    @PostMapping("/gerar")
-    public List<IndicadorCicloDTO> gerar() {
-        return service.gerarDoCiclo();
     }
 
     /** Define um indicador complementar no ciclo ativo. */

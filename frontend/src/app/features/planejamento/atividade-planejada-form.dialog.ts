@@ -11,7 +11,7 @@ import { PlanejamentoService } from '../../core/services/planejamento/planejamen
 import { AtividadePlanejada } from '../../models/planejamento/planejamento.model';
 
 interface AtividadePlanejadaFormData {
-  prtCod: number;
+  prtcCod: number;
   /** Nome da prática (contexto no cabeçalho do modal). */
   pratica: string;
   /** Presente no modo ajuste (edição). */
@@ -68,7 +68,7 @@ export class AtividadePlanejadaFormDialog {
     };
     const req = this.data.atividade
       ? this.service.ajustarAtividade(this.data.atividade.atpCod, dto)
-      : this.service.adicionarComplementar(this.data.prtCod, dto);
+      : this.service.adicionarComplementar(this.data.prtcCod, dto);
     req.subscribe({
       next: () => {
         this.service.recarregar();

@@ -1,5 +1,6 @@
 package com.github.davidpotentini.controller.monitoramento;
 
+import com.github.davidpotentini.comum.ciclo.EscopoCiclo;
 import com.github.davidpotentini.dto.monitoramento.AplicacaoDTO;
 import com.github.davidpotentini.dto.monitoramento.EvolucaoRodadaDTO;
 import com.github.davidpotentini.dto.monitoramento.RodadaDTO;
@@ -23,6 +24,7 @@ import java.util.List;
  * "Rodadas" (planejar/listar rodadas) e aba "Aplicações e pontuação" (cards por rodada e revisão).
  */
 @RestController
+@EscopoCiclo
 @RequestMapping("/incubadora/monitoramento")
 public class MonitoramentoController {
 

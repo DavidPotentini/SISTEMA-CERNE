@@ -1,5 +1,6 @@
 package com.github.davidpotentini.controller.evidencia;
 
+import com.github.davidpotentini.comum.ciclo.EscopoCiclo;
 import com.github.davidpotentini.dto.evidencia.AtividadeOpcaoDTO;
 import com.github.davidpotentini.dto.evidencia.AvaliacaoDTO;
 import com.github.davidpotentini.dto.evidencia.EvidenciaDTO;
@@ -23,6 +24,7 @@ import java.util.List;
  * solicitada).
  */
 @RestController
+@EscopoCiclo
 @RequestMapping("/incubadora/evidencias")
 public class EvidenciaController {
 

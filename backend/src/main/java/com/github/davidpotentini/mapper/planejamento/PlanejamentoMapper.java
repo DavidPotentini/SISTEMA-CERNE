@@ -4,8 +4,8 @@ import com.github.davidpotentini.dto.planejamento.AtividadePlanejadaDTO;
 import com.github.davidpotentini.dto.planejamento.PlanPraticaDTO;
 import com.github.davidpotentini.dto.planejamento.PlanProcessoDTO;
 import com.github.davidpotentini.dto.planejamento.PlanejamentoDTO;
-import com.github.davidpotentini.model.metodologia.PraticaModel;
-import com.github.davidpotentini.model.metodologia.ProcessoModel;
+import com.github.davidpotentini.model.estruturaciclo.PraticaCicloModel;
+import com.github.davidpotentini.model.estruturaciclo.ProcessoCicloModel;
 import com.github.davidpotentini.model.planejamento.AtividadePlanejadaModel;
 import com.github.davidpotentini.model.planejamento.PlanejamentoModel;
 import org.mapstruct.Mapper;
@@ -17,8 +17,9 @@ import java.util.List;
 /**
  * Conversão de planejamentos. No cabeçalho, os rótulos ({@code cicloNome}, {@code modeloNome},
  * {@code responsavel}) e o resumo de execução ({@code totalAtividades}/{@code concluidas}/
- * {@code progresso}) são calculados no service e passados prontos. A estrutura (processo/prática) é
- * herdada da metodologia — o service carrega práticas/atividades e as passa ao montar os DTOs de árvore.
+ * {@code progresso}) são calculados no service e passados prontos. A estrutura (processo/prática) vem
+ * da instância do ciclo ({@code PROCESSOS_CICLO}/{@code PRATICAS_CICLO}) — o service carrega os nós e
+ * as atividades e os passa ao montar os DTOs de árvore ({@code prtcCod}/{@code prccCod}).
  */
 @Mapper(componentModel = "spring")
 public interface PlanejamentoMapper {
@@ -30,11 +31,11 @@ public interface PlanejamentoMapper {
 
     AtividadePlanejadaDTO toDTO(AtividadePlanejadaModel atividade, String responsavelNome);
 
-    /** Inclusão (complementar): plnCod/prtCod vêm da rota; origem/status nascem no service. */
+    /** Inclusão (complementar): plnCod/prtcCod vêm da rota; origem/status nascem no service. */
     @Mapping(target = "atpCod", ignore = true)
     @Mapping(target = "plnCod", ignore = true)
     @Mapping(target = "origem", ignore = true)
-    @Mapping(target = "prtCod", ignore = true)
+    @Mapping(target = "prtcCod", ignore = true)
     @Mapping(target = "status", ignore = true)
     AtividadePlanejadaModel toModel(AtividadePlanejadaDTO dto);
 
@@ -42,14 +43,14 @@ public interface PlanejamentoMapper {
     @Mapping(target = "atpCod", ignore = true)
     @Mapping(target = "plnCod", ignore = true)
     @Mapping(target = "origem", ignore = true)
-    @Mapping(target = "prtCod", ignore = true)
+    @Mapping(target = "prtcCod", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "empCod", ignore = true)
     void atualizar(AtividadePlanejadaDTO dto, @MappingTarget AtividadePlanejadaModel atividade);
 
-    // ---- árvore (herdada da metodologia + atividades) ----
+    // ---- árvore (instância do ciclo + atividades) ----
 
-    PlanPraticaDTO toDTO(PraticaModel pratica, List<AtividadePlanejadaDTO> atividades);
+    PlanPraticaDTO toDTO(PraticaCicloModel pratica, List<AtividadePlanejadaDTO> atividades);
 
-    PlanProcessoDTO toDTO(ProcessoModel processo, List<PlanPraticaDTO> praticas);
+    PlanProcessoDTO toDTO(ProcessoCicloModel processo, List<PlanPraticaDTO> praticas);
 }

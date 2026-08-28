@@ -3,26 +3,25 @@ package com.github.davidpotentini.service.painel;
 import com.github.davidpotentini.dto.indicador.IndicadorCicloDTO;
 import com.github.davidpotentini.dto.painel.PendenciaDTO;
 import com.github.davidpotentini.enums.EStatusAtividade;
-import com.github.davidpotentini.enums.EStatusCiclo;
 import com.github.davidpotentini.enums.EStatusEvidencia;
 import com.github.davidpotentini.enums.EStatusPlanejamento;
 import com.github.davidpotentini.enums.ETipoPendencia;
+import com.github.davidpotentini.comum.ciclo.CicloContexto;
 import com.github.davidpotentini.model.ciclos.CiclosModel;
 import com.github.davidpotentini.model.empreendimentos.EmpreendimentosModel;
+import com.github.davidpotentini.model.estruturaciclo.PraticaCicloModel;
+import com.github.davidpotentini.model.estruturaciclo.ProcessoCicloModel;
 import com.github.davidpotentini.model.evidencia.EvidenciaModel;
 import com.github.davidpotentini.model.indicador.MetaModel;
 import com.github.davidpotentini.model.indicador.ResultadoModel;
-import com.github.davidpotentini.model.metodologia.PraticaModel;
-import com.github.davidpotentini.model.metodologia.ProcessoModel;
 import com.github.davidpotentini.model.planejamento.AtividadePlanejadaModel;
 import com.github.davidpotentini.model.planejamento.PlanejamentoModel;
-import com.github.davidpotentini.repository.ciclos.CiclosRepository;
 import com.github.davidpotentini.repository.empreendimentos.EmpreendimentosRepository;
+import com.github.davidpotentini.repository.estruturaciclo.PraticaCicloRepository;
+import com.github.davidpotentini.repository.estruturaciclo.ProcessoCicloRepository;
 import com.github.davidpotentini.repository.evidencia.EvidenciaRepository;
 import com.github.davidpotentini.repository.indicador.MetaRepository;
 import com.github.davidpotentini.repository.indicador.ResultadoRepository;
-import com.github.davidpotentini.repository.metodologia.PraticaRepository;
-import com.github.davidpotentini.repository.metodologia.ProcessoRepository;
 import com.github.davidpotentini.repository.planejamento.AtividadePlanejadaRepository;
 import com.github.davidpotentini.repository.planejamento.PlanejamentoRepository;
 import com.github.davidpotentini.service.indicador.IndicadorService;
@@ -47,28 +46,29 @@ import java.util.Set;
 @Service
 public class PainelOperacionalService {
 
-    private final CiclosRepository ciclos;
+    private final CicloContexto cicloContexto;
     private final PlanejamentoRepository planejamentos;
     private final AtividadePlanejadaRepository atividades;
-    private final PraticaRepository praticas;
-    private final ProcessoRepository processos;
+    private final PraticaCicloRepository praticasCiclo;
+    private final ProcessoCicloRepository processosCiclo;
     private final EmpreendimentosRepository empreendimentos;
     private final EvidenciaRepository evidencias;
     private final IndicadorService indicadorService;
     private final MetaRepository metas;
     private final ResultadoRepository resultados;
 
-    public PainelOperacionalService(CiclosRepository ciclos, PlanejamentoRepository planejamentos,
-                                    AtividadePlanejadaRepository atividades, PraticaRepository praticas,
-                                    ProcessoRepository processos,
+    public PainelOperacionalService(CicloContexto cicloContexto, PlanejamentoRepository planejamentos,
+                                    AtividadePlanejadaRepository atividades,
+                                    PraticaCicloRepository praticasCiclo,
+                                    ProcessoCicloRepository processosCiclo,
                                     EmpreendimentosRepository empreendimentos,
                                     EvidenciaRepository evidencias, IndicadorService indicadorService,
                                     MetaRepository metas, ResultadoRepository resultados) {
-        this.ciclos = ciclos;
+        this.cicloContexto = cicloContexto;
         this.planejamentos = planejamentos;
         this.atividades = atividades;
-        this.praticas = praticas;
-        this.processos = processos;
+        this.praticasCiclo = praticasCiclo;
+        this.processosCiclo = processosCiclo;
         this.empreendimentos = empreendimentos;
         this.evidencias = evidencias;
         this.indicadorService = indicadorService;
@@ -80,7 +80,7 @@ public class PainelOperacionalService {
     @Transactional(readOnly = true)
     public List<PendenciaDTO> pendencias() {
         List<PendenciaDTO> pendencias = new ArrayList<>();
-        CiclosModel ciclo = cicloAtivo();
+        CiclosModel ciclo = cicloContexto.emFoco();
         if (ciclo == null) {
             return pendencias;
         }
@@ -93,28 +93,72 @@ public class PainelOperacionalService {
                 .orElse(List.of());
         Map<Long, Long> prtPorAtp = new HashMap<>();
         for (AtividadePlanejadaModel atv : ativs) {
-            prtPorAtp.put(atv.getAtpCod(), atv.getPrtCod());
+            prtPorAtp.put(atv.getAtpCod(), atv.getPrtcCod());
         }
 
-        // Rótulos processo/prática por prtCod (em lote).
-        Set<Long> prtCods = new HashSet<>(prtPorAtp.values());
+        // Rótulos processo/prática por prtcCod (instância do ciclo, em lote).
+        Set<Long> prtcCods = new HashSet<>(prtPorAtp.values());
         Map<Long, String> praticaNomePorPrt = new HashMap<>();
         Map<Long, Long> prcPorPrt = new HashMap<>();
-        Set<Long> prcCods = new HashSet<>();
-        for (PraticaModel pr : praticas.findAllById(prtCods)) {
-            praticaNomePorPrt.put(pr.getPrtCod(), pr.getNome());
-            prcPorPrt.put(pr.getPrtCod(), pr.getPrcCod());
-            prcCods.add(pr.getPrcCod());
+        Set<Long> prccCods = new HashSet<>();
+        for (PraticaCicloModel pr : praticasCiclo.findAllById(prtcCods)) {
+            praticaNomePorPrt.put(pr.getPrtcCod(), pr.getNome());
+            prcPorPrt.put(pr.getPrtcCod(), pr.getPrccCod());
+            prccCods.add(pr.getPrccCod());
         }
         Map<Long, String> processoNomePorPrc = new HashMap<>();
-        for (ProcessoModel proc : processos.findAllById(prcCods)) {
-            processoNomePorPrc.put(proc.getPrcCod(), proc.getNome());
+        for (ProcessoCicloModel proc : processosCiclo.findAllById(prccCods)) {
+            processoNomePorPrc.put(proc.getPrccCod(), proc.getNome());
         }
 
         pendenciasDeAtividades(ativs, praticaNomePorPrt, prcPorPrt, processoNomePorPrc, pendencias);
         pendenciasDeEvidencias(prtPorAtp, praticaNomePorPrt, prcPorPrt, processoNomePorPrc, pendencias);
         pendenciasDeMetas(pendencias);
         return pendencias;
+    }
+
+    /**
+     * Nº de impedimentos ao encerramento do ciclo em foco: atividades não concluídas e evidências em
+     * correção (mesma regra do painel) mais as metas ainda sem resultado — aqui TODAS, não só as
+     * vencidas: encerrar exige o ciclo integralmente apurado. Zero = liberado para encerrar.
+     */
+    @Transactional(readOnly = true)
+    public long impedimentosDeEncerramento() {
+        long total = 0;
+        for (PendenciaDTO p : pendencias()) {
+            if (p.tipo() != ETipoPendencia.META_VENCIDA) {
+                total++;
+            }
+        }
+        return total + metasSemResultado();
+    }
+
+    /** Quantas metas dos indicadores do ciclo em foco ainda não têm resultado apurado (todas). */
+    private long metasSemResultado() {
+        List<IndicadorCicloDTO> indicadores = indicadorService.listar();
+        if (indicadores.isEmpty()) {
+            return 0;
+        }
+        List<Long> indCods = new ArrayList<>();
+        for (IndicadorCicloDTO ind : indicadores) {
+            indCods.add(ind.indCod());
+        }
+        List<MetaModel> todasMetas = metas.findByIndCodIn(indCods);
+        List<Long> metCods = new ArrayList<>();
+        for (MetaModel m : todasMetas) {
+            metCods.add(m.getMetCod());
+        }
+        Set<Long> apurados = new HashSet<>();
+        for (ResultadoModel r : resultados.findByMetCodIn(metCods)) {
+            apurados.add(r.getMetCod());
+        }
+        long semResultado = 0;
+        for (MetaModel m : todasMetas) {
+            if (!apurados.contains(m.getMetCod())) {
+                semResultado++;
+            }
+        }
+        return semResultado;
     }
 
     // ---- atividades (em aberto / atrasadas) ----
@@ -136,8 +180,8 @@ public class PainelOperacionalService {
             pendencias.add(new PendenciaDTO(
                     atrasada ? ETipoPendencia.ATIVIDADE_ATRASADA : ETipoPendencia.ATIVIDADE_ABERTA,
                     atv.getAtpCod(), atv.getNome(),
-                    processoNome(atv.getPrtCod(), prcPorPrt, processoNomePorPrc),
-                    praticaNomePorPrt.get(atv.getPrtCod()),
+                    processoNome(atv.getPrtcCod(), prcPorPrt, processoNomePorPrc),
+                    praticaNomePorPrt.get(atv.getPrtcCod()),
                     detalhe, atv.getPrazo(), atv.getRespPesCod()));
         }
     }
@@ -228,10 +272,5 @@ public class PainelOperacionalService {
                                 Map<Long, String> processoNomePorPrc) {
         Long prcCod = prcPorPrt.get(prtCod);
         return prcCod == null ? null : processoNomePorPrc.get(prcCod);
-    }
-
-    private CiclosModel cicloAtivo() {
-        List<CiclosModel> ativos = ciclos.findByStatus(EStatusCiclo.ATIVO);
-        return ativos.isEmpty() ? null : ativos.get(0);
     }
 }

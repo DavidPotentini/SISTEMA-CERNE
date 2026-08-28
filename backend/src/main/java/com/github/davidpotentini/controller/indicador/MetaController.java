@@ -1,5 +1,6 @@
 package com.github.davidpotentini.controller.indicador;
 
+import com.github.davidpotentini.comum.ciclo.EscopoCiclo;
 import com.github.davidpotentini.dto.indicador.MetaDTO;
 import com.github.davidpotentini.service.indicador.MetaService;
 import jakarta.validation.Valid;
@@ -21,6 +22,7 @@ import java.util.List;
  * a janela de apuração; o cadastro é manual.
  */
 @RestController
+@EscopoCiclo
 @RequestMapping("/incubadora/indicadores/{indCod}/metas")
 public class MetaController {
 

@@ -6,7 +6,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { EmpreendimentoService } from '../../core/services/empreendimento/empreendimento.service';
@@ -33,8 +32,8 @@ import { IndicadorComplementarDialog } from './indicador-complementar.dialog';
 
 /**
  * Aba "Indicadores do ciclo": lista os indicadores do ciclo ativo (nome, origem, vínculo CERNE,
- * unidade, periodicidade, situação). "Gerar indicadores do ciclo" copia da metodologia vigente;
- * "Definir complementar" inclui um indicador manual.
+ * unidade, periodicidade, situação). Os indicadores da metodologia entram pelo "Gerar do ciclo"
+ * (Metodologia); aqui só "Definir complementar" inclui um indicador manual.
  */
 @Component({
   selector: 'app-indicadores-ciclo-tab',
@@ -45,7 +44,6 @@ import { IndicadorComplementarDialog } from './indicador-complementar.dialog';
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
-    MatProgressBarModule,
     MatSelectModule,
     MatDialogModule,
     FiltrosBarComponent,
@@ -60,7 +58,6 @@ export class IndicadoresCicloTabComponent {
 
   readonly colunas = ['nome', 'origem', 'vinculo', 'unidade', 'periodicidade', 'responsavel', 'situacao'];
 
-  readonly gerando = signal(false);
   readonly erroAcao = signal<string | null>(null);
 
   readonly indicadoresRes = rxResource({
@@ -120,21 +117,6 @@ export class IndicadoresCicloTabComponent {
 
   periodicidadeLabel(p: EPeriodicidade): string {
     return PERIODICIDADE_LABEL[p];
-  }
-
-  gerar(): void {
-    this.gerando.set(true);
-    this.erroAcao.set(null);
-    this.service.gerar().subscribe({
-      next: () => {
-        this.gerando.set(false);
-        this.service.recarregar();
-      },
-      error: e => {
-        this.gerando.set(false);
-        this.erroAcao.set(e?.error?.mensagem ?? 'Não foi possível gerar os indicadores do ciclo.');
-      },
-    });
   }
 
   /** Define o responsável pela apuração (único campo editável dos indicadores da metodologia). */

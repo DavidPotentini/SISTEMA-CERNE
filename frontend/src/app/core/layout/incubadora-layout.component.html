@@ -5,10 +5,10 @@
 
       <mat-nav-list class="menu">
         <div class="grupo-menu">Visão Geral</div>
-        
-        <a mat-list-item routerLink="/incubadora/painel-operacional" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>checklist</mat-icon>
-          <span matListItemTitle>Painel Operacional</span>
+
+        <a mat-list-item routerLink="/incubadora/visao-geral" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>dashboard</mat-icon>
+          <span matListItemTitle>Dashboard</span>
         </a>
 
         <div class="grupo-menu">Empreendimentos Apoiados</div>
@@ -18,11 +18,20 @@
           <span matListItemTitle>Monitoramento dos empreendimentos</span>
         </a>
 
-        <div class="grupo-menu">Operação</div>
-
+        <div class="grupo-menu">Planejamento</div>
         <a mat-list-item routerLink="/incubadora/planejamento" routerLinkActive="ativo">
           <mat-icon matListItemIcon>event_note</mat-icon>
           <span matListItemTitle>Planejamento institucional</span>
+        </a>
+        <a mat-list-item routerLink="/incubadora/indicadores" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>insights</mat-icon>
+          <span matListItemTitle>Configurar indicadores e metas</span>
+        </a>
+
+        <div class="grupo-menu">Acompanhamento e execução</div>
+        <a mat-list-item routerLink="/incubadora/painel-operacional" routerLinkActive="ativo">
+          <mat-icon matListItemIcon>checklist</mat-icon>
+          <span matListItemTitle>Pendências</span>
         </a>
         <a mat-list-item routerLink="/incubadora/evidencias" routerLinkActive="ativo">
           <mat-icon matListItemIcon>fact_check</mat-icon>
@@ -30,11 +39,7 @@
         </a>
         <a mat-list-item routerLink="/incubadora/acompanhamento" routerLinkActive="ativo">
           <mat-icon matListItemIcon>track_changes</mat-icon>
-          <span matListItemTitle>Acompanhamento de execução</span>
-        </a>
-        <a mat-list-item routerLink="/incubadora/indicadores" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>insights</mat-icon>
-          <span matListItemTitle>Indicadores e metas</span>
+          <span matListItemTitle>Acompanhamento do Planejamento</span>
         </a>
         <a mat-list-item routerLink="/incubadora/apuracao" routerLinkActive="ativo">
           <mat-icon matListItemIcon>assessment</mat-icon>
@@ -47,10 +52,12 @@
           <mat-icon matListItemIcon>account_tree</mat-icon>
           <span matListItemTitle>Metodologia</span>
         </a>
-        <a mat-list-item routerLink="/incubadora/modelos" routerLinkActive="ativo">
+        <!-- LEGADO: Modelos de planejamento substituídos pela metodologia unificada (atividades na
+             Metodologia). Rota e tela mantidas para referência; item de menu desativado. -->
+        <!-- <a mat-list-item routerLink="/incubadora/modelos" routerLinkActive="ativo">
           <mat-icon matListItemIcon>assignment</mat-icon>
           <span matListItemTitle>Modelos de planejamento</span>
-        </a>
+        </a> -->
         <a mat-list-item routerLink="/incubadora/minha-incubadora" routerLinkActive="ativo">
           <mat-icon matListItemIcon>domain</mat-icon>
           <span matListItemTitle>Minha Incubadora</span>

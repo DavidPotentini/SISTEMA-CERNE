@@ -7,7 +7,7 @@ import java.util.List;
  * modelo, ordenado por {@code ordem}), com suas práticas e atividades. Só entram processos ATIVOS.
  */
 public record PlanProcessoDTO(
-        Long prcCod,
+        Long prccCod,
         Integer ordem,
         String nome,
         String descricao,

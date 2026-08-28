@@ -1,9 +1,20 @@
 .topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 12px;
 }
 .topo h1 {
   margin: 0;
   font-size: 1.5rem;
+}
+.feedback {
+  margin: 0 0 12px;
+  color: #2e7d32;
+}
+.feedback.erro {
+  color: #b02020;
 }
 .placeholder {
   padding: 32px 8px;

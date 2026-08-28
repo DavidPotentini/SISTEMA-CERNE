@@ -3,6 +3,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { AplicacoesTabComponent } from './aplicacoes-tab.component';
 import { RadarEvolucaoTabComponent } from './radar-evolucao-tab.component';
 import { RodadasTabComponent } from './rodadas-tab.component';
+import { CicloReadonlyBannerComponent } from '../ciclos/ciclo-readonly-banner.component';
 
 /**
  * Tela "Monitoramento dos empreendimentos": aba "Rodadas" (planeja e lista as rodadas de
@@ -12,7 +13,13 @@ import { RodadasTabComponent } from './rodadas-tab.component';
  */
 @Component({
   selector: 'app-monitoramento',
-  imports: [MatTabsModule, RodadasTabComponent, AplicacoesTabComponent, RadarEvolucaoTabComponent],
+  imports: [
+    MatTabsModule,
+    RodadasTabComponent,
+    AplicacoesTabComponent,
+    RadarEvolucaoTabComponent,
+    CicloReadonlyBannerComponent,
+  ],
   templateUrl: './monitoramento.component.html',
   styleUrl: './monitoramento.component.css',
 })

@@ -1,33 +1,67 @@
-.rodada-cartao {
-  width: 100%;
-  padding: 1rem;
-  box-sizing: border-box;
+.rodada {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
 }
 .rodada-cabecalho {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin: 8px 0 16px;
+  gap: 12px;
+  padding: 8px 12px 8px 4px;
 }
-.rodada-titulo h2 {
-  margin: 0;
-  font-size: 1.2rem;
+.rodada.aberta .rodada-cabecalho {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Cabeçalho clicável que recolhe/expande a rodada. */
+.rodada-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.rodada-toggle:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+.chevron {
+  color: rgba(0, 0, 0, 0.55);
+  flex-shrink: 0;
+}
+.rodada-titulo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.rodada-nome {
+  font-weight: 600;
+  font-size: 1.05rem;
 }
 .rodada-meta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-top: 4px;
+  margin-top: 2px;
   color: rgba(0, 0, 0, 0.6);
-  font-size: 0.88rem;
+  font-size: 0.85rem;
+}
+.contagem {
+  color: rgba(0, 0, 0, 0.5);
 }
 .chip {
   display: inline-block;
   padding: 1px 10px;
   border-radius: 999px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 500;
   background: rgba(63, 81, 181, 0.1);
   color: #3f51b5;
@@ -36,43 +70,67 @@
   background: rgba(46, 125, 50, 0.12);
   color: #2e7d32;
 }
+
 .estado {
-  padding: 16px 4px;
+  padding: 16px;
   color: rgba(0, 0, 0, 0.5);
 }
 .estado.erro {
   color: #b02020;
 }
 
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 14px;
+/* A tabela rola horizontalmente em telas estreitas, sem estourar a página. */
+.tabela-wrap {
+  overflow-x: auto;
 }
-.card {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  background: rgba(0, 0, 0, 0.012);
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
 }
-.card.revisado {
-  border-color: rgba(63, 81, 181, 0.35);
+.tabela th,
+.tabela td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+}
+.tabela thead th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(0, 0, 0, 0.55);
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.02);
+}
+.tabela tbody tr:hover {
   background: rgba(63, 81, 181, 0.03);
 }
-.card-topo {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+.tabela tbody tr:last-child td {
+  border-bottom: none;
 }
-.emp-nome {
-  font-weight: 600;
-  font-size: 1rem;
+.col-nome {
+  font-weight: 500;
+  white-space: normal;
+  min-width: 180px;
 }
+.col-nota {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.col-acao {
+  text-align: right;
+  width: 1%;
+}
+.vazio {
+  color: rgba(0, 0, 0, 0.3);
+}
+tr.nao-revisada .col-nome {
+  color: rgba(0, 0, 0, 0.6);
+}
+
 .status {
+  display: inline-block;
   font-size: 0.76rem;
   font-weight: 500;
   padding: 1px 9px;
@@ -88,68 +146,4 @@
 .status.nao-revisado {
   background: rgba(0, 0, 0, 0.06);
   color: rgba(0, 0, 0, 0.5);
-}
-
-.eixos {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 6px;
-}
-.eixo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 6px 2px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.03);
-  min-width: 0;
-}
-.eixo-nome {
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  color: rgba(0, 0, 0, 0.55);
-  text-align: center;
-  overflow-wrap: anywhere;
-}
-.eixo-nota {
-  font-size: 1.05rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-.eixo-nota .max {
-  font-size: 0.7rem;
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.45);
-}
-.eixo-nota.vazio {
-  color: rgba(0, 0, 0, 0.3);
-  font-weight: 400;
-}
-
-.detalhe {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.detalhe dt {
-  font-size: 0.66rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: rgba(0, 0, 0, 0.5);
-}
-.detalhe dd {
-  margin: 1px 0 0;
-  font-size: 0.9rem;
-}
-.detalhe .obs dd {
-  color: rgba(0, 0, 0, 0.7);
-  white-space: pre-wrap;
-}
-.card-acoes {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: auto;
 }

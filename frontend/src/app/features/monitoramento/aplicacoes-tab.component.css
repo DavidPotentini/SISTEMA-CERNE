@@ -1,7 +1,19 @@
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 8px 0 4px;
+}
+.filtro-nome {
+  flex: 1 1 260px;
+}
+.filtro-status {
+  flex: 0 0 200px;
+}
 .rodadas {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 .estado {
   padding: 20px 4px;

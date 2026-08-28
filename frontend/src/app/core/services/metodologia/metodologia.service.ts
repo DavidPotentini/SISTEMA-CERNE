@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
+import { Ciclo } from '../../../models/ciclo/ciclo.model';
 import {
+  AtividadeMetodologia,
   EAtivoInativo,
   Indicador,
   Pratica,
@@ -16,6 +18,7 @@ import {
 export class MetodologiaService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/incubadora/metodologia`;
+  private readonly materializacaoBase = `${environment.apiUrl}/incubadora/materializacao-metodologia`;
 
   /** Incrementa a cada mutação; a listagem de processos observa para recarregar. */
   readonly versao = signal(0);
@@ -81,5 +84,41 @@ export class MetodologiaService {
     return this.http.patch<Indicador>(`${this.base}/indicadores/${inmCod}/situacao`, null, {
       params: { situacao },
     });
+  }
+
+  // ---- atividades ----
+
+  listarAtividades() {
+    return this.http.get<AtividadeMetodologia[]>(`${this.base}/atividades`);
+  }
+
+  criarAtividade(dto: Partial<AtividadeMetodologia>) {
+    return this.http.post<AtividadeMetodologia>(`${this.base}/atividades`, dto);
+  }
+
+  editarAtividade(ameCod: number, dto: Partial<AtividadeMetodologia>) {
+    return this.http.put<AtividadeMetodologia>(`${this.base}/atividades/${ameCod}`, dto);
+  }
+
+  alterarSituacaoAtividade(ameCod: number, situacao: EAtivoInativo) {
+    return this.http.patch<AtividadeMetodologia>(`${this.base}/atividades/${ameCod}/situacao`, null, {
+      params: { situacao },
+    });
+  }
+
+  excluirAtividade(ameCod: number) {
+    return this.http.delete<void>(`${this.base}/atividades/${ameCod}`);
+  }
+
+  // ---- materializar no ciclo ("Gerar do ciclo") ----
+
+  /** Ciclo em foco que receberá a materialização (ou `null` se não houver). */
+  alvoMaterializacao() {
+    return this.http.get<Ciclo | null>(`${this.materializacaoBase}/alvo`);
+  }
+
+  /** Materializa a metodologia no ciclo em foco (estrutura + indicadores + atividades). */
+  materializarMetodologia() {
+    return this.http.post<Ciclo>(this.materializacaoBase, null);
   }
 }

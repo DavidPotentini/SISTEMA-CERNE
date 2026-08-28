@@ -1,10 +1,10 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MonitoramentoService } from '../../core/services/monitoramento/monitoramento.service';
 import {
   Aplicacao,
@@ -24,18 +24,19 @@ import {
 import { RevisarAplicacaoDialog } from './revisar-aplicacao.dialog';
 
 /**
- * Uma rodada na aba "Aplicações e pontuação": cabeçalho com tipo/situação e o botão "Concluir
- * rodada"; abaixo, um card por empreendimento com a nota de cada eixo CERNE, a recomendação do
- * monitor e o status do monitoramento. "Revisar" abre o modal de atribuição.
+ * Uma rodada na aba "Aplicações e pontuação": seção recolhível com cabeçalho (tipo/situação,
+ * contagem e "Concluir rodada") e uma tabela densa — 1 linha por empreendimento, colunas dos 5 eixos
+ * CERNE + recomendação + status. Aplica o filtro (nome/status) vindo da aba; expande sozinha quando o
+ * filtro está ativo e há resultados.
  */
 @Component({
   selector: 'app-rodada-aplicacoes',
   imports: [
-    MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
     MatDialogModule,
+    MatTooltipModule,
   ],
   templateUrl: './rodada-aplicacoes.component.html',
   styleUrl: './rodada-aplicacoes.component.css',
@@ -45,14 +46,52 @@ export class RodadaAplicacoesComponent {
   private readonly dialog = inject(MatDialog);
 
   readonly rodada = input.required<Rodada>();
+  /** Filtro por nome do empreendimento (vindo da aba). */
+  readonly filtroNome = input('');
+  /** Filtro por status: TODOS | CONCLUIDO | EM_ANDAMENTO | NAO_REVISADO. */
+  readonly filtroStatus = input('TODOS');
 
   readonly eixos = EIXOS;
   readonly concluindo = signal(false);
+
+  /** Seção aberta manualmente (o filtro pode forçar a abertura). */
+  private readonly abertaManual = signal(false);
 
   readonly aplicacoesRes = rxResource({
     params: () => ({ v: this.service.versao(), rod: this.rodada().rodCod }),
     stream: () => this.service.aplicacoes(this.rodada().rodCod),
   });
+
+  private readonly filtroAtivo = computed<boolean>(
+    () => this.filtroNome().trim() !== '' || this.filtroStatus() !== 'TODOS',
+  );
+
+  /** Linhas após o filtro (nome/status). */
+  readonly linhas = computed<Aplicacao[]>(() => {
+    const nome = this.filtroNome().trim().toLowerCase();
+    const status = this.filtroStatus();
+    const base = this.aplicacoesRes.value() ?? [];
+
+    const filtradas: Aplicacao[] = [];
+    for (const a of base) {
+      if (nome !== '' && !(a.empNome ?? '').toLowerCase().includes(nome)) {
+        continue;
+      }
+      if (status !== 'TODOS' && this.chaveStatus(a) !== status) {
+        continue;
+      }
+      filtradas.push(a);
+    }
+    return filtradas;
+  });
+
+  readonly expandida = computed<boolean>(
+    () => this.abertaManual() || (this.filtroAtivo() && this.linhas().length > 0),
+  );
+
+  alternarSecao(): void {
+    this.abertaManual.update(v => !v);
+  }
 
   tipoLabel(t: ETipoRodada): string {
     return TIPO_RODADA_LABEL[t];
@@ -74,6 +113,11 @@ export class RodadaAplicacoesComponent {
   notaDoEixo(aplicacao: Aplicacao, eixo: EEixoCerne): number | null {
     const p = aplicacao.pontuacoes.find(x => x.dimensao === eixo);
     return p != null ? p.pontuacao : null;
+  }
+
+  /** Chave de status para o filtro (não revisado quando não há status). */
+  chaveStatus(a: Aplicacao): string {
+    return a.status ?? 'NAO_REVISADO';
   }
 
   get concluida(): boolean {

@@ -1,6 +1,32 @@
 <div class="topo">
   <h1>Metodologia</h1>
+  @if (alvoRes.value(); as alvo) {
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="materializar()"
+      [disabled]="materializando()"
+    >
+      <mat-icon>autorenew</mat-icon>
+      Publicar metodologia para o ciclo de planejamento: {{ alvo.nome }}
+    </button>
+  } @else {
+    <button mat-flat-button color="primary" disabled matTooltip="Abra um ciclo para puvlicar">
+      <mat-icon>autorenew</mat-icon>
+      Publicar metodologia para o ciclo de planejamento
+    </button>
+  }
 </div>
+
+@if (materializando()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+@if (feedback()) {
+  <p class="feedback">{{ feedback() }}</p>
+}
+@if (erro()) {
+  <p class="feedback erro">{{ erro() }}</p>
+}
 
 <mat-tab-group>
   <!-- <mat-tab label="Níveis adotados">

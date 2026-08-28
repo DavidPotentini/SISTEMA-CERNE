@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
 import { EvidenciaService } from '../../core/services/evidencia/evidencia.service';
+import { CicloReadonlyBannerComponent } from '../ciclos/ciclo-readonly-banner.component';
 import {
   EStatusEvidencia,
   Evidencia,
@@ -39,6 +40,7 @@ import { EvidenciaFormDialog } from './evidencia-form.dialog';
     MatProgressBarModule,
     MatDialogModule,
     FiltrosBarComponent,
+    CicloReadonlyBannerComponent,
   ],
   templateUrl: './evidencias.component.html',
   styleUrl: './evidencias.component.css',

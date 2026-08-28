@@ -6,10 +6,10 @@ import com.github.davidpotentini.dto.monitoramento.AplicacaoDTO;
 import com.github.davidpotentini.dto.monitoramento.EvolucaoRodadaDTO;
 import com.github.davidpotentini.dto.monitoramento.PontuacaoDTO;
 import com.github.davidpotentini.dto.monitoramento.RodadaDTO;
-import com.github.davidpotentini.enums.EStatusCiclo;
 import com.github.davidpotentini.enums.EStatusMonitoramento;
 import com.github.davidpotentini.enums.ESituacaoRodada;
 import com.github.davidpotentini.mapper.monitoramento.MonitoramentoMapper;
+import com.github.davidpotentini.comum.ciclo.CicloContexto;
 import com.github.davidpotentini.model.ciclos.CiclosModel;
 import com.github.davidpotentini.model.contas.ContasModel;
 import com.github.davidpotentini.model.empreendimentos.EmpreendimentosModel;
@@ -20,7 +20,6 @@ import com.github.davidpotentini.model.monitoramento.RodadaIncubadaId;
 import com.github.davidpotentini.model.monitoramento.RodadaIncubadaModel;
 import com.github.davidpotentini.model.monitoramento.RodadaModel;
 import com.github.davidpotentini.model.pessoas.PessoasModel;
-import com.github.davidpotentini.repository.ciclos.CiclosRepository;
 import com.github.davidpotentini.repository.contas.ContasRepository;
 import com.github.davidpotentini.repository.empreendimentos.EmpreendimentosRepository;
 import com.github.davidpotentini.repository.monitoramento.AvaliacaoRepository;
@@ -56,14 +55,14 @@ public class MonitoramentoService {
     private final AvaliacaoRepository avaliacoes;
     private final PontuacaoRepository pontuacoes;
     private final EmpreendimentosRepository empreendimentos;
-    private final CiclosRepository ciclos;
+    private final CicloContexto cicloContexto;
     private final PessoasRepository pessoas;
     private final ContasRepository contas;
     private final MonitoramentoMapper mapper;
 
     public MonitoramentoService(RodadaRepository rodadas, RodadaIncubadaRepository incubadas,
                                 AvaliacaoRepository avaliacoes, PontuacaoRepository pontuacoes,
-                                EmpreendimentosRepository empreendimentos, CiclosRepository ciclos,
+                                EmpreendimentosRepository empreendimentos, CicloContexto cicloContexto,
                                 PessoasRepository pessoas, ContasRepository contas,
                                 MonitoramentoMapper mapper) {
         this.rodadas = rodadas;
@@ -71,7 +70,7 @@ public class MonitoramentoService {
         this.avaliacoes = avaliacoes;
         this.pontuacoes = pontuacoes;
         this.empreendimentos = empreendimentos;
-        this.ciclos = ciclos;
+        this.cicloContexto = cicloContexto;
         this.pessoas = pessoas;
         this.contas = contas;
         this.mapper = mapper;
@@ -92,7 +91,8 @@ public class MonitoramentoService {
     @Transactional(rollbackFor = Exception.class)
     public RodadaDTO planejar(RodadaDTO dto) {
         RodadaModel rodada = mapper.toModel(dto);
-        rodada.setCicCod(cicloAtivo());
+        CiclosModel ciclo = cicloContexto.emFoco();
+        rodada.setCicCod(ciclo == null ? null : ciclo.getCicCod());
         rodada.setSituacao(ESituacaoRodada.EM_ANDAMENTO);
         rodadas.save(rodada);
 
@@ -279,12 +279,6 @@ public class MonitoramentoService {
     private RodadaModel exigirRodada(Long rodCod) {
         return rodadas.findById(rodCod)
                 .orElseThrow(() -> new NaoEncontradoException("Rodada", rodCod));
-    }
-
-    /** Ciclo ativo da incubadora, ou {@code null} se não houver. */
-    private Long cicloAtivo() {
-        List<CiclosModel> ativos = ciclos.findByStatus(EStatusCiclo.ATIVO);
-        return ativos.isEmpty() ? null : ativos.get(0).getCicCod();
     }
 
     /** Nome do responsável (equipe → conta), ou {@code null} se não definido/inexistente. */

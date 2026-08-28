@@ -63,7 +63,7 @@ export class EvidenciaFormDialog {
   readonly processos = computed<Opcao[]>(() => {
     const mapa = new Map<number, Opcao>();
     for (const o of this.opcoes()) {
-      if (!mapa.has(o.prcCod)) mapa.set(o.prcCod, { cod: o.prcCod, nome: o.processoNome });
+      if (!mapa.has(o.prccCod)) mapa.set(o.prccCod, { cod: o.prccCod, nome: o.processoNome });
     }
     return [...mapa.values()];
   });
@@ -72,15 +72,15 @@ export class EvidenciaFormDialog {
   readonly praticas = computed<Opcao[]>(() => {
     const mapa = new Map<number, Opcao>();
     for (const o of this.opcoes()) {
-      if (o.prcCod !== this.prcCod()) continue;
-      if (!mapa.has(o.prtCod)) mapa.set(o.prtCod, { cod: o.prtCod, nome: o.praticaNome });
+      if (o.prccCod !== this.prcCod()) continue;
+      if (!mapa.has(o.prtcCod)) mapa.set(o.prtcCod, { cod: o.prtcCod, nome: o.praticaNome });
     }
     return [...mapa.values()];
   });
 
   /** Atividades dentro da prática selecionada. */
   readonly atividades = computed<AtividadeOpcao[]>(() =>
-    this.opcoes().filter(o => o.prtCod === this.prtCod()),
+    this.opcoes().filter(o => o.prtcCod === this.prtCod()),
   );
 
   // campos
@@ -113,8 +113,8 @@ export class EvidenciaFormDialog {
     const atp = this.atpCod();
     const atual = atp == null ? undefined : lista.find(o => o.atpCod === atp);
     if (atual) {
-      this.prcCod.set(atual.prcCod);
-      this.prtCod.set(atual.prtCod);
+      this.prcCod.set(atual.prccCod);
+      this.prtCod.set(atual.prtcCod);
     }
   }
 

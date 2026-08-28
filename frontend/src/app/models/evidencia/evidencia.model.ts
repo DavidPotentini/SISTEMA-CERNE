@@ -8,14 +8,14 @@ export const STATUS_EVIDENCIA_LABEL: Record<EStatusEvidencia, string> = {
 
 /**
  * Opção de atividade para o cadastro de evidência (lista plana do plano vigente). A UI agrupa por
- * `prcCod`/`prtCod` para montar os dropdowns em cascata processo → prática → atividade.
+ * `prccCod`/`prtcCod` para montar os dropdowns em cascata processo → prática → atividade.
  */
 export interface AtividadeOpcao {
   atpCod: number;
   nome: string;
-  prtCod: number;
+  prtcCod: number;
   praticaNome: string | null;
-  prcCod: number;
+  prccCod: number;
   processoNome: string | null;
 }
 

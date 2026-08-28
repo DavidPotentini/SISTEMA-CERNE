@@ -7,7 +7,7 @@ import java.util.List;
  * modelo), acrescida das {@code atividades} planejadas daquela prática. Só entram práticas ATIVAS.
  */
 public record PlanPraticaDTO(
-        Long prtCod,
+        Long prtcCod,
         String nome,
         String descricao,
         List<AtividadePlanejadaDTO> atividades

@@ -5,7 +5,8 @@ import { Ciclo } from '../../../models/ciclo/ciclo.model';
 
 /**
  * Ciclos da própria incubadora (o schema do tenant vem do JWT). Criar encerra o ativo anterior;
- * "pôr em foco" alterna o ciclo refletido nas telas. O encerramento terá tela própria no futuro.
+ * "pôr em foco" alterna o ciclo refletido nas telas. Encerrar fecha o ciclo ativo (irreversível), só
+ * quando não há pendências em aberto.
  */
 @Injectable({ providedIn: 'root' })
 export class CicloService {
@@ -28,5 +29,9 @@ export class CicloService {
 
   porEmFoco(cicCod: number) {
     return this.http.patch<Ciclo>(`${this.base}/${cicCod}/foco`, {});
+  }
+
+  encerrar(cicCod: number) {
+    return this.http.patch<Ciclo>(`${this.base}/${cicCod}/encerramento`, {});
   }
 }

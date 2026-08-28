@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 /**
  * Indicador de um ciclo (entrada + saída).
  *
- * <p><b>Entrada</b> (definir complementar): {@code nome}, {@code prtCod} (vínculo CERNE opcional),
+ * <p><b>Entrada</b> (definir complementar): {@code nome}, {@code prtcCod} (vínculo CERNE opcional),
  * {@code unidade}, {@code periodicidade}, {@code respPesCod} (responsável — único campo editável nos
  * gerados da metodologia). <b>Saída</b>: acrescenta {@code indCod}, {@code origem}, {@code situacao},
  * os rótulos do "Vínculo CERNE" ({@code processoNome}/{@code praticaNome}) e o nome do responsável
@@ -18,7 +18,7 @@ public record IndicadorCicloDTO(
         Long indCod,
         @NotBlank String nome,
         EOrigemIndicador origem,
-        Long prtCod,
+        Long prtcCod,
         String unidade,
         EPeriodicidade periodicidade,
         EAtivoInativo situacao,

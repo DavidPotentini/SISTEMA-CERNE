@@ -27,7 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Modelos de planejamento da incubadora logada (schema do tenant vem do JWT).
+ * LEGADO — substituído pela metodologia unificada: as atividades passaram a viver na Metodologia
+ * ({@code ATIVIDADES_METODOLOGIA}), materializadas no ciclo pelo "Gerar do ciclo". Mantido só para
+ * referência (tela desconectada da navegação).
+ *
+ * <p>Modelos de planejamento da incubadora logada (schema do tenant vem do JWT).
  *
  * <p>Um modelo herda da metodologia da incubadora a estrutura de processos/práticas ATIVOS (não copia
  * — só lê ao vivo). O que o modelo guarda são as atividades de cada prática. Nesta tela

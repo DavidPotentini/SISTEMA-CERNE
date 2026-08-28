@@ -2,14 +2,17 @@ package com.github.davidpotentini.service.metodologia;
 
 import com.github.davidpotentini.comum.erro.NaoEncontradoException;
 import com.github.davidpotentini.comum.erro.RegraNegocioException;
+import com.github.davidpotentini.dto.metodologia.AtividadeMetodologiaDTO;
 import com.github.davidpotentini.dto.metodologia.IndicadorDTO;
 import com.github.davidpotentini.dto.metodologia.PraticaDTO;
 import com.github.davidpotentini.dto.metodologia.ProcessoDTO;
 import com.github.davidpotentini.enums.EAtivoInativo;
 import com.github.davidpotentini.mapper.metodologia.MetodologiaMapper;
+import com.github.davidpotentini.model.metodologia.AtividadeMetodologiaModel;
 import com.github.davidpotentini.model.metodologia.IndicadorMetodologiaModel;
 import com.github.davidpotentini.model.metodologia.PraticaModel;
 import com.github.davidpotentini.model.metodologia.ProcessoModel;
+import com.github.davidpotentini.repository.metodologia.AtividadeMetodologiaRepository;
 import com.github.davidpotentini.repository.metodologia.IndicadorMetodologiaRepository;
 import com.github.davidpotentini.repository.metodologia.PraticaRepository;
 import com.github.davidpotentini.repository.metodologia.ProcessoRepository;
@@ -37,13 +40,16 @@ public class MetodologiaService {
     private final ProcessoRepository processos;
     private final PraticaRepository praticas;
     private final IndicadorMetodologiaRepository indicadores;
+    private final AtividadeMetodologiaRepository atividades;
     private final MetodologiaMapper mapper;
 
     public MetodologiaService(ProcessoRepository processos, PraticaRepository praticas,
-                              IndicadorMetodologiaRepository indicadores, MetodologiaMapper mapper) {
+                              IndicadorMetodologiaRepository indicadores,
+                              AtividadeMetodologiaRepository atividades, MetodologiaMapper mapper) {
         this.processos = processos;
         this.praticas = praticas;
         this.indicadores = indicadores;
+        this.atividades = atividades;
         this.mapper = mapper;
     }
 
@@ -205,6 +211,71 @@ public class MetodologiaService {
         return mapper.toDTO(indicador, vinculo);
     }
 
+    // ---- atividades ----
+
+    /**
+     * Atividades-padrão da metodologia. A atividade aponta para uma prática (PRT_COD); reúno as
+     * práticas (processos → práticas) e busco as atividades delas numa só query; o mesmo mapa de nomes
+     * preenche o "Vínculo metodológico".
+     */
+    @Transactional(readOnly = true)
+    public List<AtividadeMetodologiaDTO> listarAtividades() {
+        List<Long> prcCods = new ArrayList<>();
+        for (ProcessoModel processo : processos.findAllByOrderByOrdemAscPrcCodAsc()) {
+            prcCods.add(processo.getPrcCod());
+        }
+        if (prcCods.isEmpty()) {
+            return List.of();
+        }
+        Map<Long, String> nomePorPratica = new HashMap<>();
+        for (PraticaModel pratica : praticas.findByPrcCodIn(prcCods)) {
+            nomePorPratica.put(pratica.getPrtCod(), pratica.getNome());
+        }
+        List<AtividadeMetodologiaDTO> lista = new ArrayList<>();
+        for (AtividadeMetodologiaModel atv : atividades.findByPrtCodInOrderByNomeAsc(nomePorPratica.keySet())) {
+            lista.add(mapper.toDTO(atv, nomePorPratica.get(atv.getPrtCod())));
+        }
+        return lista;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public AtividadeMetodologiaDTO criarAtividade(AtividadeMetodologiaDTO dto) {
+        PraticaModel pratica = buscarPraticaPorId(dto.prtCod());
+        AtividadeMetodologiaModel atividade = mapper.toModel(dto);
+        atividade.setSituacao(EAtivoInativo.ATIVO);
+        atividades.save(atividade);
+        return mapper.toDTO(atividade, pratica.getNome());
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public AtividadeMetodologiaDTO editarAtividade(Long ameCod, AtividadeMetodologiaDTO dto) {
+        AtividadeMetodologiaModel atividade = buscarAtividade(ameCod);
+        PraticaModel pratica = buscarPraticaPorId(dto.prtCod());
+        mapper.atualizar(dto, atividade);
+        atividades.save(atividade);
+        return mapper.toDTO(atividade, pratica.getNome());
+    }
+
+    /** Ativa/inativa a atividade. */
+    @Transactional(rollbackFor = Exception.class)
+    public AtividadeMetodologiaDTO alterarSituacaoAtividade(Long ameCod, EAtivoInativo situacao) {
+        AtividadeMetodologiaModel atividade = buscarAtividade(ameCod);
+        atividade.setSituacao(situacao);
+        atividades.save(atividade);
+        String vinculo = buscarPraticaPorId(atividade.getPrtCod()).getNome();
+        return mapper.toDTO(atividade, vinculo);
+    }
+
+    /**
+     * Exclui a atividade-padrão. Diferente de processos/práticas (que só se inativam), a atividade é
+     * um dado da incubadora e pode ser removida — o que já foi materializado num ciclo não é afetado
+     * (a cópia do ciclo é independente).
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void excluirAtividade(Long ameCod) {
+        atividades.delete(buscarAtividade(ameCod));
+    }
+
     // ---- apoio ----
 
     private ProcessoModel buscarProcesso(Long prcCod) {
@@ -230,6 +301,11 @@ public class MetodologiaService {
     private IndicadorMetodologiaModel buscarIndicador(Long inmCod) {
         return indicadores.findById(inmCod)
                 .orElseThrow(() -> new NaoEncontradoException("Indicador", inmCod));
+    }
+
+    private AtividadeMetodologiaModel buscarAtividade(Long ameCod) {
+        return atividades.findById(ameCod)
+                .orElseThrow(() -> new NaoEncontradoException("Atividade", ameCod));
     }
 
     /** Orquestra a busca das práticas do processo; a montagem do DTO fica no mapper. */

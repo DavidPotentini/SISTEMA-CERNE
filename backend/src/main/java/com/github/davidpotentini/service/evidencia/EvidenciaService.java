@@ -5,25 +5,24 @@ import com.github.davidpotentini.comum.erro.RegraNegocioException;
 import com.github.davidpotentini.comum.tenant.SessaoContext;
 import com.github.davidpotentini.dto.evidencia.AtividadeOpcaoDTO;
 import com.github.davidpotentini.dto.evidencia.EvidenciaDTO;
-import com.github.davidpotentini.enums.EStatusCiclo;
 import com.github.davidpotentini.enums.EStatusEvidencia;
 import com.github.davidpotentini.enums.EStatusPlanejamento;
 import com.github.davidpotentini.mapper.evidencia.EvidenciaMapper;
 import com.github.davidpotentini.model.arquivo.ArquivoModel;
+import com.github.davidpotentini.comum.ciclo.CicloContexto;
 import com.github.davidpotentini.model.ciclos.CiclosModel;
 import com.github.davidpotentini.model.contas.ContasModel;
+import com.github.davidpotentini.model.estruturaciclo.PraticaCicloModel;
+import com.github.davidpotentini.model.estruturaciclo.ProcessoCicloModel;
 import com.github.davidpotentini.model.evidencia.EvidenciaModel;
-import com.github.davidpotentini.model.metodologia.PraticaModel;
-import com.github.davidpotentini.model.metodologia.ProcessoModel;
 import com.github.davidpotentini.model.pessoas.PessoasModel;
 import com.github.davidpotentini.model.planejamento.AtividadePlanejadaModel;
 import com.github.davidpotentini.model.planejamento.PlanejamentoModel;
 import com.github.davidpotentini.repository.arquivo.ArquivoRepository;
-import com.github.davidpotentini.repository.ciclos.CiclosRepository;
 import com.github.davidpotentini.repository.contas.ContasRepository;
+import com.github.davidpotentini.repository.estruturaciclo.PraticaCicloRepository;
+import com.github.davidpotentini.repository.estruturaciclo.ProcessoCicloRepository;
 import com.github.davidpotentini.repository.evidencia.EvidenciaRepository;
-import com.github.davidpotentini.repository.metodologia.PraticaRepository;
-import com.github.davidpotentini.repository.metodologia.ProcessoRepository;
 import com.github.davidpotentini.repository.pessoas.PessoasRepository;
 import com.github.davidpotentini.repository.planejamento.AtividadePlanejadaRepository;
 import com.github.davidpotentini.repository.planejamento.PlanejamentoRepository;
@@ -50,26 +49,26 @@ public class EvidenciaService {
     private final EvidenciaRepository evidencias;
     private final AtividadePlanejadaRepository atividades;
     private final ArquivoRepository arquivos;
-    private final CiclosRepository ciclos;
+    private final CicloContexto cicloContexto;
     private final PlanejamentoRepository planejamentos;
-    private final ProcessoRepository processos;
-    private final PraticaRepository praticas;
+    private final ProcessoCicloRepository processosCiclo;
+    private final PraticaCicloRepository praticasCiclo;
     private final PessoasRepository pessoas;
     private final ContasRepository contas;
     private final EvidenciaMapper mapper;
 
     public EvidenciaService(EvidenciaRepository evidencias,
                             AtividadePlanejadaRepository atividades, ArquivoRepository arquivos,
-                            CiclosRepository ciclos, PlanejamentoRepository planejamentos,
-                            ProcessoRepository processos, PraticaRepository praticas,
+                            CicloContexto cicloContexto, PlanejamentoRepository planejamentos,
+                            ProcessoCicloRepository processosCiclo, PraticaCicloRepository praticasCiclo,
                             PessoasRepository pessoas, ContasRepository contas, EvidenciaMapper mapper) {
         this.evidencias = evidencias;
         this.atividades = atividades;
         this.arquivos = arquivos;
-        this.ciclos = ciclos;
+        this.cicloContexto = cicloContexto;
         this.planejamentos = planejamentos;
-        this.processos = processos;
-        this.praticas = praticas;
+        this.processosCiclo = processosCiclo;
+        this.praticasCiclo = praticasCiclo;
         this.pessoas = pessoas;
         this.contas = contas;
         this.mapper = mapper;
@@ -170,37 +169,37 @@ public class EvidenciaService {
      */
     @Transactional(readOnly = true)
     public List<AtividadeOpcaoDTO> atividadesDisponiveis() {
-        PlanejamentoModel plano = vigenteDoCicloAtivo();
+        PlanejamentoModel plano = vigenteDoCicloEmFoco();
         if (plano == null) {
             return List.of();
         }
-        Map<Long, PraticaModel> cachePratica = new HashMap<>();
-        Map<Long, ProcessoModel> cacheProcesso = new HashMap<>();
+        Map<Long, PraticaCicloModel> cachePratica = new HashMap<>();
+        Map<Long, ProcessoCicloModel> cacheProcesso = new HashMap<>();
         List<AtividadeOpcaoDTO> opcoes = new ArrayList<>();
         for (AtividadePlanejadaModel a : atividades.findByPlnCodOrderByAtpCodAsc(plano.getPlnCod())) {
-            PraticaModel pratica = cachePratica.computeIfAbsent(
-                    a.getPrtCod(), id -> praticas.findById(id).orElse(null));
-            Long prcCod = pratica == null ? null : pratica.getPrcCod();
-            ProcessoModel processo = prcCod == null ? null
-                    : cacheProcesso.computeIfAbsent(prcCod, id -> processos.findById(id).orElse(null));
+            PraticaCicloModel pratica = cachePratica.computeIfAbsent(
+                    a.getPrtcCod(), id -> praticasCiclo.findById(id).orElse(null));
+            Long prccCod = pratica == null ? null : pratica.getPrccCod();
+            ProcessoCicloModel processo = prccCod == null ? null
+                    : cacheProcesso.computeIfAbsent(prccCod, id -> processosCiclo.findById(id).orElse(null));
             opcoes.add(new AtividadeOpcaoDTO(
                     a.getAtpCod(), a.getNome(),
-                    a.getPrtCod(), pratica == null ? null : pratica.getNome(),
-                    prcCod, processo == null ? null : processo.getNome()));
+                    a.getPrtcCod(), pratica == null ? null : pratica.getNome(),
+                    prccCod, processo == null ? null : processo.getNome()));
         }
         return opcoes;
     }
 
     // ---- apoio ----
 
-    /** Planejamento vigente ({@code PUBLICADO}) do ciclo ativo, ou {@code null}. */
-    private PlanejamentoModel vigenteDoCicloAtivo() {
-        List<CiclosModel> ativos = ciclos.findByStatus(EStatusCiclo.ATIVO);
-        if (ativos.isEmpty()) {
+    /** Planejamento vigente ({@code PUBLICADO}) do ciclo em foco (fallback ATIVO), ou {@code null}. */
+    private PlanejamentoModel vigenteDoCicloEmFoco() {
+        CiclosModel ciclo = cicloContexto.emFoco();
+        if (ciclo == null) {
             return null;
         }
         return planejamentos
-                .findByCicCodAndStatus(ativos.get(0).getCicCod(), EStatusPlanejamento.PUBLICADO)
+                .findByCicCodAndStatus(ciclo.getCicCod(), EStatusPlanejamento.PUBLICADO)
                 .orElse(null);
     }
 
@@ -219,10 +218,10 @@ public class EvidenciaService {
             AtividadePlanejadaModel atividade = atividades.findById(e.getAtpCod()).orElse(null);
             if (atividade != null) {
                 atividadeNome = atividade.getNome();
-                PraticaModel pratica = praticas.findById(atividade.getPrtCod()).orElse(null);
+                PraticaCicloModel pratica = praticasCiclo.findById(atividade.getPrtcCod()).orElse(null);
                 if (pratica != null) {
                     praticaNome = pratica.getNome();
-                    ProcessoModel processo = processos.findById(pratica.getPrcCod()).orElse(null);
+                    ProcessoCicloModel processo = processosCiclo.findById(pratica.getPrccCod()).orElse(null);
                     if (processo != null) {
                         processoNome = processo.getNome();
                     }

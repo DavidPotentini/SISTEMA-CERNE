@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PlanejamentoService } from '../../core/services/planejamento/planejamento.service';
+import { CicloReadonlyBannerComponent } from '../ciclos/ciclo-readonly-banner.component';
 import {
   AtividadePlanejada,
   Planejamento,
@@ -25,14 +26,12 @@ import {
 } from '../../shared/ui/filtros-bar/filtros-bar.component';
 import { AtividadePlanejadaFormDialog } from './atividade-planejada-form.dialog';
 import { ConsultarPublicacaoDialog } from './consultar-publicacao.dialog';
-import { GerarModeloDialog } from './gerar-modelo.dialog';
 
 /**
- * Tela "Planejamento institucional" do ciclo ativo. No máx. um planejamento vigente por ciclo:
- * "Gerar de modelo" cria (ou substitui) o plano a partir de um modelo publicado; "Consultar
- * publicação" mostra status/período/responsável/progresso. A estrutura de processos/práticas é
- * herdada da metodologia base (só leitura); as atividades podem ser ajustadas e complementares
- * incluídas/removidas enquanto o plano está publicado.
+ * Tela "Planejamento institucional" do ciclo ativo. No máx. um planejamento vigente por ciclo, que é
+ * materializado pelo "Gerar do ciclo" (Metodologia). "Consultar publicação" mostra status/período/
+ * responsável/progresso. A estrutura de processos/práticas é a do ciclo (só leitura); as atividades
+ * podem ser ajustadas e complementares incluídas/removidas enquanto o plano está publicado.
  */
 @Component({
   selector: 'app-planejamento',
@@ -46,9 +45,10 @@ import { GerarModeloDialog } from './gerar-modelo.dialog';
     MatProgressBarModule,
     MatDialogModule,
     FiltrosBarComponent,
+    CicloReadonlyBannerComponent,
   ],
   templateUrl: './planejamento.component.html',
-  styleUrl: './planejamento.component.css',
+  styleUrls: ['./planejamento.component.css', '../shared/arvore-processos.css'],
 })
 export class PlanejamentoComponent {
   private readonly service = inject(PlanejamentoService);
@@ -126,14 +126,6 @@ export class PlanejamentoComponent {
     return out;
   });
 
-  gerar(): void {
-    const atual = this.atualRes.value();
-    this.dialog.open(GerarModeloDialog, {
-      width: '520px',
-      data: { cicloNome: atual?.cicloNome ?? null, substitui: this.plano() != null },
-    });
-  }
-
   consultar(): void {
     const plano = this.plano();
     if (!plano) return;
@@ -143,14 +135,14 @@ export class PlanejamentoComponent {
   adicionarAtividade(pr: PlanPratica): void {
     this.dialog.open(AtividadePlanejadaFormDialog, {
       width: '560px',
-      data: { prtCod: pr.prtCod, pratica: pr.nome },
+      data: { prtcCod: pr.prtcCod, pratica: pr.nome },
     });
   }
 
   ajustarAtividade(pr: PlanPratica, atv: AtividadePlanejada): void {
     this.dialog.open(AtividadePlanejadaFormDialog, {
       width: '560px',
-      data: { prtCod: pr.prtCod, pratica: pr.nome, atividade: atv },
+      data: { prtcCod: pr.prtcCod, pratica: pr.nome, atividade: atv },
     });
   }
 

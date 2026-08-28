@@ -17,7 +17,7 @@ import lombok.Setter;
 /**
  * Indicador de um ciclo (tabela {@code INDICADORES}). Nasce de duas origens: copiado da metodologia
  * vigente ("Gerar indicadores do ciclo") ou definido manualmente ({@code COMPLEMENTAR}). Vincula-se a
- * uma prática ({@code PRT_COD}, o "Vínculo CERNE"; o processo deriva dela) e ao ciclo ({@code CIC_COD}).
+ * uma prática do ciclo ({@code PRTC_COD}, o "Vínculo CERNE"; o processo deriva dela) e ao ciclo ({@code CIC_COD}).
  * Schema do tenant.
  */
 @Entity
@@ -38,8 +38,9 @@ public class IndicadorModel {
     @Column(name = "ORIGEM", nullable = false)
     private EOrigemIndicador origem = EOrigemIndicador.METODOLOGIA_CERNE;
 
-    @Column(name = "PRT_COD")
-    private Long prtCod;
+    /** Prática do ciclo (instância) → {@code PRATICAS_CICLO(PRTC_COD)}; o processo deriva dela. */
+    @Column(name = "PRTC_COD")
+    private Long prtcCod;
 
     @Column(name = "CIC_COD")
     private Long cicCod;

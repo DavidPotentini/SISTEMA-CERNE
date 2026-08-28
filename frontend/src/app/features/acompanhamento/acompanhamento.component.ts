@@ -9,6 +9,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { PlanejamentoService } from '../../core/services/planejamento/planejamento.service';
+import { CicloReadonlyBannerComponent } from '../ciclos/ciclo-readonly-banner.component';
 import {
   AtividadePlanejada,
   EStatusAtividade,
@@ -48,9 +49,10 @@ const STATUS_FILTRAVEIS: EStatusAtividade[] = ['PLANEJADA', 'EM_ANDAMENTO', 'CON
     MatProgressBarModule,
     MatDialogModule,
     FiltrosBarComponent,
+    CicloReadonlyBannerComponent,
   ],
   templateUrl: './acompanhamento.component.html',
-  styleUrl: './acompanhamento.component.css',
+  styleUrls: ['./acompanhamento.component.css', '../shared/arvore-processos.css'],
 })
 export class AcompanhamentoComponent {
   private readonly service = inject(PlanejamentoService);

@@ -1,8 +1,10 @@
 package com.github.davidpotentini.mapper.metodologia;
 
+import com.github.davidpotentini.dto.metodologia.AtividadeMetodologiaDTO;
 import com.github.davidpotentini.dto.metodologia.IndicadorDTO;
 import com.github.davidpotentini.dto.metodologia.PraticaDTO;
 import com.github.davidpotentini.dto.metodologia.ProcessoDTO;
+import com.github.davidpotentini.model.metodologia.AtividadeMetodologiaModel;
 import com.github.davidpotentini.model.metodologia.IndicadorMetodologiaModel;
 import com.github.davidpotentini.model.metodologia.PraticaModel;
 import com.github.davidpotentini.model.metodologia.ProcessoModel;
@@ -64,4 +66,17 @@ public interface MetodologiaMapper {
     @Mapping(target = "situacao", ignore = true)
     @Mapping(target = "periodicidade", source = "periodicidade", defaultValue = "NAO_SE_APLICA")
     void atualizar(IndicadorDTO dto, @MappingTarget IndicadorMetodologiaModel indicador);
+
+    // ---- atividade ----
+
+    AtividadeMetodologiaDTO toDTO(AtividadeMetodologiaModel atividade, String vinculoMetodologico);
+
+    @Mapping(target = "ameCod", ignore = true)
+    @Mapping(target = "situacao", ignore = true)
+    AtividadeMetodologiaModel toModel(AtividadeMetodologiaDTO dto);
+
+    /** Edição de atividade: aplica prática (vínculo)/nome/observações; preserva código e situação. */
+    @Mapping(target = "ameCod", ignore = true)
+    @Mapping(target = "situacao", ignore = true)
+    void atualizar(AtividadeMetodologiaDTO dto, @MappingTarget AtividadeMetodologiaModel atividade);
 }

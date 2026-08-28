@@ -6,22 +6,26 @@ import com.github.davidpotentini.dto.indicador.IndicadorCicloDTO;
 import com.github.davidpotentini.dto.indicador.PraticaOpcaoDTO;
 import com.github.davidpotentini.enums.EAtivoInativo;
 import com.github.davidpotentini.enums.EOrigemIndicador;
-import com.github.davidpotentini.enums.EStatusCiclo;
+import com.github.davidpotentini.comum.ciclo.CicloContexto;
 import com.github.davidpotentini.mapper.indicador.IndicadorMapper;
 import com.github.davidpotentini.model.ciclos.CiclosModel;
 import com.github.davidpotentini.model.contas.ContasModel;
+import com.github.davidpotentini.model.estruturaciclo.PraticaCicloModel;
+import com.github.davidpotentini.model.estruturaciclo.ProcessoCicloModel;
 import com.github.davidpotentini.model.indicador.IndicadorModel;
 import com.github.davidpotentini.model.metodologia.IndicadorMetodologiaModel;
 import com.github.davidpotentini.model.metodologia.PraticaModel;
 import com.github.davidpotentini.model.metodologia.ProcessoModel;
 import com.github.davidpotentini.model.pessoas.PessoasModel;
-import com.github.davidpotentini.repository.ciclos.CiclosRepository;
 import com.github.davidpotentini.repository.contas.ContasRepository;
+import com.github.davidpotentini.repository.estruturaciclo.PraticaCicloRepository;
+import com.github.davidpotentini.repository.estruturaciclo.ProcessoCicloRepository;
 import com.github.davidpotentini.repository.indicador.IndicadorRepository;
 import com.github.davidpotentini.repository.metodologia.IndicadorMetodologiaRepository;
 import com.github.davidpotentini.repository.metodologia.PraticaRepository;
 import com.github.davidpotentini.repository.metodologia.ProcessoRepository;
 import com.github.davidpotentini.repository.pessoas.PessoasRepository;
+import com.github.davidpotentini.service.estruturaciclo.EstruturaCicloService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +49,10 @@ public class IndicadorService {
     private final ProcessoRepository processos;
     private final PraticaRepository praticas;
     private final IndicadorMetodologiaRepository indicadoresMetodologia;
-    private final CiclosRepository ciclos;
+    private final ProcessoCicloRepository processosCiclo;
+    private final PraticaCicloRepository praticasCiclo;
+    private final EstruturaCicloService estruturaCiclo;
+    private final CicloContexto cicloContexto;
     private final PessoasRepository pessoas;
     private final ContasRepository contas;
     private final IndicadorMapper mapper;
@@ -53,13 +60,18 @@ public class IndicadorService {
     public IndicadorService(IndicadorRepository indicadores,
                             ProcessoRepository processos, PraticaRepository praticas,
                             IndicadorMetodologiaRepository indicadoresMetodologia,
-                            CiclosRepository ciclos, PessoasRepository pessoas,
+                            ProcessoCicloRepository processosCiclo, PraticaCicloRepository praticasCiclo,
+                            EstruturaCicloService estruturaCiclo,
+                            CicloContexto cicloContexto, PessoasRepository pessoas,
                             ContasRepository contas, IndicadorMapper mapper) {
         this.indicadores = indicadores;
         this.processos = processos;
         this.praticas = praticas;
         this.indicadoresMetodologia = indicadoresMetodologia;
-        this.ciclos = ciclos;
+        this.processosCiclo = processosCiclo;
+        this.praticasCiclo = praticasCiclo;
+        this.estruturaCiclo = estruturaCiclo;
+        this.cicloContexto = cicloContexto;
         this.pessoas = pessoas;
         this.contas = contas;
         this.mapper = mapper;
@@ -68,7 +80,7 @@ public class IndicadorService {
     /** Indicadores do ciclo ativo (vazio se não houver ciclo). */
     @Transactional(readOnly = true)
     public List<IndicadorCicloDTO> listar() {
-        CiclosModel ciclo = cicloAtivo();
+        CiclosModel ciclo = cicloContexto.emFoco();
         if (ciclo == null) {
             return List.of();
         }
@@ -82,7 +94,7 @@ public class IndicadorService {
      */
     @Transactional(rollbackFor = Exception.class)
     public List<IndicadorCicloDTO> gerarDoCiclo() {
-        CiclosModel ciclo = cicloAtivoObrigatorio();
+        CiclosModel ciclo = cicloEmFocoObrigatorio();
 
         indicadores.deleteByCicCodAndOrigem(ciclo.getCicCod(), EOrigemIndicador.METODOLOGIA_CERNE);
 
@@ -96,7 +108,7 @@ public class IndicadorService {
                 IndicadorModel ind = new IndicadorModel();
                 ind.setNome(base.getNome());
                 ind.setOrigem(EOrigemIndicador.METODOLOGIA_CERNE);
-                ind.setPrtCod(base.getPrtCod());
+                ind.setPrtcCod(estruturaCiclo.garantirPratica(ciclo.getCicCod(), base.getPrtCod()));
                 ind.setCicCod(ciclo.getCicCod());
                 ind.setUnidade(base.getUnidade());
                 ind.setPeriodicidade(base.getPeriodicidade());
@@ -110,9 +122,9 @@ public class IndicadorService {
     /** Inclui um indicador complementar no ciclo ativo. O vínculo (prática) é opcional. */
     @Transactional(rollbackFor = Exception.class)
     public IndicadorCicloDTO definirComplementar(IndicadorCicloDTO dto) {
-        CiclosModel ciclo = cicloAtivoObrigatorio();
-        if (dto.prtCod() != null) {
-            exigirPraticaExiste(dto.prtCod());
+        CiclosModel ciclo = cicloEmFocoObrigatorio();
+        if (dto.prtcCod() != null) {
+            exigirPraticaCicloExiste(ciclo.getCicCod(), dto.prtcCod());
         }
         IndicadorModel ind = mapper.toModel(dto);
         ind.setOrigem(EOrigemIndicador.COMPLEMENTAR);
@@ -135,22 +147,21 @@ public class IndicadorService {
         return comLabels(List.of(ind)).get(0);
     }
 
-    /** Práticas ATIVAS da metodologia (para o seletor de vínculo do complementar). */
+    /** Práticas da estrutura do ciclo ativo (para o seletor de vínculo do complementar). */
     @Transactional(readOnly = true)
     public List<PraticaOpcaoDTO> vinculos() {
+        CiclosModel ciclo = cicloContexto.emFoco();
+        if (ciclo == null) {
+            return List.of();
+        }
         Map<Long, String> nomeProcesso = new HashMap<>();
-        for (ProcessoModel proc : processos.findAllByOrderByOrdemAscPrcCodAsc()) {
-            if (proc.getSituacao() == EAtivoInativo.ATIVO) {
-                nomeProcesso.put(proc.getPrcCod(), proc.getNome());
-            }
+        for (ProcessoCicloModel proc : processosCiclo.findByCicCodOrderByOrdemAscPrccCodAsc(ciclo.getCicCod())) {
+            nomeProcesso.put(proc.getPrccCod(), proc.getNome());
         }
         List<PraticaOpcaoDTO> opcoes = new ArrayList<>();
-        for (PraticaModel pr : praticas.findByPrcCodIn(nomeProcesso.keySet())) {
-            if (pr.getSituacao() != EAtivoInativo.ATIVO) {
-                continue;
-            }
+        for (PraticaCicloModel pr : praticasCiclo.findByCicCodOrderByPrtcCodAsc(ciclo.getCicCod())) {
             opcoes.add(new PraticaOpcaoDTO(
-                    pr.getPrtCod(), pr.getNome(), pr.getPrcCod(), nomeProcesso.get(pr.getPrcCod())));
+                    pr.getPrtcCod(), pr.getNome(), pr.getPrccCod(), nomeProcesso.get(pr.getPrccCod())));
         }
         return opcoes;
     }
@@ -176,30 +187,30 @@ public class IndicadorService {
         return prtCods;
     }
 
-    /** Resolve os rótulos do "Vínculo CERNE" (processo/prática) e o responsável em lote e monta os DTOs. */
+    /** Resolve os rótulos do "Vínculo CERNE" (processo/prática do ciclo) e o responsável em lote. */
     private List<IndicadorCicloDTO> comLabels(List<IndicadorModel> lista) {
-        Set<Long> prtCods = new HashSet<>();
+        Set<Long> prtcCods = new HashSet<>();
         for (IndicadorModel ind : lista) {
-            if (ind.getPrtCod() != null) {
-                prtCods.add(ind.getPrtCod());
+            if (ind.getPrtcCod() != null) {
+                prtcCods.add(ind.getPrtcCod());
             }
         }
-        Map<Long, PraticaModel> praticaPorId = new HashMap<>();
-        Set<Long> prcCods = new HashSet<>();
-        for (PraticaModel pr : praticas.findAllById(prtCods)) {
-            praticaPorId.put(pr.getPrtCod(), pr);
-            prcCods.add(pr.getPrcCod());
+        Map<Long, PraticaCicloModel> praticaPorId = new HashMap<>();
+        Set<Long> prccCods = new HashSet<>();
+        for (PraticaCicloModel pr : praticasCiclo.findAllById(prtcCods)) {
+            praticaPorId.put(pr.getPrtcCod(), pr);
+            prccCods.add(pr.getPrccCod());
         }
         Map<Long, String> nomeProcesso = new HashMap<>();
-        for (ProcessoModel proc : processos.findAllById(prcCods)) {
-            nomeProcesso.put(proc.getPrcCod(), proc.getNome());
+        for (ProcessoCicloModel proc : processosCiclo.findAllById(prccCods)) {
+            nomeProcesso.put(proc.getPrccCod(), proc.getNome());
         }
         Map<Long, String> nomeResponsavel = new HashMap<>();
         List<IndicadorCicloDTO> out = new ArrayList<>();
         for (IndicadorModel ind : lista) {
-            PraticaModel pratica = ind.getPrtCod() == null ? null : praticaPorId.get(ind.getPrtCod());
+            PraticaCicloModel pratica = ind.getPrtcCod() == null ? null : praticaPorId.get(ind.getPrtcCod());
             String praticaNome = pratica == null ? null : pratica.getNome();
-            String processoNome = pratica == null ? null : nomeProcesso.get(pratica.getPrcCod());
+            String processoNome = pratica == null ? null : nomeProcesso.get(pratica.getPrccCod());
             out.add(mapper.toDTO(ind, processoNome, praticaNome,
                     rotuloResponsavel(ind.getRespPesCod(), nomeResponsavel)));
         }
@@ -226,20 +237,16 @@ public class IndicadorService {
         return nome;
     }
 
-    /** Garante que a prática existe na metodologia. */
-    private void exigirPraticaExiste(Long prtCod) {
-        if (!praticas.existsById(prtCod)) {
-            throw new NaoEncontradoException("Prática", prtCod);
+    /** Garante que a prática (instância) existe e pertence ao ciclo informado. */
+    private void exigirPraticaCicloExiste(Long cicCod, Long prtcCod) {
+        PraticaCicloModel pratica = praticasCiclo.findById(prtcCod).orElse(null);
+        if (pratica == null || !pratica.getCicCod().equals(cicCod)) {
+            throw new NaoEncontradoException("Prática", prtcCod);
         }
     }
 
-    private CiclosModel cicloAtivo() {
-        List<CiclosModel> ativos = ciclos.findByStatus(EStatusCiclo.ATIVO);
-        return ativos.isEmpty() ? null : ativos.get(0);
-    }
-
-    private CiclosModel cicloAtivoObrigatorio() {
-        CiclosModel ciclo = cicloAtivo();
+    private CiclosModel cicloEmFocoObrigatorio() {
+        CiclosModel ciclo = cicloContexto.emFoco();
         if (ciclo == null) {
             throw new RegraNegocioException("Não há ciclo ativo. Abra um ciclo antes de definir indicadores.");
         }

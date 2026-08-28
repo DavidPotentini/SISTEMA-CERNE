@@ -1,5 +1,6 @@
 package com.github.davidpotentini.controller.indicador;
 
+import com.github.davidpotentini.comum.ciclo.EscopoCiclo;
 import com.github.davidpotentini.dto.indicador.ApuracaoIndicadorDTO;
 import com.github.davidpotentini.dto.indicador.PainelIndicadorDTO;
 import com.github.davidpotentini.dto.indicador.PeriodoApuracaoDTO;
@@ -20,6 +21,7 @@ import java.util.List;
  * períodos de um indicador com o resultado; registro (upsert) do resultado de um período.
  */
 @RestController
+@EscopoCiclo
 @RequestMapping("/incubadora/apuracao")
 public class ApuracaoController {
 

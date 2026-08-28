@@ -1,0 +1,98 @@
+<div class="topo">
+  <h1>Visão geral</h1>
+  @if (resumoRes.value(); as r) {
+    <span class="ciclo">{{ r.cicloNome || 'Nenhum ciclo em foco' }}</span>
+  }
+</div>
+
+@if (resumoRes.isLoading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+} @else if (resumoRes.error()) {
+  <p class="estado erro">Não foi possível carregar a visão geral.</p>
+} @else if (resumoRes.value(); as r) {
+  @if (r.cicloNome == null) {
+    <mat-card class="vazio-card">
+      <mat-icon>event_busy</mat-icon>
+      <p>Nenhum ciclo em foco. Abra ou coloque um ciclo em foco para ver o andamento.</p>
+    </mat-card>
+  } @else {
+    <section class="grade">
+      <!-- Anel de progresso (atividades concluídas) -->
+      <a class="cartao anel-cartao" routerLink="/incubadora/planejamento">
+        <svg class="anel" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="trilho" cx="60" cy="60" r="52" />
+          <circle
+            class="preenchido"
+            cx="60"
+            cy="60"
+            r="52"
+            [style.stroke-dasharray]="circunferencia"
+            [style.stroke-dashoffset]="offset()"
+          />
+          <text x="60" y="60" class="anel-num">{{ r.progresso }}%</text>
+        </svg>
+        <div class="anel-legenda">
+          <span class="rotulo">Atividades concluídas</span>
+          <span class="valor">{{ r.atividadesConcluidas }} / {{ r.atividadesTotal }}</span>
+        </div>
+      </a>
+
+      <!-- Empreendimentos ativos -->
+      <a class="cartao kpi" routerLink="/incubadora/minha-incubadora">
+        <mat-icon class="kpi-icone">apartment</mat-icon>
+        <span class="kpi-valor">{{ r.empreendimentosAtivos }}</span>
+        <span class="kpi-rotulo">Empreendimentos ativos</span>
+      </a>
+
+      <!-- Evidências -->
+      <a class="cartao kpi" routerLink="/incubadora/evidencias">
+        <mat-icon class="kpi-icone">fact_check</mat-icon>
+        <span class="kpi-valor">
+          {{ r.evidenciasValidadas }} <span class="de">/ {{ r.evidenciasRegistradas }}</span>
+        </span>
+        <span class="kpi-rotulo">Evidências validadas / registradas</span>
+      </a>
+
+      <!-- Indicadores com meta atingida -->
+      <a class="cartao kpi" routerLink="/incubadora/apuracao">
+        <mat-icon class="kpi-icone">insights</mat-icon>
+        <span class="kpi-valor">
+          {{ r.indicadoresAtingidos }} <span class="de">/ {{ r.indicadoresComMeta }}</span>
+        </span>
+        <span class="kpi-rotulo">Indicadores com meta atingida</span>
+      </a>
+    </section>
+
+    <!-- Fluxo de processos -->
+    <mat-card class="fluxo-cartao">
+      <h2>Fluxo de processos</h2>
+      @if (r.fluxo.length === 0) {
+        <p class="estado">
+          Sem processos no ciclo. Consolide a metodologia no ciclo para materializar a estrutura.
+        </p>
+      } @else {
+        <div class="fluxo">
+          @for (p of r.fluxo; track p.prccCod; let last = $last) {
+            <div
+              class="no"
+              [class]="estadoClasse(p.estado)"
+              [matTooltip]="estadoLabel(p.estado)"
+            >
+              <span class="no-nome">{{ p.nome }}</span>
+              <span class="no-contagem">{{ p.atividadesConcluidas }}/{{ p.atividadesTotal }}</span>
+            </div>
+            @if (!last) {
+              <mat-icon class="conector">chevron_right</mat-icon>
+            }
+          }
+        </div>
+
+        <div class="legenda">
+          <span class="legenda-item"><span class="ponto concluido"></span> Concluído</span>
+          <span class="legenda-item"><span class="ponto andamento"></span> Em andamento</span>
+          <span class="legenda-item"><span class="ponto nao-iniciado"></span> Não iniciado</span>
+        </div>
+      }
+    </mat-card>
+  }
+}

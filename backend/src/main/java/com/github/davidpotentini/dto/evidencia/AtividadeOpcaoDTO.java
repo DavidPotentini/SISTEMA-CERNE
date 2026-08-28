@@ -8,8 +8,8 @@ package com.github.davidpotentini.dto.evidencia;
 public record AtividadeOpcaoDTO(
         Long atpCod,
         String nome,
-        Long prtCod,
+        Long prtcCod,
         String praticaNome,
-        Long prcCod,
+        Long prccCod,
         String processoNome) {
 }

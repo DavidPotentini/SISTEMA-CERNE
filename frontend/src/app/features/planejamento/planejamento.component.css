@@ -1,3 +1,10 @@
+/* Esqueleto da árvore (processo/prática/atividade) vem de ../shared/arvore-processos.css.
+   Aqui ficam só as particularidades desta tela: topo, cabeçalho do plano e a tag "Complementar". */
+:host {
+  display: block;
+  padding-bottom: 32px;
+}
+
 .topo {
   display: flex;
   align-items: center;
@@ -93,94 +100,7 @@
   font-size: 0.9rem;
 }
 
-.ordem {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 24px;
-  margin-right: 10px;
-  padding: 0 6px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.08);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-.proc-desc {
-  margin: 0 0 12px;
-  color: rgba(0, 0, 0, 0.7);
-}
-
-.pratica {
-  padding: 8px 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-}
-.pratica:first-of-type {
-  border-top: none;
-}
-.pratica-topo {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.pratica-nome {
-  font-weight: 600;
-}
-.atividades {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 6px 0 0;
-}
-.atividade {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 4px 12px;
-  border-left: 3px solid rgba(63, 81, 181, 0.4);
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 4px;
-}
-.atividade-info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.atividade-acoes {
-  display: flex;
-  flex-shrink: 0;
-}
-.atividade-nome {
-  font-weight: 500;
-}
-.atividade-desc {
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 0.88rem;
-}
-.atividade-prazo {
-  color: rgba(0, 0, 0, 0.5);
-  font-size: 0.8rem;
-}
-.atividade-meta {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.atividade-resp {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 0.8rem;
-}
-.atividade-resp mat-icon {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-}
+/* Tag "Complementar" (atividade incluída fora do modelo). */
 .tag-origem {
   display: inline-block;
   margin-left: 8px;
@@ -191,14 +111,4 @@
   font-size: 0.72rem;
   font-weight: 600;
   vertical-align: middle;
-}
-.vazio {
-  margin: 6px 0 0;
-  color: rgba(0, 0, 0, 0.45);
-  font-size: 0.9rem;
-}
-
-mat-expansion-panel {
-  background-color: #fafafa;
-  margin-bottom: 12px;
 }

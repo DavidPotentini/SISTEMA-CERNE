@@ -1,12 +1,13 @@
+<app-ciclo-readonly-banner />
+
 <div class="topo">
   <h1>Planejamento institucional</h1>
 </div>
 
-@if (atualRes.isLoading()) {
-  <p class="estado">Carregando…</p>
-} @else if (atualRes.error()) {
+@if (atualRes.error()) {
   <p class="estado erro">Não foi possível carregar o planejamento.</p>
 } @else if (atualRes.value(); as atual) {
+  <!-- Renderiza enquanto houver valor (mesmo durante reload): preserva o estado dos painéis. -->
   @if (!atual.cicloAtivo) {
     <mat-card class="vazio-card">
       <mat-icon>event_busy</mat-icon>
@@ -24,16 +25,11 @@
             <mat-icon>fact_check</mat-icon>
             Consultar publicação
           </button>
-          <button mat-flat-button color="primary" (click)="gerar()">
-            <mat-icon>autorenew</mat-icon>
-            Gerar de modelo
-          </button>
         </div>
       </div>
 
       <dl class="meta">
         <div><dt>Ciclo</dt><dd>{{ m.cicloNome || '—' }}</dd></div>
-        <div><dt>Modelo</dt><dd>{{ m.modeloNome || '—' }}</dd></div>
         <div>
           <dt>Período</dt>
           <dd>
@@ -52,9 +48,9 @@
       </div>
     </mat-card>
 
-    @if (estruturaRes.isLoading()) {
-      <p class="estado">Carregando estrutura…</p>
-    } @else {
+    @if (estruturaRes.error()) {
+      <p class="estado erro">Não foi possível carregar a estrutura.</p>
+    } @else if (estruturaRes.hasValue()) {
       <app-filtros-bar
         [(filtros)]="filtros"
         [processos]="processoOpcoes()"
@@ -63,7 +59,7 @@
       />
 
       <mat-accordion multi>
-        @for (proc of estruturaFiltrada(); track proc.prcCod) {
+        @for (proc of estruturaFiltrada(); track proc.prccCod) {
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title>
@@ -79,81 +75,99 @@
               <p class="proc-desc">{{ proc.descricao }}</p>
             }
 
-            @for (pr of proc.praticas; track pr.prtCod) {
-              <div class="pratica">
-                <div class="pratica-topo">
-                  <span class="pratica-nome">{{ pr.nome }}</span>
-                  @if (editavel()) {
-                    <button mat-button color="primary" (click)="adicionarAtividade(pr)">
-                      <mat-icon>add</mat-icon>
-                      Atividade
-                    </button>
-                  }
-                </div>
+            <mat-accordion class="praticas" multi>
+              @for (pr of proc.praticas; track pr.prtcCod) {
+                <mat-expansion-panel class="pratica">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      <span class="pratica-nome">{{ pr.nome }}</span>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                      {{ pr.atividades.length }}
+                      {{ pr.atividades.length === 1 ? 'atividade' : 'atividades' }}
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
 
-                <div class="atividades">
-                  @for (atv of pr.atividades; track atv.atpCod) {
-                    <div class="atividade">
-                      <div class="atividade-info">
-                        <span class="atividade-nome">
-                          {{ atv.nome }}
-                          @if (atv.origem === 'COMPLEMENTAR') {
-                            <span class="tag-origem">Complementar</span>
+                  <div class="atividades">
+                    @for (atv of pr.atividades; track atv.atpCod) {
+                      <div class="atividade">
+                        <div class="atividade-info">
+                          <span class="atividade-nome">
+                            {{ atv.nome }}
+                            @if (atv.origem === 'COMPLEMENTAR') {
+                              <span class="tag-origem">Complementar</span>
+                            }
+                          </span>
+                          @if (atv.observacoes) {
+                            <span class="atividade-desc">{{ atv.observacoes }}</span>
                           }
-                        </span>
-                        @if (atv.observacoes) {
-                          <span class="atividade-desc">{{ atv.observacoes }}</span>
-                        }
-                        <span class="atividade-meta">
-                          @if (atv.responsavelNome) {
-                            <span class="atividade-resp">
-                              <mat-icon>person</mat-icon>{{ atv.responsavelNome }}
-                            </span>
-                          }
-                          @if (atv.prazo) {
-                            <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
-                          }
-                        </span>
-                      </div>
-                      @if (editavel()) {
-                        <div class="atividade-acoes">
-                          <button mat-icon-button matTooltip="Ajustar" (click)="ajustarAtividade(pr, atv)">
-                            <mat-icon>edit</mat-icon>
-                          </button>
-                          @if (atv.origem === 'COMPLEMENTAR') {
-                            <button
-                              mat-icon-button
-                              matTooltip="Remover"
-                              (click)="removerAtividade(atv)"
-                            >
-                              <mat-icon>delete</mat-icon>
-                            </button>
-                          }
+                          <span class="atividade-meta">
+                            @if (atv.responsavelNome) {
+                              <span class="atividade-resp">
+                                <mat-icon>person</mat-icon>{{ atv.responsavelNome }}
+                              </span>
+                            } @else {
+                              <span class="n-atividade-resp">
+                                <mat-icon>person</mat-icon>Responsável não definido
+                              </span>
+                            }
+                            @if (atv.prazo) {
+                              <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
+                            }@else {
+                              <span class="n-atividade-prazo">Prazo não definido</span>
+                            }
+                          </span>
                         </div>
-                      }
-                    </div>
-                  } @empty {
-                    <p class="vazio">Nenhuma atividade nesta prática.</p>
+                        @if (editavel()) {
+                          <div class="atividade-acoes">
+                            <button mat-icon-button matTooltip="Ajustar" (click)="ajustarAtividade(pr, atv)">
+                              <mat-icon>edit</mat-icon>
+                            </button>
+                            @if (atv.origem === 'COMPLEMENTAR') {
+                              <button
+                                mat-icon-button
+                                matTooltip="Remover"
+                                (click)="removerAtividade(atv)"
+                              >
+                                <mat-icon>delete</mat-icon>
+                              </button>
+                            }
+                          </div>
+                        }
+                      </div>
+                    } @empty {
+                      <p class="vazio">Nenhuma atividade nesta prática.</p>
+                    }
+                  </div>
+
+                  @if (editavel()) {
+                    <mat-action-row>
+                      <button mat-button color="primary" (click)="adicionarAtividade(pr)">
+                        <mat-icon>add</mat-icon>
+                        Adicionar atividade
+                      </button>
+                    </mat-action-row>
                   }
-                </div>
-              </div>
-            } @empty {
-              <p class="vazio">Nenhuma prática ativa neste processo.</p>
-            }
+                </mat-expansion-panel>
+              } @empty {
+                <p class="vazio">Nenhuma prática ativa neste processo.</p>
+              }
+            </mat-accordion>
           </mat-expansion-panel>
         } @empty {
           <p class="estado">A metodologia base não tem processos ativos.</p>
         }
       </mat-accordion>
+    } @else {
+      <p class="estado">Carregando estrutura…</p>
     }
   } @else {
     <mat-card class="vazio-card">
       <mat-icon>assignment_add</mat-icon>
       <p>Ainda não há planejamento para o ciclo <strong>{{ atual.cicloNome }}</strong>.</p>
-      <button mat-flat-button color="primary" (click)="gerar()">
-        <mat-icon>autorenew</mat-icon>
-        Gerar de modelo
-      </button>
+      <p class="dica">Use "Publicar metodologia para o ciclo de planejamento" na tela de Metodologia para materializá-lo.</p>
     </mat-card>
   }
+} @else {
+  <p class="estado">Carregando…</p>
 }

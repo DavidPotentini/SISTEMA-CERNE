@@ -17,9 +17,9 @@ import java.time.LocalDate;
 
 /**
  * Atividade de um {@link PlanejamentoModel} ({@code PLN_COD}), pendurada numa prática ({@code PRT_COD},
- * obrigatório). {@code origem} distingue as copiadas do modelo ({@code MODELO}) das incluídas à mão
- * ({@code COMPLEMENTAR}) — ambas podem ser ajustadas. {@code status} é o estado de execução (o
- * progresso do plano é a fração {@code CONCLUIDA}). Schema do tenant.
+ * obrigatório). {@code origem} distingue as materializadas da metodologia ({@code METODOLOGIA}) das
+ * incluídas à mão ({@code COMPLEMENTAR}) — ambas podem ser ajustadas. {@code status} é o estado de
+ * execução (o progresso do plano é a fração {@code CONCLUIDA}). Schema do tenant.
  */
 @Entity
 @Table(name = "ATIVIDADES_PLANEJADAS")
@@ -37,10 +37,11 @@ public class AtividadePlanejadaModel {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ORIGEM", nullable = false)
-    private EOrigemAtividade origem = EOrigemAtividade.MODELO;
+    private EOrigemAtividade origem = EOrigemAtividade.METODOLOGIA;
 
-    @Column(name = "PRT_COD", nullable = false)
-    private Long prtCod;
+    /** Prática do ciclo (instância) → {@code PRATICAS_CICLO(PRTC_COD)}; obrigatório. */
+    @Column(name = "PRTC_COD", nullable = false)
+    private Long prtcCod;
 
     @Column(name = "NOME", nullable = false)
     private String nome;

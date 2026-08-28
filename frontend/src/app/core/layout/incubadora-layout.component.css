@@ -63,8 +63,9 @@
 .rodape button {
   color: #eaf1fb;
 }
+/* Folga extra no rodapé para que o último painel expandido não fique colado na base. */
 .conteudo {
-  padding: 24px;
+  padding: 24px 24px 96px;
 }
 .grupo-menu {
   padding: 1rem 1rem 0.3rem;

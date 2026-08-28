@@ -11,24 +11,23 @@ import com.github.davidpotentini.dto.planejamento.PlanejamentoDTO;
 import com.github.davidpotentini.enums.EAtivoInativo;
 import com.github.davidpotentini.enums.EOrigemAtividade;
 import com.github.davidpotentini.enums.EStatusAtividade;
-import com.github.davidpotentini.enums.EStatusCiclo;
-import com.github.davidpotentini.enums.EStatusModelo;
 import com.github.davidpotentini.enums.EStatusPlanejamento;
 import com.github.davidpotentini.mapper.planejamento.PlanejamentoMapper;
+import com.github.davidpotentini.comum.ciclo.CicloContexto;
 import com.github.davidpotentini.model.ciclos.CiclosModel;
 import com.github.davidpotentini.model.contas.ContasModel;
-import com.github.davidpotentini.model.metodologia.PraticaModel;
-import com.github.davidpotentini.model.metodologia.ProcessoModel;
-import com.github.davidpotentini.model.modelos.AtividadeModeloModel;
+import com.github.davidpotentini.model.estruturaciclo.PraticaCicloModel;
+import com.github.davidpotentini.model.estruturaciclo.ProcessoCicloModel;
+import com.github.davidpotentini.model.metodologia.AtividadeMetodologiaModel;
 import com.github.davidpotentini.model.modelos.ModeloModel;
 import com.github.davidpotentini.model.pessoas.PessoasModel;
 import com.github.davidpotentini.model.planejamento.AtividadePlanejadaModel;
 import com.github.davidpotentini.model.planejamento.PlanejamentoModel;
 import com.github.davidpotentini.repository.ciclos.CiclosRepository;
 import com.github.davidpotentini.repository.contas.ContasRepository;
-import com.github.davidpotentini.repository.metodologia.PraticaRepository;
-import com.github.davidpotentini.repository.metodologia.ProcessoRepository;
-import com.github.davidpotentini.repository.modelos.AtividadeModeloRepository;
+import com.github.davidpotentini.repository.estruturaciclo.PraticaCicloRepository;
+import com.github.davidpotentini.repository.estruturaciclo.ProcessoCicloRepository;
+import com.github.davidpotentini.repository.metodologia.AtividadeMetodologiaRepository;
 import com.github.davidpotentini.repository.modelos.ModeloRepository;
 import com.github.davidpotentini.repository.pessoas.PessoasRepository;
 import com.github.davidpotentini.repository.planejamento.AtividadePlanejadaRepository;
@@ -56,27 +55,30 @@ public class PlanejamentoService {
     private final PlanejamentoRepository planejamentos;
     private final AtividadePlanejadaRepository atividades;
     private final CiclosRepository ciclos;
+    private final CicloContexto cicloContexto;
     private final ModeloRepository modelos;
-    private final AtividadeModeloRepository atividadesModelo;
-    private final ProcessoRepository processos;
-    private final PraticaRepository praticas;
+    private final AtividadeMetodologiaRepository atividadesMetodologia;
+    private final ProcessoCicloRepository processosCiclo;
+    private final PraticaCicloRepository praticasCiclo;
     private final PessoasRepository pessoas;
     private final ContasRepository contas;
     private final PlanejamentoMapper mapper;
 
     public PlanejamentoService(PlanejamentoRepository planejamentos,
                                AtividadePlanejadaRepository atividades, CiclosRepository ciclos,
-                               ModeloRepository modelos, AtividadeModeloRepository atividadesModelo,
-                               ProcessoRepository processos, PraticaRepository praticas,
+                               CicloContexto cicloContexto, ModeloRepository modelos,
+                               AtividadeMetodologiaRepository atividadesMetodologia,
+                               ProcessoCicloRepository processosCiclo, PraticaCicloRepository praticasCiclo,
                                PessoasRepository pessoas, ContasRepository contas,
                                PlanejamentoMapper mapper) {
         this.planejamentos = planejamentos;
         this.atividades = atividades;
         this.ciclos = ciclos;
+        this.cicloContexto = cicloContexto;
         this.modelos = modelos;
-        this.atividadesModelo = atividadesModelo;
-        this.processos = processos;
-        this.praticas = praticas;
+        this.atividadesMetodologia = atividadesMetodologia;
+        this.processosCiclo = processosCiclo;
+        this.praticasCiclo = praticasCiclo;
         this.pessoas = pessoas;
         this.contas = contas;
         this.mapper = mapper;
@@ -90,7 +92,7 @@ public class PlanejamentoService {
      */
     @Transactional(readOnly = true)
     public PlanejamentoAtualDTO atual() {
-        CiclosModel ciclo = cicloAtivo();
+        CiclosModel ciclo = cicloContexto.emFoco();
         if (ciclo == null) {
             return new PlanejamentoAtualDTO(false, null, null, null);
         }
@@ -101,21 +103,20 @@ public class PlanejamentoService {
     }
 
     /**
-     * Gera o planejamento do ciclo ativo a partir de um modelo publicado. Substitui o vigente, se
-     * houver (o anterior vira {@code ENCERRADO}). O responsável do plano é o usuário logado. Copia as
-     * atividades ATIVAS do modelo com os mesmos valores ({@code prtCod}/{@code nome}/{@code observacoes}/
-     * {@code respPesCod}).
+     * Materializa o planejamento do ciclo em foco a partir das atividades-padrão da metodologia (parte
+     * do "Gerar do ciclo"). Substitui o vigente, se houver (o anterior vira {@code ENCERRADO}). O
+     * responsável do plano é o usuário logado. Copia as atividades ATIVAS da metodologia
+     * ({@code nome}/{@code observacoes}); "quem"/"quando" ficam nulos, para o ajuste no planejamento.
+     *
+     * <p>É <b>consumidor</b> da estrutura: casa a prática do template com a do ciclo por proveniência
+     * (find-only), sem criar prática — a estrutura já foi materializada por
+     * {@link com.github.davidpotentini.service.estruturaciclo.EstruturaCicloService#materializarEstrutura}.
      */
     @Transactional(rollbackFor = Exception.class)
-    public PlanejamentoDTO gerarDeModelo(Long modCod) {
-        CiclosModel ciclo = cicloAtivo();
+    public PlanejamentoDTO gerarDoCiclo() {
+        CiclosModel ciclo = cicloContexto.emFoco();
         if (ciclo == null) {
-            throw new RegraNegocioException("Não há ciclo ativo. Abra um ciclo antes de planejar.");
-        }
-        ModeloModel modelo = modelos.findById(modCod)
-                .orElseThrow(() -> new NaoEncontradoException("Modelo", modCod));
-        if (modelo.getStatus() != EStatusModelo.PUBLICADO) {
-            throw new RegraNegocioException("Só é possível gerar a partir de um modelo publicado.");
+            throw new RegraNegocioException("Não há ciclo ativo. Abra um ciclo antes de gerar.");
         }
 
         // Substitui o vigente: o anterior é inativado (ENCERRADO), preservado como histórico.
@@ -127,24 +128,31 @@ public class PlanejamentoService {
         PlanejamentoModel plano = new PlanejamentoModel();
         plano.setNome("Planejamento — " + ciclo.getNome());
         plano.setCicCod(ciclo.getCicCod());
-        plano.setModCod(modelo.getModCod());
         plano.setStatus(EStatusPlanejamento.PUBLICADO);
         plano.setRespPesCod(pessoaAtual());
         plano.setInicio(ciclo.getInicio());
         plano.setFim(ciclo.getFim());
         planejamentos.save(plano);
 
-        for (AtividadeModeloModel base : atividadesModelo.findByModCodOrderByAtmCodAsc(modCod)) {
+        // Índice prática-do-template → prática-do-ciclo (estrutura já materializada); find-only.
+        Map<Long, Long> prtcPorPrt = new HashMap<>();
+        for (PraticaCicloModel pr : praticasCiclo.findByCicCodOrderByPrtcCodAsc(ciclo.getCicCod())) {
+            if (pr.getPrtCodOrigem() != null) {
+                prtcPorPrt.put(pr.getPrtCodOrigem(), pr.getPrtcCod());
+            }
+        }
+
+        for (AtividadeMetodologiaModel base
+                : atividadesMetodologia.findByPrtCodInOrderByNomeAsc(prtcPorPrt.keySet())) {
             if (base.getSituacao() != EAtivoInativo.ATIVO) {
                 continue;
             }
             AtividadePlanejadaModel atv = new AtividadePlanejadaModel();
             atv.setPlnCod(plano.getPlnCod());
-            atv.setOrigem(EOrigemAtividade.MODELO);
-            atv.setPrtCod(base.getPrtCod());
+            atv.setOrigem(EOrigemAtividade.METODOLOGIA);
+            atv.setPrtcCod(prtcPorPrt.get(base.getPrtCod()));
             atv.setNome(base.getNome());
             atv.setObservacoes(base.getObservacoes());
-            atv.setRespPesCod(base.getRespPesCod());
             atv.setStatus(EStatusAtividade.PLANEJADA);
             atividades.save(atv);
         }
@@ -167,21 +175,15 @@ public class PlanejamentoService {
         Map<Long, String> nomeResponsavel = new HashMap<>();
         Map<Long, List<AtividadePlanejadaDTO>> porPratica = new HashMap<>();
         for (AtividadePlanejadaModel a : atividades.findByPlnCodOrderByAtpCodAsc(plano.getPlnCod())) {
-            porPratica.computeIfAbsent(a.getPrtCod(), k -> new ArrayList<>())
+            porPratica.computeIfAbsent(a.getPrtcCod(), k -> new ArrayList<>())
                     .add(mapper.toDTO(a, rotuloResponsavel(a.getRespPesCod(), nomeResponsavel)));
         }
 
         List<PlanProcessoDTO> arvore = new ArrayList<>();
-        for (ProcessoModel proc : processos.findAllByOrderByOrdemAscPrcCodAsc()) {
-            if (proc.getSituacao() != EAtivoInativo.ATIVO) {
-                continue;
-            }
+        for (ProcessoCicloModel proc : processosCiclo.findByCicCodOrderByOrdemAscPrccCodAsc(plano.getCicCod())) {
             List<PlanPraticaDTO> praticasDTO = new ArrayList<>();
-            for (PraticaModel pr : praticas.findByPrcCodOrderByPrtCodAsc(proc.getPrcCod())) {
-                if (pr.getSituacao() != EAtivoInativo.ATIVO) {
-                    continue;
-                }
-                praticasDTO.add(mapper.toDTO(pr, porPratica.getOrDefault(pr.getPrtCod(), List.of())));
+            for (PraticaCicloModel pr : praticasCiclo.findByPrccCodOrderByPrtcCodAsc(proc.getPrccCod())) {
+                praticasDTO.add(mapper.toDTO(pr, porPratica.getOrDefault(pr.getPrtcCod(), List.of())));
             }
             arvore.add(mapper.toDTO(proc, praticasDTO));
         }
@@ -190,14 +192,14 @@ public class PlanejamentoService {
 
     // ---- atividades ----
 
-    /** Inclui uma atividade complementar na prática (do planejamento vigente). */
+    /** Inclui uma atividade complementar na prática do ciclo (do planejamento vigente). */
     @Transactional(rollbackFor = Exception.class)
-    public AtividadePlanejadaDTO adicionarComplementar(Long prtCod, AtividadePlanejadaDTO dto) {
+    public AtividadePlanejadaDTO adicionarComplementar(Long prtcCod, AtividadePlanejadaDTO dto) {
         PlanejamentoModel plano = exigirVigente();
-        exigirPraticaExiste(prtCod);
+        exigirPraticaCiclo(plano.getCicCod(), prtcCod);
         AtividadePlanejadaModel atv = mapper.toModel(dto);
         atv.setPlnCod(plano.getPlnCod());
-        atv.setPrtCod(prtCod);
+        atv.setPrtcCod(prtcCod);
         atv.setOrigem(EOrigemAtividade.COMPLEMENTAR);
         atv.setStatus(EStatusAtividade.PLANEJADA);
         atividades.save(atv);
@@ -227,18 +229,13 @@ public class PlanejamentoService {
 
     // ---- apoio ----
 
-    private CiclosModel cicloAtivo() {
-        List<CiclosModel> ativos = ciclos.findByStatus(EStatusCiclo.ATIVO);
-        return ativos.isEmpty() ? null : ativos.get(0);
-    }
-
     private java.util.Optional<PlanejamentoModel> planejamentoVigente(Long cicCod) {
         return planejamentos.findByCicCodAndStatus(cicCod, EStatusPlanejamento.PUBLICADO);
     }
 
     /** Planejamento vigente do ciclo ativo, ou {@code null} (sem ciclo/sem plano). */
     private PlanejamentoModel vigenteDoCicloAtivo() {
-        CiclosModel ciclo = cicloAtivo();
+        CiclosModel ciclo = cicloContexto.emFoco();
         return ciclo == null ? null : planejamentoVigente(ciclo.getCicCod()).orElse(null);
     }
 
@@ -260,10 +257,11 @@ public class PlanejamentoService {
         return atv;
     }
 
-    /** Garante que a prática existe na metodologia. */
-    private void exigirPraticaExiste(Long prtCod) {
-        if (!praticas.existsById(prtCod)) {
-            throw new NaoEncontradoException("Prática", prtCod);
+    /** Garante que a prática (instância) existe e pertence ao ciclo informado. */
+    private void exigirPraticaCiclo(Long cicCod, Long prtcCod) {
+        PraticaCicloModel pratica = praticasCiclo.findById(prtcCod).orElse(null);
+        if (pratica == null || !pratica.getCicCod().equals(cicCod)) {
+            throw new NaoEncontradoException("Prática", prtcCod);
         }
     }
 

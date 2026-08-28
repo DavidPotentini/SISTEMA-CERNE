@@ -9,7 +9,7 @@ export const ORIGEM_INDICADOR_LABEL: Record<EOrigemIndicador, string> = {
 
 /**
  * Indicador de um ciclo. Origem `METODOLOGIA_CERNE` (gerado da metodologia vigente) ou `COMPLEMENTAR`
- * (definido à mão). O "Vínculo CERNE" é o par processo/prática (só leitura), derivado do `prtCod`. O
+ * (definido à mão). O "Vínculo CERNE" é o par processo/prática (só leitura), derivado do `prtcCod`. O
  * `respPesCod` (responsável pela apuração) é o único campo editável dos gerados; `responsavelNome` é
  * o rótulo resolvido para exibição.
  */
@@ -17,7 +17,7 @@ export interface IndicadorCiclo {
   indCod: number;
   nome: string;
   origem: EOrigemIndicador;
-  prtCod: number | null;
+  prtcCod: number | null;
   unidade: string | null;
   periodicidade: EPeriodicidade;
   situacao: EAtivoInativo;
@@ -29,9 +29,9 @@ export interface IndicadorCiclo {
 
 /** Opção de vínculo CERNE (prática da metodologia vigente) para o cadastro complementar. */
 export interface PraticaOpcao {
-  prtCod: number;
+  prtcCod: number;
   praticaNome: string | null;
-  prcCod: number;
+  prccCod: number;
   processoNome: string | null;
 }
 

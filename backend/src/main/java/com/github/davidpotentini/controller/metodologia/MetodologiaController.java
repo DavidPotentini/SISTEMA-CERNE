@@ -1,5 +1,6 @@
 package com.github.davidpotentini.controller.metodologia;
 
+import com.github.davidpotentini.dto.metodologia.AtividadeMetodologiaDTO;
 import com.github.davidpotentini.dto.metodologia.PraticaDTO;
 import com.github.davidpotentini.dto.metodologia.ProcessoDTO;
 import com.github.davidpotentini.dto.metodologia.IndicadorDTO;
@@ -7,6 +8,7 @@ import com.github.davidpotentini.enums.EAtivoInativo;
 import com.github.davidpotentini.service.metodologia.MetodologiaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -104,5 +106,38 @@ public class MetodologiaController {
     public IndicadorDTO alterarSituacaoIndicador(@PathVariable Long inmCod,
                                                  @RequestParam EAtivoInativo situacao) {
         return service.alterarSituacaoIndicador(inmCod, situacao);
+    }
+
+    // ---- atividades ----
+
+    @GetMapping("/atividades")
+    public List<AtividadeMetodologiaDTO> listarAtividades() {
+        return service.listarAtividades();
+    }
+
+    @PostMapping("/atividades")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AtividadeMetodologiaDTO criarAtividade(@Valid @RequestBody AtividadeMetodologiaDTO dto) {
+        return service.criarAtividade(dto);
+    }
+
+    @PutMapping("/atividades/{ameCod}")
+    public AtividadeMetodologiaDTO editarAtividade(@PathVariable Long ameCod,
+                                                   @Valid @RequestBody AtividadeMetodologiaDTO dto) {
+        return service.editarAtividade(ameCod, dto);
+    }
+
+    /** Ativa/inativa a atividade. */
+    @PatchMapping("/atividades/{ameCod}/situacao")
+    public AtividadeMetodologiaDTO alterarSituacaoAtividade(@PathVariable Long ameCod,
+                                                            @RequestParam EAtivoInativo situacao) {
+        return service.alterarSituacaoAtividade(ameCod, situacao);
+    }
+
+    /** Exclui a atividade-padrão (só a metodologia; o que já foi materializado no ciclo permanece). */
+    @DeleteMapping("/atividades/{ameCod}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluirAtividade(@PathVariable Long ameCod) {
+        service.excluirAtividade(ameCod);
     }
 }

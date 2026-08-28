@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { format, parseISO } from 'date-fns';
 import { PainelOperacionalService } from '../../core/services/painel/painel-operacional.service';
+import { CicloReadonlyBannerComponent } from '../ciclos/ciclo-readonly-banner.component';
 import {
   ETipoPendencia,
   Pendencia,
@@ -47,6 +48,7 @@ interface Secao {
     MatIconModule,
     MatProgressBarModule,
     FiltrosBarComponent,
+    CicloReadonlyBannerComponent,
   ],
   templateUrl: './painel-operacional.component.html',
   styleUrl: './painel-operacional.component.css',

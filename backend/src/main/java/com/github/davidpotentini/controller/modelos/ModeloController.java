@@ -21,7 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * Modelos de planejamento da própria incubadora (tenant vem do JWT; basta estar autenticado). A tela
+ * LEGADO — substituído pela metodologia unificada: as atividades passaram a viver na Metodologia
+ * ({@code ATIVIDADES_METODOLOGIA}) e são materializadas no ciclo pelo "Gerar do ciclo". Esta camada de
+ * Modelos foi desconectada da navegação (rota/menu comentados) e é mantida apenas para referência.
+ *
+ * <p>Modelos de planejamento da própria incubadora (tenant vem do JWT; basta estar autenticado). A tela
  * lista modelos, abre um editor com a estrutura herdada da metodologia e permite editar apenas as
  * atividades enquanto o modelo está em RASCUNHO. Publicar torna o modelo imutável.
  */

@@ -1,5 +1,6 @@
 package com.github.davidpotentini.controller.execucao;
 
+import com.github.davidpotentini.comum.ciclo.EscopoCiclo;
 import com.github.davidpotentini.dto.execucao.MudarStatusAtividadeDTO;
 import com.github.davidpotentini.service.execucao.ExecucaoService;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  * exige que todas as evidências da atividade estejam validadas (regra em {@link ExecucaoService}).
  */
 @RestController
+@EscopoCiclo
 @RequestMapping("/incubadora/execucao")
 public class ExecucaoController {
 

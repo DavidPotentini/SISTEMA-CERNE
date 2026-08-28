@@ -19,6 +19,13 @@ public class TenantSchemaProvisioner {
     private static final Pattern SCHEMA_NAME = Pattern.compile("^[a-z0-9_]+$");
     private static final String DDL_LOCATION = "classpath:sql/create_tenant_schema_tables.sql";
 
+    // Registros padrão carregados na criação do tenant, na ordem: metodologia
+    // (processos/práticas/indicadores) e depois o modelo padrão, que depende dela.
+    private static final String[] SEED_LOCATIONS = {
+        "classpath:sql/seed_cerne1_metodologia.sql",
+        "classpath:sql/seed_cerne1_atividades_metodologia.sql"
+    };
+
     private final JdbcTemplate jdbcTemplate;
     private final ResourceLoader resourceLoader;
 
@@ -34,23 +41,26 @@ public class TenantSchemaProvisioner {
             throw new IllegalArgumentException("Nome de schema inválido: " + nomeSchema);
         }
 
-        String ddl = lerDDL();
+        String ddl = lerSql(DDL_LOCATION);
 
         jdbcTemplate.execute("CREATE SCHEMA IF NOT EXISTS \"" + nomeSchema.toLowerCase() + "\"");
         try {
             jdbcTemplate.execute("SET search_path TO \"" + nomeSchema.toLowerCase() + "\"");
             jdbcTemplate.execute(ddl);
+            for (String seed : SEED_LOCATIONS) {
+                jdbcTemplate.execute(lerSql(seed));
+            }
         } finally {
             jdbcTemplate.execute("SET search_path TO public");
         }
     }
 
-    private String lerDDL() {
-        Resource resource = resourceLoader.getResource(DDL_LOCATION);
+    private String lerSql(String location) {
+        Resource resource = resourceLoader.getResource(location);
         try (InputStream in = resource.getInputStream()) {
             return StreamUtils.copyToString(in, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new IllegalStateException("Falha ao ler DDL do tenant: " + DDL_LOCATION, e);
+            throw new IllegalStateException("Falha ao ler SQL do tenant: " + location, e);
         }
     }
 }

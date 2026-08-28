@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
 /**
- * Atividade planejada — DTO único de entrada e saída. O vínculo ({@code plnCod}, {@code prtCod}) e a
+ * Atividade planejada — DTO único de entrada e saída. O vínculo ({@code plnCod}, {@code prtcCod}) e a
  * {@code origem} vêm da rota/geração; {@code status} é gerenciado na execução. Ao ajustar/incluir,
  * entram {@code nome}, {@code observacoes}, {@code respPesCod} e {@code prazo}. O
  * {@code responsavelNome} é rótulo de saída (nome do responsável), resolvido no service.
@@ -16,7 +16,7 @@ public record AtividadePlanejadaDTO(
         Long atpCod,
         Long plnCod,
         EOrigemAtividade origem,
-        Long prtCod,
+        Long prtcCod,
         @NotBlank String nome,
         String observacoes,
         Long respPesCod,

@@ -51,3 +51,16 @@ export interface Indicador {
   periodicidade: EPeriodicidade;
   situacao: EAtivoInativo;
 }
+
+/**
+ * Atividade-padrão da metodologia. Vincula-se a uma prática pelo `prtCod` ("Vínculo metodológico");
+ * `vinculoMetodologico` é o nome da prática (só leitura). "Quem"/"quando" só no planejamento.
+ */
+export interface AtividadeMetodologia {
+  ameCod: number;
+  prtCod: number;
+  vinculoMetodologico: string | null;
+  nome: string;
+  observacoes: string | null;
+  situacao: EAtivoInativo;
+}

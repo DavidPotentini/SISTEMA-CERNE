@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -20,6 +20,9 @@ export class CiclosListComponent {
   private readonly dialog = inject(MatDialog);
 
   readonly colunas = ['nome', 'periodo', 'status', 'acoes'];
+
+  /** Mensagem da última ação de encerramento que falhou (ex.: ciclo com pendências). */
+  readonly erroEncerrar = signal<string | null>(null);
 
   /** Refaz a busca sempre que houver mutação (criar / pôr em foco). */
   readonly dados = rxResource({
@@ -48,5 +51,18 @@ export class CiclosListComponent {
 
   porEmFoco(c: Ciclo): void {
     this.service.porEmFoco(c.cicCod).subscribe(() => this.service.recarregar());
+  }
+
+  /** Encerra o ciclo ativo (irreversível). O backend recusa se houver pendências em aberto. */
+  encerrar(c: Ciclo): void {
+    const ok = window.confirm(
+      `Encerrar o ciclo "${c.nome}"? Esta ação é irreversível: o ciclo passa a somente leitura.`,
+    );
+    if (!ok) return;
+    this.erroEncerrar.set(null);
+    this.service.encerrar(c.cicCod).subscribe({
+      next: () => this.service.recarregar(),
+      error: e => this.erroEncerrar.set(e?.error?.mensagem ?? 'Falha ao encerrar o ciclo.'),
+    });
   }
 }
