@@ -11,8 +11,8 @@ public interface PraticaCicloRepository extends JpaRepository<PraticaCicloModel,
     /** Práticas (instância) de um ciclo, na ordem de cadastro. */
     List<PraticaCicloModel> findByCicCodOrderByPrtcCodAsc(Long cicCod);
 
-    /** Práticas (instância) de um processo do ciclo, na ordem de cadastro. */
-    List<PraticaCicloModel> findByPrccCodOrderByPrtcCodAsc(Long prccCod);
+    /** Práticas (instância) de um processo do ciclo, na ordem de exibição ({@code ordem}). */
+    List<PraticaCicloModel> findByPrccCodOrderByOrdemAscPrtcCodAsc(Long prccCod);
 
     /** Instância de uma prática do template dentro do ciclo (para remapear na geração). */
     Optional<PraticaCicloModel> findByCicCodAndPrtCodOrigem(Long cicCod, Long prtCodOrigem);

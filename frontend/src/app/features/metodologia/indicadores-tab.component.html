@@ -7,7 +7,7 @@
     </button>
   </div>
 
-  @if (indicadores.isLoading()) {
+  @if (indicadores.isLoading() && !indicadores.hasValue()) {
     <p class="estado">Carregando…</p>
   } @else if (indicadores.error()) {
     <p class="estado erro">Não foi possível carregar os indicadores.</p>

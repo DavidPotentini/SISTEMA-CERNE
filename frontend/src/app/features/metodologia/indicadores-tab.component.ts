@@ -13,6 +13,7 @@ import {
   PERIODICIDADE_LABEL,
 } from '../../models/metodologia/metodologia.model';
 import { IndicadorFormDialog } from './indicador-form.dialog';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /**
  * Aba "Indicadores": lista os indicadores da metodologia (nome, vínculo metodológico, unidade,
@@ -37,21 +38,21 @@ export class IndicadoresTabComponent {
 
   readonly colunas = ['nome', 'vinculo', 'unidade', 'periodicidade', 'situacao', 'acoes'];
 
-  readonly indicadores = rxResource({
+  readonly indicadores = reterRecurso(rxResource({
     params: () => ({ v: this.service.versao() }),
     stream: () => this.service.listarIndicadores(),
-  });
+  }));
 
   periodicidadeLabel(p: EPeriodicidade): string {
     return PERIODICIDADE_LABEL[p];
   }
 
   adicionar(): void {
-    this.dialog.open(IndicadorFormDialog, { width: '560px' });
+    this.dialog.open(IndicadorFormDialog, { width: '90vw', maxWidth: '1200px' });
   }
 
   editar(i: Indicador): void {
-    this.dialog.open(IndicadorFormDialog, { width: '560px', data: { indicador: i } });
+    this.dialog.open(IndicadorFormDialog, { width: '90vw', maxWidth: '1200px', data: { indicador: i } });
   }
 
   alternar(i: Indicador): void {

@@ -1,69 +1,81 @@
 <mat-sidenav-container class="shell">
   <mat-sidenav mode="side" opened class="side">
-    <div class="side-content">
-      <div class="brand">Incubadora</div>
+    <div class="side-content" [class.recolhido]="recolhido()">
+      <div class="topo-side">
+        @if (modo() === 'principal') {
+          <span class="brand-txt">Incubadora</span>
+        }
+        <button mat-icon-button class="toggle" (click)="recolhido.set(!recolhido())"
+                [title]="recolhido() ? 'Expandir menu' : 'Recolher menu'"
+                [attr.aria-label]="recolhido() ? 'Expandir menu' : 'Recolher menu'">
+          <mat-icon>{{ recolhido() ? 'menu' : 'chevron_left' }}</mat-icon>
+        </button>
+      </div>
 
-      <mat-nav-list class="menu">
-        <div class="grupo-menu">Visão Geral</div>
+      @if (modo() === 'principal') {
+        <mat-nav-list class="menu">
+          <div class="grupo-menu">Visão Geral</div>
 
-        <a mat-list-item routerLink="/incubadora/visao-geral" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>dashboard</mat-icon>
-          <span matListItemTitle>Dashboard</span>
-        </a>
+          <a mat-list-item routerLink="/incubadora/visao-geral" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>dashboard</mat-icon>
+            <span matListItemTitle>Dashboard</span>
+          </a>
 
-        <div class="grupo-menu">Empreendimentos Apoiados</div>
-        
-        <a mat-list-item routerLink="/incubadora/monitoramento" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>monitoring</mat-icon>
-          <span matListItemTitle>Monitoramento dos empreendimentos</span>
-        </a>
+          <div class="grupo-menu">Empreendimentos Apoiados</div>
 
-        <div class="grupo-menu">Planejamento</div>
-        <a mat-list-item routerLink="/incubadora/planejamento" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>event_note</mat-icon>
-          <span matListItemTitle>Planejamento institucional</span>
-        </a>
-        <a mat-list-item routerLink="/incubadora/indicadores" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>insights</mat-icon>
-          <span matListItemTitle>Configurar indicadores e metas</span>
-        </a>
+          <a mat-list-item routerLink="/incubadora/monitoramento" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>monitoring</mat-icon>
+            <span matListItemTitle>Monitoramento dos empreendimentos</span>
+          </a>
 
-        <div class="grupo-menu">Acompanhamento e execução</div>
-        <a mat-list-item routerLink="/incubadora/painel-operacional" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>checklist</mat-icon>
-          <span matListItemTitle>Pendências</span>
-        </a>
-        <a mat-list-item routerLink="/incubadora/evidencias" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>fact_check</mat-icon>
-          <span matListItemTitle>Registros de evidência</span>
-        </a>
-        <a mat-list-item routerLink="/incubadora/acompanhamento" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>track_changes</mat-icon>
-          <span matListItemTitle>Acompanhamento do Planejamento</span>
-        </a>
-        <a mat-list-item routerLink="/incubadora/apuracao" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>assessment</mat-icon>
-          <span matListItemTitle>Apuração de indicadores</span>
-        </a>
+          <div class="grupo-menu">Planejamento</div>
+          <a mat-list-item routerLink="/incubadora/planejamento" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>event_note</mat-icon>
+            <span matListItemTitle>Planejamento institucional</span>
+          </a>
+          <a mat-list-item routerLink="/incubadora/indicadores" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>insights</mat-icon>
+            <span matListItemTitle>Configurar indicadores e metas</span>
+          </a>
 
-        <div class="grupo-menu">Configuração</div>
+          <div class="grupo-menu">Acompanhamento e execução</div>
+          <a mat-list-item routerLink="/incubadora/pendencias" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>checklist</mat-icon>
+            <span matListItemTitle>Pendências</span>
+          </a>
+          <a mat-list-item routerLink="/incubadora/acompanhamento" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>track_changes</mat-icon>
+            <span matListItemTitle>Acompanhamento do Planejamento</span>
+          </a>
+          <a mat-list-item routerLink="/incubadora/evidencias" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>fact_check</mat-icon>
+            <span matListItemTitle>Registros de evidência</span>
+          </a>
+          <a mat-list-item routerLink="/incubadora/apuracao" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>assessment</mat-icon>
+            <span matListItemTitle>Apuração de indicadores</span>
+          </a>
 
-        <a mat-list-item routerLink="/incubadora/metodologia" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>account_tree</mat-icon>
-          <span matListItemTitle>Metodologia</span>
-        </a>
-        <!-- LEGADO: Modelos de planejamento substituídos pela metodologia unificada (atividades na
-             Metodologia). Rota e tela mantidas para referência; item de menu desativado. -->
-        <!-- <a mat-list-item routerLink="/incubadora/modelos" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>assignment</mat-icon>
-          <span matListItemTitle>Modelos de planejamento</span>
-        </a> -->
-        <a mat-list-item routerLink="/incubadora/minha-incubadora" routerLinkActive="ativo">
-          <mat-icon matListItemIcon>domain</mat-icon>
-          <span matListItemTitle>Minha Incubadora</span>
-        </a>
+        </mat-nav-list>
+      } @else {
+        <button mat-button class="voltar" (click)="modo.set('principal')">
+          <mat-icon>arrow_back</mat-icon>
+          <span class="rotulo">Voltar</span>
+        </button>
 
-      </mat-nav-list>
+        <mat-nav-list class="menu">
+          <div class="grupo-menu">Configuração</div>
+
+          <a mat-list-item routerLink="/incubadora/metodologia" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>account_tree</mat-icon>
+            <span matListItemTitle>Metodologia</span>
+          </a>
+          <a mat-list-item routerLink="/incubadora/minha-incubadora" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>domain</mat-icon>
+            <span matListItemTitle>Minha Incubadora</span>
+          </a>
+        </mat-nav-list>
+      }
 
       <div class="rodape">
         <div class="rodape-inicio">
@@ -72,13 +84,20 @@
               <span class="nome">{{ inc.nome }}</span>
               <span class="nivel">{{ inc.nivel ? nivelLabel(inc.nivel) : '—' }}</span>
             </div>
+            <button mat-icon-button class="sobre" (click)="modo.set('config')"
+                    title="Configuração" aria-label="Configuração">
+              <mat-icon>settings</mat-icon>
+            </button>
             <button mat-icon-button class="sobre" (click)="sobre()"
                     title="Sobre a incubadora" aria-label="Sobre a incubadora">
               <mat-icon>info</mat-icon>
             </button>
           }
         </div>
-        <button mat-button (click)="sair()">Sair</button>
+        <button mat-button class="sair-btn" (click)="sair()" title="Sair">
+          <mat-icon>logout</mat-icon>
+          <span class="rotulo">Sair</span>
+        </button>
       </div>
     </div>
   </mat-sidenav>

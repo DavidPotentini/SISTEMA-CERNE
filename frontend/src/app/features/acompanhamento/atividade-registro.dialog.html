@@ -13,27 +13,32 @@
   <section class="bloco">
     <div class="bloco-titulo">Status da atividade</div>
     <div class="status-linha">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Status</mat-label>
-        <mat-select [ngModel]="novoStatus()" (ngModelChange)="novoStatus.set($event)">
-          @for (s of statusManuais; track s) {
-            <mat-option [value]="s">{{ statusAtividadeLabel[s] }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-      <button
-        mat-flat-button
-        color="primary"
-        [disabled]="salvandoStatus() || novoStatus() === atividade().status"
-        (click)="salvarStatus()"
-      >
-        Salvar status
-      </button>
+      <span class="status-atual" [attr.data-status]="atividade().status">
+        <mat-icon>{{ statusIcone[atividade().status] }}</mat-icon>
+        {{ statusAtividadeLabel[atividade().status] }}
+      </span>
+      @if (concluida()) {
+        <button mat-stroked-button [disabled]="salvandoStatus()" (click)="reabrir()">
+          <mat-icon>lock_open</mat-icon>
+          Reabrir atividade
+        </button>
+      } @else {
+        <button
+          mat-flat-button
+          color="primary"
+          [disabled]="salvandoStatus() || !todasValidadas()"
+          (click)="concluir()"
+        >
+          <mat-icon>check_circle</mat-icon>
+          Concluir atividade
+        </button>
+      }
     </div>
-    @if (novoStatus() === 'CONCLUIDA' && !todasValidadas()) {
+    <p class="dica">O estado "planejada / em andamento" é definido pelas evidências.</p>
+    @if (!concluida() && !todasValidadas()) {
       <p class="aviso">
         <mat-icon>info</mat-icon>
-        Só é possível concluir com ao menos uma evidência e todas validadas.
+        Para concluir, registre ao menos uma evidência e valide todas.
       </p>
     }
     @if (statusSalvo()) {
@@ -76,7 +81,7 @@
               </button>
             }
 
-            @if (ev.status === 'EM_VALIDACAO') {
+            @if (ev.status === 'PENDENTE_VALIDACAO') {
               <mat-form-field appearance="outline" subscriptSizing="dynamic" class="ev-obs">
                 <mat-label>Motivo (ao solicitar correção)</mat-label>
                 <textarea

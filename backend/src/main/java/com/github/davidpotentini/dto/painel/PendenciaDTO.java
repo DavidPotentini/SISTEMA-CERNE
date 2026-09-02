@@ -5,7 +5,7 @@ import com.github.davidpotentini.enums.ETipoPendencia;
 import java.time.LocalDate;
 
 /**
- * Uma pendência do Painel Operacional — linha da lista unificada (só saída). O {@code tipo} diz a
+ * Uma pendência (tela Pendências) — linha da lista unificada (só saída). O {@code tipo} diz a
  * seção; {@code referenciaId} é o código da origem usado na navegação (atividade → {@code atpCod},
  * evidência → {@code evdCod}, meta → {@code indCod}). {@code titulo} é o nome principal;
  * {@code processoNome}/{@code praticaNome} situam o item na estrutura CERNE; {@code detalhe} é um

@@ -23,6 +23,20 @@
   margin: 0;
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+}
+.grid mat-form-field {
+  width: 100%;
+}
+.nota {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
 .chip {
   padding: 3px 10px;
   border-radius: 999px;

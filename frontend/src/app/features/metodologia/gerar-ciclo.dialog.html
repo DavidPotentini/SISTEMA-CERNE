@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>Gerar do ciclo — {{ data.ciclo }}</h2>
+<mat-dialog-content>
+  <p class="intro">
+    Escolha as incubadas participantes. As atividades marcadas para repetir por empreendimento serão
+    duplicadas por incubada selecionada, em um grupo por empreendimento.
+  </p>
+
+  @if (carregando()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  } @else if (erro()) {
+    <p class="erro">{{ erro() }}</p>
+  } @else if (incubadas().length === 0) {
+    <p class="vazio">Nenhuma incubada ativa. As atividades que repetem por empreendimento não serão geradas.</p>
+  } @else {
+    <div class="lista">
+      @for (inc of incubadas(); track inc.empCod) {
+        <mat-checkbox [checked]="marcada(inc.empCod)" (change)="alternar(inc.empCod)">
+          {{ inc.nome }}
+        </mat-checkbox>
+      }
+    </div>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-flat-button color="primary" (click)="gerar()" [disabled]="carregando()">
+    Gerar
+  </button>
+</mat-dialog-actions>

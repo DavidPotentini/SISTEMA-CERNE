@@ -2,9 +2,12 @@ package com.github.davidpotentini.controller.ciclos;
 
 import com.github.davidpotentini.comum.ciclo.EscopoCiclo;
 import com.github.davidpotentini.dto.ciclos.CicloDTO;
+import com.github.davidpotentini.dto.ciclos.GerarCicloOpcoesDTO;
+import com.github.davidpotentini.dto.ciclos.MaterializarCicloDTO;
 import com.github.davidpotentini.service.ciclos.MaterializacaoMetodologiaService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,9 +33,15 @@ public class MaterializacaoMetodologiaController {
         return service.alvo();
     }
 
-    /** Materializa a metodologia no ciclo em foco. */
+    /** Incubadas ofertadas + as já selecionadas no ciclo em foco (para o diálogo de gerar). */
+    @GetMapping("/empreendimentos")
+    public GerarCicloOpcoesDTO opcoesGerar() {
+        return service.opcoesGerar();
+    }
+
+    /** Materializa a metodologia no ciclo em foco, com as incubadas participantes escolhidas. */
     @PostMapping
-    public CicloDTO materializarMetodologia() {
-        return service.materializarMetodologia();
+    public CicloDTO materializarMetodologia(@RequestBody(required = false) MaterializarCicloDTO dto) {
+        return service.materializarMetodologia(dto == null ? null : dto.empCods());
     }
 }

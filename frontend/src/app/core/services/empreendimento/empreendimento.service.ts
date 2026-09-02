@@ -3,13 +3,13 @@ import { Injectable, inject, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import {
   Empreendimento,
+  NovoEmpreendimento,
   PessoaEmpreendimento,
-  Responsavel,
 } from '../../../models/empreendimento/empreendimento.model';
 
 /**
- * Empreendimentos da própria incubadora (o schema do tenant vem do JWT). O responsável interno é
- * escolhido a partir da equipe (/responsaveis); as pessoas do empreendimento são geridas no modal.
+ * Empreendimentos da própria incubadora (o schema do tenant vem do JWT). As pessoas do
+ * empreendimento (membros da startup) são geridas no modal.
  */
 @Injectable({ providedIn: 'root' })
 export class EmpreendimentoService {
@@ -26,12 +26,8 @@ export class EmpreendimentoService {
     return this.http.get<Empreendimento[]>(this.base);
   }
 
-  /** Equipe da incubadora — candidatos a responsável interno. */
-  listarResponsaveis() {
-    return this.http.get<Responsavel[]>(`${this.base}/responsaveis`);
-  }
-
-  criar(dto: Partial<Empreendimento>) {
+  /** Cria o empreendimento; {@code dto.pessoas} (opcional) grava as pessoas iniciais no mesmo POST. */
+  criar(dto: NovoEmpreendimento) {
     return this.http.post<Empreendimento>(this.base, dto);
   }
 
@@ -47,9 +43,9 @@ export class EmpreendimentoService {
     return this.http.post<PessoaEmpreendimento>(`${this.base}/${empCod}/pessoas`, dto);
   }
 
-  definirPrincipal(empCod: number, pseCod: number) {
+  definirRepresentanteLegal(empCod: number, pseCod: number) {
     return this.http.patch<PessoaEmpreendimento>(
-      `${this.base}/${empCod}/pessoas/${pseCod}/principal`,
+      `${this.base}/${empCod}/pessoas/${pseCod}/representante-legal`,
       {},
     );
   }

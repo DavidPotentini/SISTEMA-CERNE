@@ -48,7 +48,7 @@ export class EvidenciaService {
     return this.http.post<Evidencia>(`${this.base}/${evdCod}/correcoes`, dto);
   }
 
-  /** Avalia a versão corrente (só se EM_VALIDACAO): validar ou solicitar correção (motivo obrigatório). */
+  /** Avalia a versão corrente (só se PENDENTE_VALIDACAO): validar ou solicitar correção (motivo obrigatório). */
   avaliar(evdCod: number, status: EStatusEvidencia, motivo: string | null) {
     return this.http.post<Evidencia>(`${this.base}/${evdCod}/avaliacoes`, { status, motivo });
   }

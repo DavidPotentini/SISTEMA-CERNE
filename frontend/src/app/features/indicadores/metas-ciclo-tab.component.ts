@@ -12,6 +12,7 @@ import {
   PERIODICIDADE_LABEL,
 } from '../../models/metodologia/metodologia.model';
 import { MetaIndicadorDialog } from './meta-indicador.dialog';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /**
  * Aba "Metas do ciclo": lista os indicadores do ciclo (nome, vínculo CERNE, periodicidade, unidade)
@@ -30,10 +31,10 @@ export class MetasCicloTabComponent {
 
   readonly colunas = ['nome', 'vinculo', 'periodicidade', 'unidade', 'acoes'];
 
-  readonly indicadoresRes = rxResource({
+  readonly indicadoresRes = reterRecurso(rxResource({
     params: () => ({ v: this.service.versao() }),
     stream: () => this.service.listar(),
-  });
+  }));
 
   periodicidadeLabel(p: EPeriodicidade): string {
     return PERIODICIDADE_LABEL[p];

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,13 +7,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MetodologiaService } from '../../core/services/metodologia/metodologia.service';
-import { AtividadeMetodologia } from '../../models/metodologia/metodologia.model';
+import { Agrupamento, AtividadeMetodologia } from '../../models/metodologia/metodologia.model';
 
 interface AtividadeFormData {
   /** Presente no modo edição. */
   atividade?: AtividadeMetodologia;
   /** No modo criação a partir de uma prática: pré-seleciona o vínculo. */
   prtCod?: number;
+  /** No modo criação a partir de um grupo: pré-seleciona o agrupamento. */
+  agrCod?: number;
 }
 
 /**
@@ -43,20 +45,35 @@ export class AtividadeFormDialog {
   /** Processos (com práticas) da metodologia, para o seletor de vínculo. */
   readonly processos = rxResource({ stream: () => this.service.listarProcessos() });
 
+  /** Agrupamentos (todos) da metodologia; filtrados pela prática escolhida no seletor de grupo. */
+  private readonly agrupamentos = rxResource({ stream: () => this.service.listarAgrupamentos() });
+
   readonly salvando = signal(false);
   readonly erro = signal<string | null>(null);
 
   readonly prtCod = signal<number | null>(this.data?.atividade?.prtCod ?? this.data?.prtCod ?? null);
+  readonly agrCod = signal<number | null>(this.data?.atividade?.agrCod ?? this.data?.agrCod ?? null);
   readonly nome = signal(this.data?.atividade?.nome ?? '');
   readonly observacoes = signal(this.data?.atividade?.observacoes ?? '');
+
+  /** Grupos ATIVOS da prática escolhida (para o seletor; opcional — sem grupo = "Sem agrupamento"). */
+  readonly gruposDisponiveis = computed<Agrupamento[]>(() => {
+    const prt = this.prtCod();
+    if (prt == null) return [];
+    return (this.agrupamentos.value() ?? []).filter(g => g.prtCod === prt && g.situacao === 'ATIVO');
+  });
 
   salvar(): void {
     const prtCod = this.prtCod();
     if (!this.nome().trim() || prtCod == null) return;
+    // Grupo válido só se pertencer à prática escolhida; senão, sem agrupamento.
+    const agr = this.agrCod();
+    const agrCod = this.gruposDisponiveis().some(g => g.agrCod === agr) ? agr : null;
     this.salvando.set(true);
     this.erro.set(null);
     const dto: Partial<AtividadeMetodologia> = {
       prtCod,
+      agrCod,
       nome: this.nome().trim(),
       observacoes: this.observacoes().trim() || null,
     };

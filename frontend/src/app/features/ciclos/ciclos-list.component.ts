@@ -7,6 +7,7 @@ import { MatTableModule } from '@angular/material/table';
 import { CicloService } from '../../core/services/ciclo/ciclo.service';
 import { Ciclo, EStatusCiclo, STATUS_CICLO_LABEL } from '../../models/ciclo/ciclo.model';
 import { CicloFormDialog } from './ciclo-form.dialog';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /** Card "Ciclos" da incubadora: listagem (nome, período, status), adicionar e pôr em foco. */
 @Component({
@@ -25,10 +26,10 @@ export class CiclosListComponent {
   readonly erroEncerrar = signal<string | null>(null);
 
   /** Refaz a busca sempre que houver mutação (criar / pôr em foco). */
-  readonly dados = rxResource({
+  readonly dados = reterRecurso(rxResource({
     params: () => ({ versao: this.service.versao() }),
     stream: () => this.service.listar(),
-  });
+  }));
 
   statusLabel(s: EStatusCiclo): string {
     return STATUS_CICLO_LABEL[s];
@@ -46,7 +47,7 @@ export class CiclosListComponent {
   }
 
   adicionar(): void {
-    this.dialog.open(CicloFormDialog, { width: '480px' });
+    this.dialog.open(CicloFormDialog, { width: '90vw', maxWidth: '1200px' });
   }
 
   porEmFoco(c: Ciclo): void {

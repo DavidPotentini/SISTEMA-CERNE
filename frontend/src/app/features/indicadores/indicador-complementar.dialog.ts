@@ -6,7 +6,7 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { EmpreendimentoService } from '../../core/services/empreendimento/empreendimento.service';
+import { EquipeService } from '../../core/services/equipe/equipe.service';
 import { IndicadorService } from '../../core/services/indicador/indicador.service';
 import { IndicadorCiclo, PraticaOpcao } from '../../models/indicador/indicador.model';
 import {
@@ -40,14 +40,14 @@ interface Opcao {
 })
 export class IndicadorComplementarDialog {
   private readonly service = inject(IndicadorService);
-  private readonly empreendimentoService = inject(EmpreendimentoService);
+  private readonly equipeService = inject(EquipeService);
   private readonly ref = inject(MatDialogRef<IndicadorComplementarDialog>);
 
   readonly periodicidades = Object.entries(PERIODICIDADE_LABEL) as [EPeriodicidade, string][];
 
   /** Equipe da incubadora — candidatos a responsável pela apuração. */
   readonly responsaveisRes = rxResource({
-    stream: () => this.empreendimentoService.listarResponsaveis(),
+    stream: () => this.equipeService.listarResponsaveis(),
   });
 
   readonly opcoes = signal<PraticaOpcao[]>([]);

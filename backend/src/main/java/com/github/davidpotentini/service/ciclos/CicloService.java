@@ -8,7 +8,7 @@ import com.github.davidpotentini.enums.EStatusCiclo;
 import com.github.davidpotentini.mapper.ciclos.CicloMapper;
 import com.github.davidpotentini.model.ciclos.CiclosModel;
 import com.github.davidpotentini.repository.ciclos.CiclosRepository;
-import com.github.davidpotentini.service.painel.PainelOperacionalService;
+import com.github.davidpotentini.service.painel.PendenciasService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,14 +27,14 @@ public class CicloService {
 
     private final CiclosRepository ciclos;
     private final CicloContexto cicloContexto;
-    private final PainelOperacionalService painelOperacional;
+    private final PendenciasService pendencias;
     private final CicloMapper mapper;
 
     public CicloService(CiclosRepository ciclos, CicloContexto cicloContexto,
-                        PainelOperacionalService painelOperacional, CicloMapper mapper) {
+                        PendenciasService pendencias, CicloMapper mapper) {
         this.ciclos = ciclos;
         this.cicloContexto = cicloContexto;
-        this.painelOperacional = painelOperacional;
+        this.pendencias = pendencias;
         this.mapper = mapper;
     }
 
@@ -92,10 +92,10 @@ public class CicloService {
         if (foco == null || !foco.getCicCod().equals(cicCod)) {
             throw new RegraNegocioException("Ponha o ciclo ativo em foco para encerrá-lo.");
         }
-        long impedimentos = painelOperacional.impedimentosDeEncerramento();
+        long impedimentos = pendencias.impedimentosDeEncerramento();
         if (impedimentos > 0) {
             throw new RegraNegocioException("Há " + impedimentos
-                    + " pendência(s) em aberto neste ciclo. Resolva-as no Painel Operacional antes de encerrar.");
+                    + " pendência(s) em aberto neste ciclo. Resolva-as em Pendências antes de encerrar.");
         }
         ciclo.setStatus(EStatusCiclo.ENCERRADO);
         ciclos.save(ciclo);

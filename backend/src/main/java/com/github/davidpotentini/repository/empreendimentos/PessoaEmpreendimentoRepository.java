@@ -11,5 +11,5 @@ public interface PessoaEmpreendimentoRepository
 
     List<PessoaEmpreendimentoModel> findByEmpCodOrderByNomeAsc(Long empCod);
 
-    Optional<PessoaEmpreendimentoModel> findByEmpCodAndPrincipalTrue(Long empCod);
+    Optional<PessoaEmpreendimentoModel> findByEmpCodAndRepresentanteLegalTrue(Long empCod);
 }

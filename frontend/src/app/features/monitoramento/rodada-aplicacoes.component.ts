@@ -22,6 +22,7 @@ import {
   TIPO_RODADA_LABEL,
 } from '../../models/monitoramento/monitoramento.model';
 import { RevisarAplicacaoDialog } from './revisar-aplicacao.dialog';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /**
  * Uma rodada na aba "Aplicações e pontuação": seção recolhível com cabeçalho (tipo/situação,
@@ -57,10 +58,10 @@ export class RodadaAplicacoesComponent {
   /** Seção aberta manualmente (o filtro pode forçar a abertura). */
   private readonly abertaManual = signal(false);
 
-  readonly aplicacoesRes = rxResource({
+  readonly aplicacoesRes = reterRecurso(rxResource({
     params: () => ({ v: this.service.versao(), rod: this.rodada().rodCod }),
     stream: () => this.service.aplicacoes(this.rodada().rodCod),
-  });
+  }));
 
   private readonly filtroAtivo = computed<boolean>(
     () => this.filtroNome().trim() !== '' || this.filtroStatus() !== 'TODOS',

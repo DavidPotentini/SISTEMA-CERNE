@@ -2,6 +2,14 @@
 <mat-dialog-content>
   <div class="grid">
     <mat-form-field appearance="outline" class="col-2">
+      <mat-label>Nível</mat-label>
+      <mat-select [ngModel]="'CERNE_1'" disabled>
+        <mat-option value="CERNE_1">CERNE 1</mat-option>
+      </mat-select>
+      <mat-hint>Por ora o sistema trata apenas o CERNE 1.</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-2">
       <mat-label>Nome</mat-label>
       <input matInput [ngModel]="nome()" (ngModelChange)="nome.set($event)" required />
     </mat-form-field>

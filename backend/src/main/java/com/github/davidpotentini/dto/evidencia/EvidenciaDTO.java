@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * acrescenta os rótulos derivados ({@code atividadeNome} e o processo/prática a que a atividade
  * pertence — {@code processoNome}, {@code praticaNome} —, {@code arquivoNome}, {@code responsavel}) e
  * o {@code motivoCorrecao} — o motivo da rejeição, presente só quando o {@code status} é
- * {@code CORRECAO_SOLICITADA}. O {@code status} nasce {@code EM_VALIDACAO} no service — não é definido
+ * {@code CORRECAO_SOLICITADA}. O {@code status} nasce {@code PENDENTE_VALIDACAO} no service — não é definido
  * pelo cliente.
  */
 public record EvidenciaDTO(

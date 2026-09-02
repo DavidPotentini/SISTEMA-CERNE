@@ -1,7 +1,10 @@
 package com.github.davidpotentini.model.estruturaciclo;
 
+import com.github.davidpotentini.enums.ENivelCerne;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,6 +35,11 @@ public class ProcessoCicloModel {
     /** Processo do template de origem — proveniência fraca (sem FK forte). */
     @Column(name = "PRC_COD_ORIGEM")
     private Long prcCodOrigem;
+
+    /** Nível CERNE do processo — por ora sempre {@code CERNE_1} (domínio de um valor só). */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "NIVEL", nullable = false)
+    private ENivelCerne nivel = ENivelCerne.CERNE_1;
 
     @Column(name = "ORDEM", nullable = false)
     private Integer ordem;

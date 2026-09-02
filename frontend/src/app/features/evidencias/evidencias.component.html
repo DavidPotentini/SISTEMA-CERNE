@@ -8,7 +8,7 @@
   </button>
 </div>
 
-@if (evidenciasRes.isLoading()) {
+@if (evidenciasRes.isLoading() && !evidenciasRes.hasValue()) {
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }
 

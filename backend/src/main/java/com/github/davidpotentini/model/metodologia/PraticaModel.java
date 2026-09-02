@@ -17,7 +17,7 @@ import lombok.Setter;
  * aba "Processos e Práticas". Schema do tenant.
  */
 @Entity
-@Table(name = "PRATICAS")
+@Table(name = "PRATICAS_METODOLOGIA")
 @Getter
 @Setter
 public class PraticaModel {
@@ -29,6 +29,10 @@ public class PraticaModel {
 
     @Column(name = "PRC_COD", nullable = false)
     private Long prcCod;
+
+    /** Ordem da prática dentro do processo (sequência de exibição). */
+    @Column(name = "ORDEM", nullable = false)
+    private Integer ordem;
 
     @Column(name = "NOME", nullable = false)
     private String nome;

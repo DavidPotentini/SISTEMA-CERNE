@@ -2,7 +2,6 @@ package com.github.davidpotentini.controller.empreendimentos;
 
 import com.github.davidpotentini.dto.empreendimentos.EmpreendimentoDTO;
 import com.github.davidpotentini.dto.empreendimentos.PessoaEmpreendimentoDTO;
-import com.github.davidpotentini.dto.empreendimentos.ResponsavelDTO;
 import com.github.davidpotentini.service.empreendimentos.EmpreendimentoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -37,12 +36,6 @@ public class EmpreendimentoController {
         return service.listar();
     }
 
-    /** Candidatos a responsável interno (equipe da incubadora). */
-    @GetMapping("/responsaveis")
-    public List<ResponsavelDTO> listarResponsaveis() {
-        return service.listarResponsaveis();
-    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EmpreendimentoDTO criar(@Valid @RequestBody EmpreendimentoDTO dto) {
@@ -67,10 +60,10 @@ public class EmpreendimentoController {
         return service.adicionarPessoa(empCod, dto);
     }
 
-    /** Marca uma pessoa do empreendimento como contato principal. */
-    @PatchMapping("/{empCod}/pessoas/{pseCod}/principal")
-    public PessoaEmpreendimentoDTO definirPrincipal(@PathVariable Long empCod,
-                                                    @PathVariable Long pseCod) {
-        return service.definirPrincipal(empCod, pseCod);
+    /** Marca uma pessoa do empreendimento como representante legal. */
+    @PatchMapping("/{empCod}/pessoas/{pseCod}/representante-legal")
+    public PessoaEmpreendimentoDTO definirRepresentanteLegal(@PathVariable Long empCod,
+                                                             @PathVariable Long pseCod) {
+        return service.definirRepresentanteLegal(empCod, pseCod);
     }
 }

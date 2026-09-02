@@ -10,6 +10,7 @@ import {
   IncubadoraResumo,
   STATUS_LABEL,
 } from '../../models/incubadora/incubadora.model';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /**
  * Painel da plataforma: cards com as contagens por status e a listagem das incubadoras
@@ -28,10 +29,10 @@ export class PainelComponent {
   readonly colunas = ['nome', 'mantenedora', 'responsavel', 'usuarios', 'status'];
 
   /** Refaz a busca sempre que houver mutação em incubadoras (ativar/suspender/salvar). */
-  readonly dados = rxResource({
+  readonly dados = reterRecurso(rxResource({
     params: () => ({ versao: this.service.versao() }),
     stream: () => this.service.listar(),
-  });
+  }));
 
   private lista(): IncubadoraResumo[] {
     return this.dados.value() ?? [];

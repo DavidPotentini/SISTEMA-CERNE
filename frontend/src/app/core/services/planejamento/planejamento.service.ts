@@ -41,7 +41,17 @@ export class PlanejamentoService {
     return this.http.put<AtividadePlanejada>(`${this.base}/atividades/${atpCod}`, dto);
   }
 
-  removerComplementar(atpCod: number) {
+  removerAtividade(atpCod: number) {
     return this.http.delete<void>(`${this.base}/atividades/${atpCod}`);
+  }
+
+  /** Reordena as atividades de uma prática (arrastar-e-soltar): envia a sequência de `atpCod`. */
+  reordenarAtividades(prtcCod: number, atpCods: number[]) {
+    return this.http.put<void>(`${this.base}/praticas/${prtcCod}/atividades/ordem`, atpCods);
+  }
+
+  /** Reordena os agrupamentos de uma prática (arrastar-e-soltar): envia a sequência de `agrcCod`. */
+  reordenarAgrupamentos(prtcCod: number, agrcCods: number[]) {
+    return this.http.put<void>(`${this.base}/praticas/${prtcCod}/agrupamentos/ordem`, agrcCods);
   }
 }

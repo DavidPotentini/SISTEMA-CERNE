@@ -9,6 +9,13 @@
    plano, chips de status, drag-and-drop) fica no CSS próprio do componente.
    ============================================================================ */
 
+/* Barra do botão recolher/expandir tudo, acima da árvore. */
+.acordeao-acoes {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 8px;
+}
+
 /* Painel do processo (accordion externo). */
 mat-expansion-panel {
   background-color: #fafafa;
@@ -57,6 +64,40 @@ mat-expansion-panel {
 .pratica-desc {
   margin: 0 0 12px;
   color: rgba(0, 0, 0, 0.7);
+}
+
+/* Agrupamento (sub-plano) dentro da prática: cabeçalho + suas atividades. */
+.grupo {
+  margin: 0 0 14px;
+}
+.grupo:last-child {
+  margin-bottom: 0;
+}
+.grupo-titulo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0 5px;
+  margin-bottom: 2px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.9);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.14);
+}
+.grupo-titulo mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: rgba(0, 0, 0, 0.4);
+}
+.grupo-nome {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+}
+.grupo-cont {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.45);
 }
 
 /* Atividades sob a prática, uma separada da outra por linha. */
@@ -141,6 +182,16 @@ mat-expansion-panel {
   color: rgba(0, 0, 0, 0.45);
   font-size: 0.9rem;
 }
+.tag-incubada {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: rgba(25, 118, 210, 0.14);
+  color: #1565c0;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
 .tag-inativo {
   display: inline-block;
   margin-left: 8px;
@@ -148,6 +199,18 @@ mat-expansion-panel {
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.1);
   color: rgba(0, 0, 0, 0.6);
+  font-size: 0.72rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+/* Nível CERNE do processo (por ora sempre "CERNE 1"): deixa o escopo explícito. */
+.tag-nivel {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #e8eefc;
+  color: #274690;
   font-size: 0.72rem;
   font-weight: 600;
   vertical-align: middle;

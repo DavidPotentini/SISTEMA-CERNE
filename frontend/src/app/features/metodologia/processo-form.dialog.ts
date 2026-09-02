@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MetodologiaService } from '../../core/services/metodologia/metodologia.service';
 import { Processo } from '../../models/metodologia/metodologia.model';
 
@@ -15,7 +16,14 @@ interface ProcessoFormData {
 /** Modal de processo: cria ou edita ordem/nome/descrição. Ordem é única na metodologia. */
 @Component({
   selector: 'app-processo-form',
-  imports: [FormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],
+  imports: [
+    FormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+  ],
   templateUrl: './processo-form.dialog.html',
   styleUrl: './processo-form.dialog.css',
 })

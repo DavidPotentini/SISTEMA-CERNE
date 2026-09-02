@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Sobre a incubadora</h2>
+<h2 mat-dialog-title>Informações da incubadora</h2>
 
 <mat-dialog-content>
   <div class="cabecalho">
@@ -6,17 +6,56 @@
     <span class="chip" [class]="'s-' + inc.status">{{ statusLabel(inc.status) }}</span>
   </div>
 
-  <dl class="campos">
-    <dt>CNPJ</dt><dd>{{ inc.cnpj || '—' }}</dd>
-    <dt>Mantenedora</dt><dd>{{ inc.mantenedora || '—' }}</dd>
-    <dt>Responsável</dt><dd>{{ inc.responsavelNome || '—' }}</dd>
-    <dt>E-mail</dt><dd>{{ inc.email || '—' }}</dd>
-    <dt>Telefone</dt><dd>{{ inc.telefone || '—' }}</dd>
-    <dt>Cidade</dt><dd>{{ inc.cidade || '—' }}</dd>
-    <dt>Nível</dt><dd>{{ inc.nivel ? nivelLabel(inc.nivel) : '—' }}</dd>
-  </dl>
+  @if (!editando()) {
+    <dl class="campos">
+      <dt>CNPJ</dt><dd>{{ inc.cnpj || '—' }}</dd>
+      <dt>Mantenedora</dt><dd>{{ inc.mantenedora || '—' }}</dd>
+      <dt>Responsável</dt><dd>{{ inc.responsavelNome || '—' }}</dd>
+      <dt>E-mail</dt><dd>{{ inc.email || '—' }}</dd>
+      <dt>Telefone</dt><dd>{{ inc.telefone || '—' }}</dd>
+      <dt>Cidade</dt><dd>{{ inc.cidade || '—' }}</dd>
+      <dt>Nível</dt><dd>{{ inc.nivel ? nivelLabel(inc.nivel) : '—' }}</dd>
+    </dl>
+  } @else {
+    <div class="grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome</mat-label>
+        <input matInput [(ngModel)]="dados.nome" required />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>CNPJ</mat-label>
+        <input matInput [(ngModel)]="dados.cnpj" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Mantenedora</mat-label>
+        <input matInput [(ngModel)]="dados.mantenedora" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>E-mail</mat-label>
+        <input matInput [(ngModel)]="dados.email" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Telefone</mat-label>
+        <input matInput [(ngModel)]="dados.telefone" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Cidade</mat-label>
+        <input matInput [(ngModel)]="dados.cidade" />
+      </mat-form-field>
+    </div>
+    <p class="nota">Responsável e nível são geridos pela plataforma.</p>
+  }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Fechar</button>
+  @if (!editando()) {
+    <button mat-button mat-dialog-close>Fechar</button>
+    <button mat-flat-button color="primary" (click)="editar()">Editar</button>
+  } @else {
+    <button mat-button (click)="cancelarEdicao()" [disabled]="salvando()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="salvar()"
+            [disabled]="salvando() || !dados.nome.trim()">
+      Salvar
+    </button>
+  }
 </mat-dialog-actions>

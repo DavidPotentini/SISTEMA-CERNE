@@ -1,6 +1,7 @@
 package com.github.davidpotentini.model.metodologia;
 
 import com.github.davidpotentini.enums.EAtivoInativo;
+import com.github.davidpotentini.enums.ENivelCerne;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,7 +19,7 @@ import lombok.Setter;
  * tenant.
  */
 @Entity
-@Table(name = "PROCESSOS")
+@Table(name = "PROCESSOS_METODOLOGIA")
 @Getter
 @Setter
 public class ProcessoModel {
@@ -27,6 +28,11 @@ public class ProcessoModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PRC_COD")
     private Long prcCod;
+
+    /** Nível CERNE do processo — por ora sempre {@code CERNE_1} (domínio de um valor só). */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "NIVEL", nullable = false)
+    private ENivelCerne nivel = ENivelCerne.CERNE_1;
 
     @Column(name = "ORDEM", nullable = false)
     private Integer ordem;

@@ -2,12 +2,16 @@ package com.github.davidpotentini.service.estruturaciclo;
 
 import com.github.davidpotentini.comum.erro.NaoEncontradoException;
 import com.github.davidpotentini.enums.EAtivoInativo;
+import com.github.davidpotentini.model.estruturaciclo.AgrupamentoCicloModel;
 import com.github.davidpotentini.model.estruturaciclo.PraticaCicloModel;
 import com.github.davidpotentini.model.estruturaciclo.ProcessoCicloModel;
+import com.github.davidpotentini.model.metodologia.AgrupamentoModel;
 import com.github.davidpotentini.model.metodologia.PraticaModel;
 import com.github.davidpotentini.model.metodologia.ProcessoModel;
+import com.github.davidpotentini.repository.estruturaciclo.AgrupamentoCicloRepository;
 import com.github.davidpotentini.repository.estruturaciclo.PraticaCicloRepository;
 import com.github.davidpotentini.repository.estruturaciclo.ProcessoCicloRepository;
+import com.github.davidpotentini.repository.metodologia.AgrupamentoRepository;
 import com.github.davidpotentini.repository.metodologia.PraticaRepository;
 import com.github.davidpotentini.repository.metodologia.ProcessoRepository;
 import org.springframework.stereotype.Service;
@@ -32,16 +36,22 @@ public class EstruturaCicloService {
 
     private final ProcessoRepository processos;
     private final PraticaRepository praticas;
+    private final AgrupamentoRepository agrupamentos;
     private final ProcessoCicloRepository processosCiclo;
     private final PraticaCicloRepository praticasCiclo;
+    private final AgrupamentoCicloRepository agrupamentosCiclo;
 
     public EstruturaCicloService(ProcessoRepository processos, PraticaRepository praticas,
+                                 AgrupamentoRepository agrupamentos,
                                  ProcessoCicloRepository processosCiclo,
-                                 PraticaCicloRepository praticasCiclo) {
+                                 PraticaCicloRepository praticasCiclo,
+                                 AgrupamentoCicloRepository agrupamentosCiclo) {
         this.processos = processos;
         this.praticas = praticas;
+        this.agrupamentos = agrupamentos;
         this.processosCiclo = processosCiclo;
         this.praticasCiclo = praticasCiclo;
+        this.agrupamentosCiclo = agrupamentosCiclo;
     }
 
     /**
@@ -61,9 +71,19 @@ public class EstruturaCicloService {
         if (prcCodsAtivos.isEmpty()) {
             return;
         }
+        List<Long> prtCodsAtivos = new ArrayList<>();
         for (PraticaModel pratica : praticas.findByPrcCodIn(prcCodsAtivos)) {
             if (pratica.getSituacao() == EAtivoInativo.ATIVO) {
                 garantirPratica(cicCod, pratica.getPrtCod());
+                prtCodsAtivos.add(pratica.getPrtCod());
+            }
+        }
+        if (prtCodsAtivos.isEmpty()) {
+            return;
+        }
+        for (AgrupamentoModel grupo : agrupamentos.findByPrtCodInOrderByOrdemAscAgrCodAsc(prtCodsAtivos)) {
+            if (grupo.getSituacao() == EAtivoInativo.ATIVO) {
+                garantirAgrupamento(cicCod, grupo.getAgrCod());
             }
         }
     }
@@ -83,6 +103,23 @@ public class EstruturaCicloService {
                 .orElseThrow(() -> new NaoEncontradoException("Prática", prtCodTemplate));
         Long prccCod = garantirProcesso(cicCod, pratica.getPrcCod());
         return copiarPratica(cicCod, prccCod, pratica).getPrtcCod();
+    }
+
+    /**
+     * Devolve o {@code AGRC_COD} da instância que corresponde ao agrupamento {@code agrCodTemplate} no
+     * ciclo, criando-o (e a prática, se preciso) sob demanda. Idempotente: casa pela proveniência.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Long garantirAgrupamento(Long cicCod, Long agrCodTemplate) {
+        AgrupamentoCicloModel existente = agrupamentosCiclo
+                .findByCicCodAndAgrCodOrigem(cicCod, agrCodTemplate).orElse(null);
+        if (existente != null) {
+            return existente.getAgrcCod();
+        }
+        AgrupamentoModel grupo = agrupamentos.findById(agrCodTemplate)
+                .orElseThrow(() -> new NaoEncontradoException("Agrupamento", agrCodTemplate));
+        Long prtcCod = garantirPratica(cicCod, grupo.getPrtCod());
+        return copiarAgrupamento(cicCod, prtcCod, grupo).getAgrcCod();
     }
 
     private Long garantirProcesso(Long cicCod, Long prcCodTemplate) {
@@ -111,8 +148,20 @@ public class EstruturaCicloService {
         copia.setCicCod(cicCod);
         copia.setPrccCod(prccCod);
         copia.setPrtCodOrigem(pratica.getPrtCod());
+        copia.setOrdem(pratica.getOrdem());
         copia.setNome(pratica.getNome());
         copia.setDescricao(pratica.getDescricao());
         return praticasCiclo.save(copia);
+    }
+
+    private AgrupamentoCicloModel copiarAgrupamento(Long cicCod, Long prtcCod, AgrupamentoModel grupo) {
+        AgrupamentoCicloModel copia = new AgrupamentoCicloModel();
+        copia.setCicCod(cicCod);
+        copia.setPrtcCod(prtcCod);
+        copia.setAgrCodOrigem(grupo.getAgrCod());
+        copia.setOrdem(grupo.getOrdem());
+        copia.setNome(grupo.getNome());
+        copia.setDescricao(grupo.getDescricao());
+        return agrupamentosCiclo.save(copia);
     }
 }

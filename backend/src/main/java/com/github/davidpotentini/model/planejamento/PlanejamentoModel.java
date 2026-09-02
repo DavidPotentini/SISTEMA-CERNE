@@ -15,10 +15,10 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 /**
- * Planejamento institucional de um ciclo — no máx. um por ciclo (o ativo). Gerado a partir de um
- * {@code MOD_COD} (modelo publicado), copiando as atividades do modelo para {@code ATIVIDADES_PLANEJADAS}.
- * O período ({@code inicio}/{@code fim}) nasce do ciclo. A estrutura de processos/práticas é herdada
- * da metodologia base do modelo (não copiada). Schema do tenant.
+ * Planejamento institucional de um ciclo — no máx. um por ciclo (o ativo). Gerado a partir da
+ * metodologia vigente ("Gerar do ciclo"), copiando as atividades ATIVAS para {@code ATIVIDADES_PLANEJADAS}.
+ * O período ({@code inicio}/{@code fim}) nasce do ciclo. A estrutura de processos/práticas é a
+ * instância do ciclo ({@code PROCESSOS_CICLO}/{@code PRATICAS_CICLO}). Schema do tenant.
  */
 @Entity
 @Table(name = "PLANEJAMENTOS")
@@ -36,10 +36,6 @@ public class PlanejamentoModel {
 
     @Column(name = "CIC_COD", nullable = false)
     private Long cicCod;
-
-    /** Modelo de origem (publicado). Fonte da estrutura e das atividades iniciais. */
-    @Column(name = "MOD_COD")
-    private Long modCod;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS", nullable = false)

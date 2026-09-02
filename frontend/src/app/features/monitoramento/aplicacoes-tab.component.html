@@ -1,4 +1,4 @@
-@if (rodadasRes.isLoading()) {
+@if (rodadasRes.isLoading() && !rodadasRes.hasValue()) {
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 } @else if (rodadasRes.error()) {
   <p class="estado erro">Não foi possível carregar as rodadas.</p>

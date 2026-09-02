@@ -5,10 +5,10 @@ export const STATUS_PLANEJAMENTO_LABEL: Record<EStatusPlanejamento, string> = {
   ENCERRADO: 'Encerrado',
 };
 
-export type EOrigemAtividade = 'MODELO' | 'COMPLEMENTAR';
+export type EOrigemAtividade = 'METODOLOGIA' | 'COMPLEMENTAR';
 
 export const ORIGEM_ATIVIDADE_LABEL: Record<EOrigemAtividade, string> = {
-  MODELO: 'Do modelo',
+  METODOLOGIA: 'Da metodologia',
   COMPLEMENTAR: 'Complementar',
 };
 
@@ -22,7 +22,7 @@ export const STATUS_ATIVIDADE_LABEL: Record<EStatusAtividade, string> = {
 };
 
 /**
- * Planejamento institucional do ciclo ativo. Gerado de um modelo publicado; `inicio`/`fim` vêm do
+ * Planejamento institucional do ciclo ativo. Gerado da metodologia vigente; `inicio`/`fim` vêm do
  * ciclo. `totalAtividades`/`concluidas`/`progresso` (%) alimentam o "Consultar publicação".
  */
 export interface Planejamento {
@@ -30,8 +30,6 @@ export interface Planejamento {
   nome: string;
   cicCod: number;
   cicloNome: string | null;
-  modCod: number | null;
-  modeloNome: string | null;
   status: EStatusPlanejamento;
   inicio: string | null;
   fim: string | null;
@@ -56,6 +54,7 @@ export interface AtividadePlanejada {
   plnCod: number;
   origem: EOrigemAtividade;
   prtcCod: number;
+  agrcCod: number | null;
   nome: string;
   observacoes: string | null;
   respPesCod: number | null;
@@ -65,17 +64,38 @@ export interface AtividadePlanejada {
   responsavelNome: string | null;
 }
 
-/** Prática dentro da estrutura do planejamento — só leitura (da metodologia) + atividades. */
+/**
+ * Agrupamento (sub-plano) dentro da estrutura do planejamento — nível entre prática e atividades.
+ * `agrcCod` é `null` no grupo sintético "Sem agrupamento" (atividades sem grupo, inclui complementares).
+ */
+export interface PlanGrupo {
+  agrcCod: number | null;
+  nome: string;
+  ordem: number;
+  /** Empreendimento do grupo dinâmico "da incubada" (nulo nos grupos do template / "Sem agrupamento"). */
+  empCod: number | null;
+  atividades: AtividadePlanejada[];
+}
+
+/** Prática dentro da estrutura do planejamento — só leitura (da metodologia) + grupos de atividades. */
 export interface PlanPratica {
   prtcCod: number;
   nome: string;
   descricao: string | null;
-  atividades: AtividadePlanejada[];
+  grupos: PlanGrupo[];
 }
+
+/** Nível CERNE do processo do ciclo. Por ora o sistema trata só o Nível I. */
+export type ENivelCerne = 'CERNE_1';
+
+export const NIVEL_CERNE_LABEL: Record<ENivelCerne, string> = {
+  CERNE_1: 'CERNE 1',
+};
 
 /** Processo dentro da estrutura do planejamento — só leitura, ordenado por `ordem`. */
 export interface PlanProcesso {
   prccCod: number;
+  nivel: ENivelCerne;
   ordem: number;
   nome: string;
   descricao: string | null;

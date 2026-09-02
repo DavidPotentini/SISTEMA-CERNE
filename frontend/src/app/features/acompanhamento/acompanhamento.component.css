@@ -1,3 +1,8 @@
+:host {
+  display: block;
+  padding-bottom: 32px;
+}
+
 /* Esqueleto da árvore (processo/prática/atividade) vem de ../shared/arvore-processos.css.
    Aqui ficam só as particularidades desta tela: topo, cabeçalho do plano, filtros e o chip de status. */
 .topo {
@@ -94,9 +99,30 @@
   margin: 0 0 12px;
 }
 
+/* Mini barra de progresso do processo. */
+.proc-progresso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+.proc-progresso mat-progress-bar {
+  flex: 1;
+  border-radius: 4px;
+}
+.proc-progresso-num {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+  min-width: 34px;
+  text-align: right;
+}
+
 /* Chip de status da atividade (exclusivo do acompanhamento). */
 .status-atv {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   margin-left: 8px;
   padding: 1px 8px;
   border-radius: 10px;
@@ -105,6 +131,11 @@
   vertical-align: middle;
   background: rgba(0, 0, 0, 0.08);
   color: rgba(0, 0, 0, 0.6);
+}
+.status-atv mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
 }
 .status-atv[data-status='EM_ANDAMENTO'] {
   background: rgba(25, 118, 210, 0.14);
@@ -117,4 +148,84 @@
 .status-atv[data-status='ATRASADA'] {
   background: rgba(176, 32, 32, 0.14);
   color: #b02020;
+}
+
+/* Prazo vencido em atividade não concluída. */
+.atividade-prazo.atrasada {
+  color: #b02020;
+  font-weight: 600;
+}
+.prazo-rel {
+  font-weight: 600;
+}
+
+/* Chips de contagem de evidências por atividade. */
+.evid-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.evid-rotulo {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+}
+.evid-rotulo mat-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+}
+.evid-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.evid-chip mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+.evid-chip.validada {
+  background: rgba(46, 125, 50, 0.14);
+  color: #2e7d32;
+}
+.evid-chip.pendente {
+  background: rgba(25, 118, 210, 0.14);
+  color: #1976d2;
+}
+.evid-chip.correcao {
+  background: rgba(176, 32, 32, 0.14);
+  color: #b02020;
+}
+.evid-sem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: rgba(0, 0, 0, 0.45);
+}
+.evid-sem mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+/* Recolher subgrupo: clique no cabeçalho inteiro alterna; as atividades somem quando recolhido. */
+.grupo-titulo {
+  cursor: pointer;
+}
+.grupo-titulo .recolher {
+  color: rgba(0, 0, 0, 0.6);
+}
+.grupo.recolhido .atividades {
+  display: none;
 }

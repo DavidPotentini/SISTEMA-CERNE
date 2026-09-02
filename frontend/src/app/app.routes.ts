@@ -51,30 +51,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/metodologia/metodologia.component').then(m => m.MetodologiaComponent),
       },
-      // LEGADO: Modelos de planejamento substituídos pela metodologia unificada (atividades na
-      // Metodologia). Telas mantidas para referência; rotas desativadas.
-      // {
-      //   path: 'modelos',
-      //   loadComponent: () =>
-      //     import('./features/modelos-planejamento/modelos.component').then(m => m.ModelosComponent),
-      // },
-      // {
-      //   path: 'modelos/:modCod',
-      //   loadComponent: () =>
-      //     import('./features/modelos-planejamento/modelo-editor.component').then(
-      //       m => m.ModeloEditorComponent,
-      //     ),
-      // },
       {
         path: 'visao-geral',
         loadComponent: () =>
           import('./features/visao-geral/visao-geral.component').then(m => m.VisaoGeralComponent),
       },
       {
-        path: 'painel-operacional',
+        path: 'pendencias',
         loadComponent: () =>
-          import('./features/painel-operacional/painel-operacional.component').then(
-            m => m.PainelOperacionalComponent,
+          import('./features/pendencias/pendencias.component').then(
+            m => m.PendenciasComponent,
           ),
       },
       {

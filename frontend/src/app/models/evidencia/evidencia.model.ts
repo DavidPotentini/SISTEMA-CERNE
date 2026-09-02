@@ -1,7 +1,7 @@
-export type EStatusEvidencia = 'EM_VALIDACAO' | 'VALIDADA' | 'CORRECAO_SOLICITADA';
+export type EStatusEvidencia = 'PENDENTE_VALIDACAO' | 'VALIDADA' | 'CORRECAO_SOLICITADA';
 
 export const STATUS_EVIDENCIA_LABEL: Record<EStatusEvidencia, string> = {
-  EM_VALIDACAO: 'Em validação',
+  PENDENTE_VALIDACAO: 'Pendente validação',
   VALIDADA: 'Validada',
   CORRECAO_SOLICITADA: 'Correção solicitada',
 };

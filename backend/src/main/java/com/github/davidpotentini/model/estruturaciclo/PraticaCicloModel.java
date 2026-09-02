@@ -36,6 +36,10 @@ public class PraticaCicloModel {
     @Column(name = "PRT_COD_ORIGEM")
     private Long prtCodOrigem;
 
+    /** Ordem da prática dentro do processo do ciclo (copiada do template). */
+    @Column(name = "ORDEM", nullable = false)
+    private Integer ordem;
+
     @Column(name = "NOME", nullable = false)
     private String nome;
 

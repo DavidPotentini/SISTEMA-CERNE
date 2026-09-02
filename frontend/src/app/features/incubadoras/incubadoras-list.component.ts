@@ -12,6 +12,7 @@ import { IncubadoraService } from '../../core/services/incubadora/incubadora.ser
 import { EStatusIncubadora, IncubadoraResumo, STATUS_LABEL } from '../../models/incubadora/incubadora.model';
 import { IncubadoraConfigurarDialog } from './incubadora-configurar.dialog';
 import { IncubadoraConsultarDialog } from './incubadora-consultar.dialog';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /** Tela "Incubadoras" do administrador: listagem, filtro e ações. */
 @Component({
@@ -41,29 +42,29 @@ export class IncubadorasListComponent {
    * Resource reativo sobre a service comum: refaz a busca sempre que o nome, o status
    * ou a {@code versao} (mutações: ativar/suspender/salvar) mudam.
    */
-  readonly dados = rxResource({
+  readonly dados = reterRecurso(rxResource({
     params: () => ({
       versao: this.service.versao(),
       nome: this.nome().trim(),
       status: this.status(),
     }),
     stream: ({ params }) => this.service.listar(params.nome, params.status),
-  });
+  }));
 
   label(s: EStatusIncubadora): string {
     return STATUS_LABEL[s];
   }
 
   nova(): void {
-    this.dialog.open(IncubadoraConfigurarDialog, { data: null, width: '640px' });
+    this.dialog.open(IncubadoraConfigurarDialog, { data: null, width: '90vw', maxWidth: '1200px' });
   }
 
   consultar(i: IncubadoraResumo): void {
-    this.dialog.open(IncubadoraConsultarDialog, { data: i.incCod, width: '560px' });
+    this.dialog.open(IncubadoraConsultarDialog, { data: i.incCod, width: '90vw', maxWidth: '1200px' });
   }
 
   configurar(i: IncubadoraResumo): void {
-    this.dialog.open(IncubadoraConfigurarDialog, { data: i.incCod, width: '640px' });
+    this.dialog.open(IncubadoraConfigurarDialog, { data: i.incCod, width: '90vw', maxWidth: '1200px' });
   }
 
   alternar(i: IncubadoraResumo): void {

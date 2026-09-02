@@ -18,6 +18,7 @@ import {
   EIXOS,
   EvolucaoRodada,
 } from '../../models/monitoramento/monitoramento.model';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /** Cores por série (rodada), em ordem; ciclam se houver mais rodadas que cores. */
 const CORES = [
@@ -53,17 +54,17 @@ export class RadarEvolucaoTabComponent {
   /** Empreendimento selecionado no filtro. */
   readonly empCod = signal<number | null>(null);
 
-  readonly empreendimentosRes = rxResource({
+  readonly empreendimentosRes = reterRecurso(rxResource({
     stream: () => this.empreendimentoService.listar(),
-  });
+  }));
 
-  readonly evolucaoRes = rxResource({
+  readonly evolucaoRes = reterRecurso(rxResource({
     params: () => {
       const emp = this.empCod();
       return emp == null ? undefined : { emp, v: this.service.versao() };
     },
     stream: ({ params }) => this.service.evolucao(params.emp),
-  });
+  }));
 
   /** Rótulos dos eixos (ordem canônica CERNE). */
   private readonly rotulosEixos = EIXOS.map(e => EIXO_LABEL[e]);

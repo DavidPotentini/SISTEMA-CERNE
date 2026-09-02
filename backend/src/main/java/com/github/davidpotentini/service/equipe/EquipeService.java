@@ -1,6 +1,7 @@
 package com.github.davidpotentini.service.equipe;
 
 import com.github.davidpotentini.dto.equipe.PessoaEquipeDTO;
+import com.github.davidpotentini.dto.equipe.ResponsavelDTO;
 import com.github.davidpotentini.model.contas.ContasModel;
 import com.github.davidpotentini.model.papeis.PapeisModel;
 import com.github.davidpotentini.model.pessoas.PessoasModel;
@@ -51,6 +52,21 @@ public class EquipeService {
                     conta.getStatus()));
         }
         return equipe;
+    }
+
+    /** Candidatos a responsável: a equipe (pessoas com conta), só {@code PES_COD} + nome. Usado por
+     * atividades, indicadores e rodadas para escolher o responsável. */
+    @Transactional(readOnly = true)
+    public List<ResponsavelDTO> listarResponsaveis() {
+        List<ResponsavelDTO> lista = new ArrayList<>();
+        for (PessoasModel pessoa : pessoas.findAll()) {
+            ContasModel conta = contas.findById(pessoa.getCtaCod()).orElse(null);
+            if (conta == null) {
+                continue;
+            }
+            lista.add(new ResponsavelDTO(pessoa.getPesCod(), conta.getNome()));
+        }
+        return lista;
     }
 
     /** Nome do papel local; {@code null} se a pessoa não tem papel ou ele não existe mais. */

@@ -21,6 +21,7 @@ import com.github.davidpotentini.repository.contas.ContasRepository;
 import com.github.davidpotentini.repository.estruturaciclo.PraticaCicloRepository;
 import com.github.davidpotentini.repository.estruturaciclo.ProcessoCicloRepository;
 import com.github.davidpotentini.repository.indicador.IndicadorRepository;
+import com.github.davidpotentini.repository.indicador.MetaRepository;
 import com.github.davidpotentini.repository.metodologia.IndicadorMetodologiaRepository;
 import com.github.davidpotentini.repository.metodologia.PraticaRepository;
 import com.github.davidpotentini.repository.metodologia.ProcessoRepository;
@@ -46,6 +47,7 @@ import java.util.Set;
 public class IndicadorService {
 
     private final IndicadorRepository indicadores;
+    private final MetaRepository metas;
     private final ProcessoRepository processos;
     private final PraticaRepository praticas;
     private final IndicadorMetodologiaRepository indicadoresMetodologia;
@@ -57,7 +59,7 @@ public class IndicadorService {
     private final ContasRepository contas;
     private final IndicadorMapper mapper;
 
-    public IndicadorService(IndicadorRepository indicadores,
+    public IndicadorService(IndicadorRepository indicadores, MetaRepository metas,
                             ProcessoRepository processos, PraticaRepository praticas,
                             IndicadorMetodologiaRepository indicadoresMetodologia,
                             ProcessoCicloRepository processosCiclo, PraticaCicloRepository praticasCiclo,
@@ -65,6 +67,7 @@ public class IndicadorService {
                             CicloContexto cicloContexto, PessoasRepository pessoas,
                             ContasRepository contas, IndicadorMapper mapper) {
         this.indicadores = indicadores;
+        this.metas = metas;
         this.processos = processos;
         this.praticas = praticas;
         this.indicadoresMetodologia = indicadoresMetodologia;
@@ -77,14 +80,40 @@ public class IndicadorService {
         this.mapper = mapper;
     }
 
-    /** Indicadores do ciclo ativo (vazio se não houver ciclo). */
+    /** Indicadores do ciclo ativo (vazio se não houver ciclo), na ordem estrutural (processo/prática). */
     @Transactional(readOnly = true)
     public List<IndicadorCicloDTO> listar() {
         CiclosModel ciclo = cicloContexto.emFoco();
         if (ciclo == null) {
             return List.of();
         }
-        return comLabels(indicadores.findByCicCodOrderByNomeAsc(ciclo.getCicCod()));
+        return comLabels(emOrdemEstrutural(
+                ciclo.getCicCod(), indicadores.findByCicCodOrderByNomeAsc(ciclo.getCicCod())));
+    }
+
+    /**
+     * Reordena os indicadores (recebidos por nome) pela posição estrutural do ciclo: processos por
+     * {@code ordem} e, dentro de cada um, práticas por {@code ordem}; o nome desempata dentro da prática.
+     * Indicadores sem vínculo de prática vão para o fim.
+     */
+    private List<IndicadorModel> emOrdemEstrutural(Long cicCod, List<IndicadorModel> porNome) {
+        Map<Long, List<IndicadorModel>> porPratica = new HashMap<>();
+        List<IndicadorModel> semVinculo = new ArrayList<>();
+        for (IndicadorModel ind : porNome) {
+            if (ind.getPrtcCod() == null) {
+                semVinculo.add(ind);
+            } else {
+                porPratica.computeIfAbsent(ind.getPrtcCod(), k -> new ArrayList<>()).add(ind);
+            }
+        }
+        List<IndicadorModel> ordenados = new ArrayList<>();
+        for (ProcessoCicloModel proc : processosCiclo.findByCicCodOrderByOrdemAscPrccCodAsc(cicCod)) {
+            for (PraticaCicloModel pr : praticasCiclo.findByPrccCodOrderByOrdemAscPrtcCodAsc(proc.getPrccCod())) {
+                ordenados.addAll(porPratica.getOrDefault(pr.getPrtcCod(), List.of()));
+            }
+        }
+        ordenados.addAll(semVinculo);
+        return ordenados;
     }
 
     /**
@@ -117,6 +146,18 @@ public class IndicadorService {
             }
         }
         return comLabels(indicadores.findByCicCodOrderByNomeAsc(ciclo.getCicCod()));
+    }
+
+    /**
+     * Os indicadores do ciclo já têm edições do usuário? (trava do "Gerar do ciclo": regerar apaga e
+     * recria os indicadores da metodologia, perdendo responsável e metas deles). Conta como edição:
+     * indicador complementar, responsável definido em algum indicador, ou qualquer meta cadastrada.
+     */
+    @Transactional(readOnly = true)
+    public boolean cicloTemEdicoes(Long cicCod) {
+        return indicadores.existsByCicCodAndOrigem(cicCod, EOrigemIndicador.COMPLEMENTAR)
+                || indicadores.existsByCicCodAndRespPesCodNotNull(cicCod)
+                || metas.existsByCiclo(cicCod);
     }
 
     /** Inclui um indicador complementar no ciclo ativo. O vínculo (prática) é opcional. */
@@ -154,14 +195,13 @@ public class IndicadorService {
         if (ciclo == null) {
             return List.of();
         }
-        Map<Long, String> nomeProcesso = new HashMap<>();
-        for (ProcessoCicloModel proc : processosCiclo.findByCicCodOrderByOrdemAscPrccCodAsc(ciclo.getCicCod())) {
-            nomeProcesso.put(proc.getPrccCod(), proc.getNome());
-        }
+        // Ordem estrutural: processos por ORDEM e, dentro de cada um, práticas por ORDEM.
         List<PraticaOpcaoDTO> opcoes = new ArrayList<>();
-        for (PraticaCicloModel pr : praticasCiclo.findByCicCodOrderByPrtcCodAsc(ciclo.getCicCod())) {
-            opcoes.add(new PraticaOpcaoDTO(
-                    pr.getPrtcCod(), pr.getNome(), pr.getPrccCod(), nomeProcesso.get(pr.getPrccCod())));
+        for (ProcessoCicloModel proc : processosCiclo.findByCicCodOrderByOrdemAscPrccCodAsc(ciclo.getCicCod())) {
+            for (PraticaCicloModel pr : praticasCiclo.findByPrccCodOrderByOrdemAscPrtcCodAsc(proc.getPrccCod())) {
+                opcoes.add(new PraticaOpcaoDTO(
+                        pr.getPrtcCod(), pr.getNome(), pr.getPrccCod(), proc.getNome()));
+            }
         }
         return opcoes;
     }

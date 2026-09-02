@@ -17,6 +17,7 @@ public record AtividadePlanejadaDTO(
         Long plnCod,
         EOrigemAtividade origem,
         Long prtcCod,
+        Long agrcCod,
         @NotBlank String nome,
         String observacoes,
         Long respPesCod,

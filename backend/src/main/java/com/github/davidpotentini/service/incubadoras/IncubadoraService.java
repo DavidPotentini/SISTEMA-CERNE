@@ -117,6 +117,29 @@ public class IncubadoraService {
         return montarDTO(carregar(conta.getIncCod()));
     }
 
+    /**
+     * Edição da própria incubadora (não admin), resolvida pela conta da sessão. Só os campos
+     * institucionais editáveis pela incubadora: {@code nivel}, {@code status}, o responsável, o
+     * schema e as datas são preservados (não vêm deste formulário).
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public IncubadoraDTO atualizarMinha(Long ctaCod, IncubadoraDTO dto) {
+        ContasModel conta = contas.findById(ctaCod)
+                .orElseThrow(() -> new NaoEncontradoException("Conta", ctaCod));
+        if (conta.getIncCod() == null) {
+            throw new AcessoNegadoException("Conta sem incubadora vinculada.");
+        }
+        IncubadorasModel model = carregar(conta.getIncCod());
+        model.setNome(dto.nome());
+        model.setCnpj(dto.cnpj());
+        model.setMantenedora(dto.mantenedora());
+        model.setEmail(dto.email());
+        model.setTelefone(dto.telefone());
+        model.setCidade(dto.cidade());
+        incubadoras.save(model);
+        return montarDTO(model);
+    }
+
     private IncubadorasModel carregar(Long id) {
         return incubadoras.findById(id)
                 .orElseThrow(() -> new NaoEncontradoException("Incubadora", id));

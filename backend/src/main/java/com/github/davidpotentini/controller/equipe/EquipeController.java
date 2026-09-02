@@ -1,6 +1,7 @@
 package com.github.davidpotentini.controller.equipe;
 
 import com.github.davidpotentini.dto.equipe.PessoaEquipeDTO;
+import com.github.davidpotentini.dto.equipe.ResponsavelDTO;
 import com.github.davidpotentini.service.equipe.EquipeService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,5 +27,11 @@ public class EquipeController {
     @GetMapping
     public List<PessoaEquipeDTO> listar() {
         return service.listar();
+    }
+
+    /** Candidatos a responsável (equipe da incubadora) para atividades, indicadores e rodadas. */
+    @GetMapping("/responsaveis")
+    public List<ResponsavelDTO> listarResponsaveis() {
+        return service.listarResponsaveis();
     }
 }

@@ -11,28 +11,28 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 /**
- * Conversão de empreendimento e suas pessoas. O {@code responsavelNome} é derivado (equipe → conta),
- * então o service resolve o nome e passa pronto na leitura — por isso a listagem de empreendimentos
- * fica orquestrada no service (não há {@code toDTOList} para ela). Na escrita, {@code estagio} e
- * {@code situacao} caem para o padrão quando não informados; códigos e vínculos ({@code empCod},
- * {@code principal}) ficam por conta do service.
+ * Conversão de empreendimento e suas pessoas. Na escrita, {@code estagio} e {@code status} caem para o
+ * padrão quando não informados; códigos e vínculos ({@code empCod}, {@code representanteLegal}) ficam
+ * por conta do service. A listagem de empreendimentos é orquestrada no service (por isso não há
+ * {@code toDTOList} para ela).
  */
 @Mapper(componentModel = "spring")
 public interface EmpreendimentoMapper {
 
     // ---- empreendimento ----
 
-    EmpreendimentoDTO toDTO(EmpreendimentosModel empreendimento, String responsavelNome);
+    @Mapping(target = "pessoas", ignore = true)
+    EmpreendimentoDTO toDTO(EmpreendimentosModel empreendimento);
 
     @Mapping(target = "empCod", ignore = true)
     @Mapping(target = "estagio", source = "estagio", defaultValue = "IDEACAO")
-    @Mapping(target = "situacao", source = "situacao", defaultValue = "EM_ANALISE")
+    @Mapping(target = "status", source = "status", defaultValue = "ATIVO")
     EmpreendimentosModel toModel(EmpreendimentoDTO dto);
 
     /** Aplica os campos editáveis sobre o empreendimento existente (edição); preserva {@code empCod}. */
     @Mapping(target = "empCod", ignore = true)
     @Mapping(target = "estagio", source = "estagio", defaultValue = "IDEACAO")
-    @Mapping(target = "situacao", source = "situacao", defaultValue = "EM_ANALISE")
+    @Mapping(target = "status", source = "status", defaultValue = "ATIVO")
     void atualizar(EmpreendimentoDTO dto, @MappingTarget EmpreendimentosModel empreendimento);
 
     // ---- pessoa do empreendimento ----
@@ -43,8 +43,7 @@ public interface EmpreendimentoMapper {
 
     @Mapping(target = "pseCod", ignore = true)
     @Mapping(target = "empCod", ignore = true)
-    @Mapping(target = "principal", ignore = true)
-    @Mapping(target = "situacao", ignore = true)
+    @Mapping(target = "representanteLegal", ignore = true)
     PessoaEmpreendimentoModel toModel(PessoaEmpreendimentoDTO dto);
 
     List<PessoaEmpreendimentoModel> toModelList(List<PessoaEmpreendimentoDTO> dtos);

@@ -1,4 +1,4 @@
-@if (painelRes.isLoading()) {
+@if (painelRes.isLoading() && !painelRes.hasValue()) {
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 } @else if (painelRes.error()) {
   <p class="estado erro">Não foi possível carregar o painel.</p>

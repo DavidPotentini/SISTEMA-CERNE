@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>{{ novo ? 'Adicionar empreendimento' : 'Gerenciar empreendimento' }}</h2>
+<h2 mat-dialog-title>{{ novo ? 'Adicionar empreendimento' : 'Editar empreendimento' }}</h2>
 <mat-dialog-content>
 
   <div class="grid">
@@ -8,18 +8,33 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Setor</mat-label>
-      <input matInput [ngModel]="setor()" (ngModelChange)="setor.set($event)" />
+      <mat-label>CNPJ</mat-label>
+      <input matInput [ngModel]="cnpj()" (ngModelChange)="cnpj.set($event)" />
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Modalidade física</mat-label>
-      <mat-select [ngModel]="modalidadeFisica()" (ngModelChange)="modalidadeFisica.set($event)">
-        <mat-option [value]="null">—</mat-option>
-        @for (m of modalidades; track m) {
-          <mat-option [value]="m">{{ modalidadeLabel[m] }}</mat-option>
-        }
-      </mat-select>
+      <mat-label>CNAE</mat-label>
+      <input matInput [ngModel]="cnae()" (ngModelChange)="cnae.set($event)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-2">
+      <mat-label>Atividade econômica</mat-label>
+      <input matInput [ngModel]="atividadeEconomica()" (ngModelChange)="atividadeEconomica.set($event)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>E-mail</mat-label>
+      <input matInput [ngModel]="email()" (ngModelChange)="email.set($event)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Instagram</mat-label>
+      <input matInput [ngModel]="instagram()" (ngModelChange)="instagram.set($event)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Site</mat-label>
+      <input matInput [ngModel]="site()" (ngModelChange)="site.set($event)" />
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -32,10 +47,30 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Situação</mat-label>
-      <mat-select [ngModel]="situacao()" (ngModelChange)="situacao.set($event)">
-        @for (s of situacoes; track s) {
-          <mat-option [value]="s">{{ situacaoLabel[s] }}</mat-option>
+      <mat-label>Status</mat-label>
+      <mat-select [ngModel]="status()" (ngModelChange)="status.set($event)">
+        @for (s of statusOpcoes; track s) {
+          <mat-option [value]="s">{{ statusLabel[s] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Situação do contrato</mat-label>
+      <mat-select [ngModel]="situacaoContrato()" (ngModelChange)="situacaoContrato.set($event)">
+        <mat-option [value]="null">—</mat-option>
+        @for (s of situacoesContrato; track s) {
+          <mat-option [value]="s">{{ situacaoContratoLabel[s] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nível de maturidade</mat-label>
+      <mat-select [ngModel]="nivelMaturidade()" (ngModelChange)="nivelMaturidade.set($event)">
+        <mat-option [value]="null">—</mat-option>
+        @for (n of niveisMaturidade; track n) {
+          <mat-option [value]="n">{{ nivelMaturidadeLabel[n] }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -45,94 +80,78 @@
       <input matInput type="date" [ngModel]="entrada()" (ngModelChange)="entrada.set($event)" />
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="col-2">
-      <mat-label>Responsável (equipe)</mat-label>
-      <mat-select
-        [ngModel]="respPesCod()"
-        (ngModelChange)="respPesCod.set($event)"
-        [disabled]="responsaveis.isLoading()"
-      >
-        <mat-option [value]="null">—</mat-option>
-        @for (r of responsaveis.value() ?? []; track r.pesCod) {
-          <mat-option [value]="r.pesCod">{{ r.nome }}</mat-option>
-        }
-      </mat-select>
+    <mat-form-field appearance="outline">
+      <mat-label>Saída</mat-label>
+      <input matInput type="date" [ngModel]="saida()" (ngModelChange)="saida.set($event)" />
     </mat-form-field>
   </div>
 
-  @if (!novo) {
-    <section class="pessoas">
-      <div class="pessoas-topo">
-        <h3>Pessoas do empreendimento</h3>
-        @if (!cadastrando()) {
-          <button mat-stroked-button color="primary" (click)="abrirCadastro()">Cadastrar</button>
-        }
-      </div>
+  <section class="pessoas">
+    <div class="pessoas-topo">
+      <h3>Pessoas do empreendimento</h3>
+      @if (!cadastrando()) {
+        <button mat-stroked-button color="primary" (click)="abrirCadastro()">Cadastrar</button>
+      }
+    </div>
 
-      @if (cadastrando()) {
-        <div class="cadastro">
-          <mat-form-field appearance="outline">
-            <mat-label>Nome</mat-label>
-            <input matInput [ngModel]="pessoaNome()" (ngModelChange)="pessoaNome.set($event)" required />
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Papel</mat-label>
-            <input matInput [ngModel]="pessoaPapel()" (ngModelChange)="pessoaPapel.set($event)" />
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Contato</mat-label>
-            <input matInput [ngModel]="pessoaContato()" (ngModelChange)="pessoaContato.set($event)" />
-          </mat-form-field>
-          <div class="cadastro-acoes">
-            <button mat-button (click)="cadastrando.set(false)">Cancelar</button>
-            <button
-              mat-flat-button
-              color="primary"
-              (click)="cadastrarPessoa()"
-              [disabled]="!pessoaNome().trim()"
-            >
-              Adicionar
-            </button>
-          </div>
+    @if (cadastrando()) {
+      <div class="cadastro">
+        <mat-form-field appearance="outline">
+          <mat-label>Nome</mat-label>
+          <input matInput [ngModel]="pessoaNome()" (ngModelChange)="pessoaNome.set($event)" required />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>E-mail</mat-label>
+          <input matInput [ngModel]="pessoaEmail()" (ngModelChange)="pessoaEmail.set($event)" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Telefone</mat-label>
+          <input matInput [ngModel]="pessoaTelefone()" (ngModelChange)="pessoaTelefone.set($event)" />
+        </mat-form-field>
+        <div class="cadastro-acoes">
+          <button mat-button (click)="cadastrando.set(false)">Cancelar</button>
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="cadastrarPessoa()"
+            [disabled]="!pessoaNome().trim()"
+          >
+            Adicionar
+          </button>
         </div>
-      }
+      </div>
+    }
 
-      <table mat-table [dataSource]="pessoas.value() ?? []" class="tabela">
-        <ng-container matColumnDef="nome">
-          <th mat-header-cell *matHeaderCellDef>Nome</th>
-          <td mat-cell *matCellDef="let p">
-            {{ p.nome }}
-            <!-- @if (p.principal) {
-              <span class="tag-principal">Principal</span>
-            } -->
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="papel">
-          <th mat-header-cell *matHeaderCellDef>Papel</th>
-          <td mat-cell *matCellDef="let p">{{ p.papel || '—' }}</td>
-        </ng-container>
-        <ng-container matColumnDef="contato">
-          <th mat-header-cell *matHeaderCellDef>Contato</th>
-          <td mat-cell *matCellDef="let p">{{ p.contato || '—' }}</td>
-        </ng-container>
-        <!-- <ng-container matColumnDef="acoes">
-          <th mat-header-cell *matHeaderCellDef></th>
-          <td mat-cell *matCellDef="let p" class="acoes">
-            @if (!p.principal) {
-              <button mat-button (click)="tornarPrincipal(p.pseCod)">Tornar principal</button>
-            }
-          </td>
-        </ng-container> -->
+    <table mat-table [dataSource]="pessoasExibidas()" class="tabela">
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let p">{{ p.nome }}</td>
+      </ng-container>
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>E-mail</th>
+        <td mat-cell *matCellDef="let p">{{ p.email || '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="telefone">
+        <th mat-header-cell *matHeaderCellDef>Telefone</th>
+        <td mat-cell *matCellDef="let p">{{ p.telefone || '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let p; let i = index" class="acoes">
+          <button mat-icon-button (click)="removerLocal(i)" title="Remover" aria-label="Remover">
+            <mat-icon>close</mat-icon>
+          </button>
+        </td>
+      </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="colunas"></tr>
-        <tr mat-row *matRowDef="let row; columns: colunas"></tr>
-      </table>
+      <tr mat-header-row *matHeaderRowDef="colunas()"></tr>
+      <tr mat-row *matRowDef="let row; columns: colunas()"></tr>
+    </table>
 
-      @if (!pessoas.isLoading() && (pessoas.value()?.length ?? 0) === 0) {
-        <p class="vazio">Nenhuma pessoa cadastrada.</p>
-      }
-    </section>
-  }
+    @if (pessoasExibidas().length === 0 && (novo || !pessoas.isLoading())) {
+      <p class="vazio">Nenhuma pessoa cadastrada.</p>
+    }
+  </section>
 
   @if (erro()) {
     <p class="erro">{{ erro() }}</p>

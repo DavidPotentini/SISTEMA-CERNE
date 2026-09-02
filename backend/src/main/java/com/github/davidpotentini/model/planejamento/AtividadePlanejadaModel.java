@@ -43,6 +43,14 @@ public class AtividadePlanejadaModel {
     @Column(name = "PRTC_COD", nullable = false)
     private Long prtcCod;
 
+    /** Agrupamento do ciclo (instância) → {@code AGRUPAMENTOS_CICLO(AGRC_COD)}. Opcional (sem grupo). */
+    @Column(name = "AGRC_COD")
+    private Long agrcCod;
+
+    /** Ordem da atividade dentro da prática (copiada da metodologia; complementar entra no fim). */
+    @Column(name = "ORDEM", nullable = false)
+    private Integer ordem;
+
     @Column(name = "NOME", nullable = false)
     private String nome;
 

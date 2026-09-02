@@ -3,8 +3,10 @@ import { Injectable, inject, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { Ciclo } from '../../../models/ciclo/ciclo.model';
 import {
+  Agrupamento,
   AtividadeMetodologia,
   EAtivoInativo,
+  GerarCicloOpcoes,
   Indicador,
   Pratica,
   Processo,
@@ -43,7 +45,7 @@ export class MetodologiaService {
     return this.http.put<Processo[]>(`${this.base}/processos/ordem`, prcCods);
   }
 
-  /** Ativa/inativa o processo (inativo continua visível, mas fora da criação de modelos). */
+  /** Ativa/inativa o processo (inativo continua visível, mas fora da geração do planejamento). */
   alterarSituacaoProcesso(prcCod: number, situacao: EAtivoInativo) {
     return this.http.patch<Processo>(`${this.base}/processos/${prcCod}/situacao`, null, {
       params: { situacao },
@@ -66,6 +68,12 @@ export class MetodologiaService {
     );
   }
 
+
+  /** Reordena as práticas de um processo (arrastar-e-soltar): envia a sequência de `prtCod`. */
+  reordenarPraticas(prcCod: number, prtCods: number[]) {
+    return this.http.put<Processo[]>(`${this.base}/processos/${prcCod}/praticas/ordem`, prtCods);
+  }
+
   // ---- indicadores ----
 
   listarIndicadores() {
@@ -86,6 +94,36 @@ export class MetodologiaService {
     });
   }
 
+  // ---- agrupamentos ----
+
+  listarAgrupamentos() {
+    return this.http.get<Agrupamento[]>(`${this.base}/agrupamentos`);
+  }
+
+  adicionarAgrupamento(prtCod: number, dto: Partial<Agrupamento>) {
+    return this.http.post<Agrupamento>(`${this.base}/praticas/${prtCod}/agrupamentos`, dto);
+  }
+
+  editarAgrupamento(agrCod: number, dto: Partial<Agrupamento>) {
+    return this.http.put<Agrupamento>(`${this.base}/agrupamentos/${agrCod}`, dto);
+  }
+
+  /** Reordena os agrupamentos de uma prática (arrastar-e-soltar): envia a sequência de `agrCod`. */
+  reordenarAgrupamentos(prtCod: number, agrCods: number[]) {
+    return this.http.put<Agrupamento[]>(`${this.base}/praticas/${prtCod}/agrupamentos/ordem`, agrCods);
+  }
+
+  alterarSituacaoAgrupamento(agrCod: number, situacao: EAtivoInativo) {
+    return this.http.patch<Agrupamento>(`${this.base}/agrupamentos/${agrCod}/situacao`, null, {
+      params: { situacao },
+    });
+  }
+
+  /** Exclui o agrupamento (bloqueado no backend se ainda tiver atividades). */
+  excluirAgrupamento(agrCod: number) {
+    return this.http.delete<void>(`${this.base}/agrupamentos/${agrCod}`);
+  }
+
   // ---- atividades ----
 
   listarAtividades() {
@@ -100,10 +138,24 @@ export class MetodologiaService {
     return this.http.put<AtividadeMetodologia>(`${this.base}/atividades/${ameCod}`, dto);
   }
 
+  /** Reordena as atividades de uma prática (arrastar-e-soltar): envia a sequência de `ameCod`. */
+  reordenarAtividades(prtCod: number, ameCods: number[]) {
+    return this.http.put<AtividadeMetodologia[]>(`${this.base}/praticas/${prtCod}/atividades/ordem`, ameCods);
+  }
+
   alterarSituacaoAtividade(ameCod: number, situacao: EAtivoInativo) {
     return this.http.patch<AtividadeMetodologia>(`${this.base}/atividades/${ameCod}/situacao`, null, {
       params: { situacao },
     });
+  }
+
+  /** Liga/desliga "repetir por empreendimento" na atividade. */
+  alterarPorEmpreendimentoAtividade(ameCod: number, valor: boolean) {
+    return this.http.patch<AtividadeMetodologia>(
+      `${this.base}/atividades/${ameCod}/por-empreendimento`,
+      null,
+      { params: { valor } },
+    );
   }
 
   excluirAtividade(ameCod: number) {
@@ -117,8 +169,13 @@ export class MetodologiaService {
     return this.http.get<Ciclo | null>(`${this.materializacaoBase}/alvo`);
   }
 
-  /** Materializa a metodologia no ciclo em foco (estrutura + indicadores + atividades). */
-  materializarMetodologia() {
-    return this.http.post<Ciclo>(this.materializacaoBase, null);
+  /** Incubadas ofertadas + as já selecionadas no ciclo em foco (para o diálogo de gerar). */
+  opcoesGerar() {
+    return this.http.get<GerarCicloOpcoes>(`${this.materializacaoBase}/empreendimentos`);
+  }
+
+  /** Materializa a metodologia no ciclo em foco com as incubadas participantes (estrutura + indicadores + atividades). */
+  materializarMetodologia(empCods: number[]) {
+    return this.http.post<Ciclo>(this.materializacaoBase, { empCods });
   }
 }

@@ -1,6 +1,10 @@
-import { Component, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { Component, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MinhaIncubadoraService } from '../services/minha-incubadora/minha-incubadora.service';
 import {
   ENivelIncubadora,
   EStatusIncubadora,
@@ -14,21 +18,31 @@ interface IncubadoraSobreData {
 }
 
 /**
- * Diálogo "Sobre a incubadora": ficha institucional em só-leitura (CNPJ, mantenedora, responsável,
- * contatos, cidade, nível). Aberto pelo botão do rodapé do menu — informação pouco consultada, tirada
- * da tela Minha Incubadora para não competir com os cards operacionais. Recebe a incubadora já
- * carregada pelo layout (sem novo fetch).
+ * Diálogo "Informações da incubadora": ficha institucional (CNPJ, mantenedora, contatos, cidade) que
+ * a própria incubadora pode editar. Nível, status e responsável ficam em só-leitura (gestão do admin).
+ * Aberto pelo botão do rodapé do menu; recebe a incubadora já carregada pelo layout. Ao salvar, fecha
+ * com {@code true} para o layout recarregar o rodapé.
  */
 @Component({
   selector: 'app-incubadora-sobre',
-  imports: [MatDialogModule, MatButtonModule],
+  imports: [FormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],
   templateUrl: './incubadora-sobre.dialog.html',
   styleUrl: './incubadora-sobre.dialog.css',
 })
 export class IncubadoraSobreDialog {
   private readonly data = inject<IncubadoraSobreData>(MAT_DIALOG_DATA);
+  private readonly service = inject(MinhaIncubadoraService);
+  private readonly ref = inject(MatDialogRef<IncubadoraSobreDialog>);
 
-  readonly inc = this.data.incubadora;
+  /** Cópia editável (não altera o objeto do layout enquanto não salvar). */
+  dados: IncubadoraDetalhe = { ...this.data.incubadora };
+
+  readonly editando = signal(false);
+  readonly salvando = signal(false);
+
+  get inc(): IncubadoraDetalhe {
+    return this.dados;
+  }
 
   statusLabel(s: EStatusIncubadora): string {
     return STATUS_LABEL[s];
@@ -36,5 +50,23 @@ export class IncubadoraSobreDialog {
 
   nivelLabel(n: ENivelIncubadora): string {
     return NIVEL_LABEL[n];
+  }
+
+  editar(): void {
+    this.editando.set(true);
+  }
+
+  cancelarEdicao(): void {
+    this.dados = { ...this.data.incubadora };
+    this.editando.set(false);
+  }
+
+  salvar(): void {
+    if (!this.dados.nome.trim()) return;
+    this.salvando.set(true);
+    this.service.atualizar(this.dados).subscribe({
+      next: () => this.ref.close(true),
+      error: () => this.salvando.set(false),
+    });
   }
 }

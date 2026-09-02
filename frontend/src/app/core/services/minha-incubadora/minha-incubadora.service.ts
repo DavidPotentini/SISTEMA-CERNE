@@ -12,4 +12,9 @@ export class MinhaIncubadoraService {
   buscar() {
     return this.http.get<IncubadoraDetalhe>(`${this.base}/minha`);
   }
+
+  /** Edição da própria ficha institucional (campos editáveis pela incubadora). */
+  atualizar(dto: IncubadoraDetalhe) {
+    return this.http.put<IncubadoraDetalhe>(`${this.base}/minha`, dto);
+  }
 }

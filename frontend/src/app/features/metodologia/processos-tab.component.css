@@ -7,6 +7,7 @@
 .barra {
   display: flex;
   justify-content: flex-end;
+  gap: 8px;
   margin: 8px 0 16px;
 }
 .estado {
@@ -17,11 +18,15 @@
   color: #b02020;
 }
 
-/* Arrastar-e-soltar de processos (exclusivo da metodologia). */
+/* Arrastar-e-soltar de processos/práticas/atividades (exclusivo da metodologia). */
 .arrastar {
   margin-right: 8px;
   color: rgba(0, 0, 0, 0.4);
   cursor: grab;
+}
+/* Com a alça de arrastar na frente, a info cresce e mantém as ações à direita. */
+.atividade .atividade-info {
+  flex: 1;
 }
 .arrastar:active {
   cursor: grabbing;
@@ -34,4 +39,29 @@
 }
 .cdk-drag-animating {
   transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Cabeçalho do agrupamento (sub-plano): ícone/alça + nome + contagem + ações à direita. */
+.grupo-icone {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: rgba(0, 0, 0, 0.4);
+}
+.grupo-acoes {
+  display: inline-flex;
+  align-items: center;
+}
+.grupo.inativa .grupo-nome {
+  opacity: 0.55;
+}
+/* Recolher subgrupo: clique no cabeçalho inteiro alterna; as atividades somem quando recolhido. */
+.grupo.recolhido .atividades {
+  display: none;
+}
+.grupo-titulo {
+  cursor: pointer;
+}
+.grupo-titulo .recolher {
+  color: rgba(0, 0, 0, 0.6);
 }

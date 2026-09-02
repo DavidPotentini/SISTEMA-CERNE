@@ -54,7 +54,7 @@ public class EvidenciaModel implements Persistable<EvidenciaId> {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS", nullable = false)
-    private EStatusEvidencia status = EStatusEvidencia.EM_VALIDACAO;
+    private EStatusEvidencia status = EStatusEvidencia.PENDENTE_VALIDACAO;
 
     /** Motivo da rejeição, gravado ao solicitar correção; {@code null} nos demais estados. */
     @Column(name = "MOTIVO_CORRECAO")

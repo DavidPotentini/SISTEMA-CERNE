@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * leitura (registro histórico).
  *
  * <p>Fica de fora de propósito: {@code CicloController} (pôr em foco/criar não pode se autobloquear)
- * e {@code MetodologiaController}/{@code ModeloController} (template global, sempre editável).
+ * e {@code MetodologiaController} (template global, sempre editável).
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

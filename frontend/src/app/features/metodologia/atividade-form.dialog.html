@@ -15,6 +15,19 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="col-2">
+      <mat-label>Agrupamento (sub-plano)</mat-label>
+      <mat-select [ngModel]="agrCod()" (ngModelChange)="agrCod.set($event)" [disabled]="prtCod() == null">
+        <mat-option [value]="null">Sem agrupamento</mat-option>
+        @for (g of gruposDisponiveis(); track g.agrCod) {
+          <mat-option [value]="g.agrCod">{{ g.nome }}</mat-option>
+        }
+      </mat-select>
+      @if (prtCod() != null && gruposDisponiveis().length === 0) {
+        <mat-hint>Esta prática ainda não tem grupos. Crie um na árvore.</mat-hint>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-2">
       <mat-label>Nome</mat-label>
       <input matInput [ngModel]="nome()" (ngModelChange)="nome.set($event)" required />
     </mat-form-field>

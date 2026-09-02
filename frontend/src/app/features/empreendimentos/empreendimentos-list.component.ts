@@ -6,15 +6,16 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
 import { EmpreendimentoService } from '../../core/services/empreendimento/empreendimento.service';
 import {
-  EEstagioEmpreendimento,
-  ESituacaoEmpreendimento,
+  EEstagioIncubacao,
+  EStatusEmpreendimento,
   Empreendimento,
   ESTAGIO_LABEL,
-  SITUACAO_EMP_LABEL,
+  STATUS_EMP_LABEL,
 } from '../../models/empreendimento/empreendimento.model';
 import { EmpreendimentoGerenciarDialog } from './empreendimento-gerenciar.dialog';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/** Tela "Empreendimentos" da incubadora: listagem, adicionar e gerenciar (dados + pessoas). */
+/** Tela "Empreendimentos" da incubadora: listagem, adicionar e editar (dados + pessoas). */
 @Component({
   selector: 'app-empreendimentos-list',
   imports: [MatCardModule, MatTableModule, MatButtonModule, MatDialogModule],
@@ -25,27 +26,27 @@ export class EmpreendimentosListComponent {
   private readonly service = inject(EmpreendimentoService);
   private readonly dialog = inject(MatDialog);
 
-  readonly colunas = ['nome', 'setor', 'estagio', 'situacao', 'responsavel', 'acoes'];
+  readonly colunas = ['nome', 'cnpj', 'estagio', 'status', 'acoes'];
 
   /** Refaz a busca sempre que houver mutação (criar / editar). */
-  readonly dados = rxResource({
+  readonly dados = reterRecurso(rxResource({
     params: () => ({ versao: this.service.versao() }),
     stream: () => this.service.listar(),
-  });
+  }));
 
-  estagioLabel(e: EEstagioEmpreendimento | null): string {
+  estagioLabel(e: EEstagioIncubacao | null): string {
     return e ? ESTAGIO_LABEL[e] : '—';
   }
 
-  situacaoLabel(s: ESituacaoEmpreendimento): string {
-    return SITUACAO_EMP_LABEL[s];
+  statusLabel(s: EStatusEmpreendimento): string {
+    return STATUS_EMP_LABEL[s];
   }
 
   adicionar(): void {
-    this.dialog.open(EmpreendimentoGerenciarDialog, { data: null, width: '760px' });
+    this.dialog.open(EmpreendimentoGerenciarDialog, { data: null, width: '90vw', maxWidth: '1200px' });
   }
 
-  gerenciar(e: Empreendimento): void {
-    this.dialog.open(EmpreendimentoGerenciarDialog, { data: e, width: '760px' });
+  editar(e: Empreendimento): void {
+    this.dialog.open(EmpreendimentoGerenciarDialog, { data: e, width: '90vw', maxWidth: '1200px' });
   }
 }

@@ -27,6 +27,7 @@ import {
   casaFiltros,
 } from '../../shared/ui/filtros-bar/filtros-bar.component';
 import { RegistrarResultadosDialog } from './registrar-resultados.dialog';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /**
  * Tela "Apuração de indicadores": mesmo estilo da aba de metas, com a coluna "Apuração"
@@ -53,15 +54,15 @@ export class ApuracaoComponent {
   private readonly dialog = inject(MatDialog);
   private readonly route = inject(ActivatedRoute);
 
-  /** Deep-link do Painel Operacional já tratado? (evita reabrir quando a lista recarrega). */
+  /** Deep-link de Pendências já tratado? (evita reabrir quando a lista recarrega). */
   private registroAberto = false;
 
   readonly colunas = ['nome', 'vinculo', 'periodicidade', 'unidade', 'apuracao', 'situacao', 'acoes'];
 
-  readonly indicadoresRes = rxResource({
+  readonly indicadoresRes = reterRecurso(rxResource({
     params: () => ({ v: this.service.versao() }),
     stream: () => this.service.listar(),
-  });
+  }));
 
   private readonly todos = computed<ApuracaoIndicador[]>(() => this.indicadoresRes.value() ?? []);
 
@@ -104,7 +105,7 @@ export class ApuracaoComponent {
   });
 
   constructor() {
-    // Vindo do Painel Operacional (?registrar=indCod): abre "Registrar Resultados" do indicador
+    // Vindo de Pendências (?registrar=indCod): abre "Registrar Resultados" do indicador
     // quando a lista carregar. Só uma vez — recarregar não deve reabrir o modal.
     effect(() => {
       const indicadores = this.indicadoresRes.value();

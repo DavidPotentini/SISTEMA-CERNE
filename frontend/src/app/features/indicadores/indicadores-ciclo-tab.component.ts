@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
-import { EmpreendimentoService } from '../../core/services/empreendimento/empreendimento.service';
+import { EquipeService } from '../../core/services/equipe/equipe.service';
 import { IndicadorService } from '../../core/services/indicador/indicador.service';
 import {
   EOrigemIndicador,
@@ -29,6 +29,7 @@ import {
   casaFiltros,
 } from '../../shared/ui/filtros-bar/filtros-bar.component';
 import { IndicadorComplementarDialog } from './indicador-complementar.dialog';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /**
  * Aba "Indicadores do ciclo": lista os indicadores do ciclo ativo (nome, origem, vínculo CERNE,
@@ -53,24 +54,24 @@ import { IndicadorComplementarDialog } from './indicador-complementar.dialog';
 })
 export class IndicadoresCicloTabComponent {
   private readonly service = inject(IndicadorService);
-  private readonly empreendimentoService = inject(EmpreendimentoService);
+  private readonly equipeService = inject(EquipeService);
   private readonly dialog = inject(MatDialog);
 
   readonly colunas = ['nome', 'origem', 'vinculo', 'unidade', 'periodicidade', 'responsavel', 'situacao'];
 
   readonly erroAcao = signal<string | null>(null);
 
-  readonly indicadoresRes = rxResource({
+  readonly indicadoresRes = reterRecurso(rxResource({
     params: () => ({ v: this.service.versao() }),
     stream: () => this.service.listar(),
-  });
+  }));
 
   readonly todos = computed<IndicadorCiclo[]>(() => this.indicadoresRes.value() ?? []);
 
   /** Equipe da incubadora — candidatos a responsável pela apuração. */
-  readonly responsaveisRes = rxResource({
-    stream: () => this.empreendimentoService.listarResponsaveis(),
-  });
+  readonly responsaveisRes = reterRecurso(rxResource({
+    stream: () => this.equipeService.listarResponsaveis(),
+  }));
 
   // ---- filtros padrão ----
   readonly filtros = signal<FiltrosState>({ ...FILTROS_VAZIO });
@@ -129,6 +130,6 @@ export class IndicadoresCicloTabComponent {
   }
 
   definirComplementar(): void {
-    this.dialog.open(IndicadorComplementarDialog, { width: '560px' });
+    this.dialog.open(IndicadorComplementarDialog, { width: '90vw', maxWidth: '1200px' });
   }
 }

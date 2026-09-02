@@ -1,10 +1,7 @@
 package com.github.davidpotentini.model.empreendimentos;
 
-import com.github.davidpotentini.enums.EAtivoInativo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,8 +11,8 @@ import lombok.Setter;
 
 /**
  * Pessoa de um empreendimento (membro da startup; NÃO é usuário do sistema) — schema do tenant.
- * {@code principal} marca o responsável (contato principal perante a incubadora); no máximo um
- * por empreendimento.
+ * {@code representanteLegal} marca o representante legal perante a incubadora; no máximo um por
+ * empreendimento.
  */
 @Entity
 @Table(name = "PESSOAS_EMPREENDIMENTO")
@@ -34,16 +31,12 @@ public class PessoaEmpreendimentoModel {
     @Column(name = "NOME", nullable = false)
     private String nome;
 
-    @Column(name = "PAPEL")
-    private String papel;
+    @Column(name = "REPRESENTANTE_LEGAL", nullable = false)
+    private boolean representanteLegal = false;
 
-    @Column(name = "PRINCIPAL", nullable = false)
-    private boolean principal = false;
+    @Column(name = "EMAIL")
+    private String email;
 
-    @Column(name = "CONTATO")
-    private String contato;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "SITUACAO", nullable = false)
-    private EAtivoInativo situacao = EAtivoInativo.ATIVO;
+    @Column(name = "TELEFONE")
+    private String telefone;
 }

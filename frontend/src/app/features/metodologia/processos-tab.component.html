@@ -1,4 +1,8 @@
 <div class="barra">
+  <button mat-stroked-button (click)="alternarTudo()">
+    <mat-icon>{{ tudoExpandido() ? 'unfold_less' : 'unfold_more' }}</mat-icon>
+    {{ tudoExpandido() ? 'Recolher tudo' : 'Expandir tudo' }}
+  </button>
   <button mat-flat-button color="primary" (click)="adicionarProcesso()">
     <mat-icon>add</mat-icon>
     Adicionar processo
@@ -23,7 +27,7 @@
     (cdkDropListDropped)="reordenar($event)"
   >
     @for (p of processosFiltrados(); track p.prcCod) {
-      <mat-expansion-panel cdkDrag [class.inativo]="p.situacao === 'INATIVO'">
+      <mat-expansion-panel cdkDrag [expanded]="tudoExpandido()" [class.inativo]="p.situacao === 'INATIVO'">
         <mat-expansion-panel-header>
           <mat-panel-title>
             <mat-icon
@@ -35,6 +39,7 @@
               drag_indicator
             </mat-icon>
             {{ p.nome }}
+            <span class="tag-nivel">{{ nivelLabel[p.nivel] }}</span>
             @if (p.situacao === 'INATIVO') {
               <span class="tag-inativo">Inativo</span>
             }
@@ -48,11 +53,25 @@
           <p class="proc-desc">{{ p.descricao }}</p>
         }
 
-        <mat-accordion class="praticas" multi>
+        <mat-accordion
+          class="praticas"
+          multi
+          cdkDropList
+          [cdkDropListDisabled]="algumFiltro()"
+          (cdkDropListDropped)="reordenarPratica(p, $event)"
+        >
           @for (pr of p.praticas; track pr.prtCod) {
-            <mat-expansion-panel class="pratica" [class.inativa]="pr.situacao === 'INATIVO'">
+            <mat-expansion-panel class="pratica" cdkDrag [expanded]="tudoExpandido()" [class.inativa]="pr.situacao === 'INATIVO'">
               <mat-expansion-panel-header>
                 <mat-panel-title>
+                  <mat-icon
+                    class="arrastar"
+                    cdkDragHandle
+                    matTooltip="Arrastar para ordenar"
+                    (click)="$event.stopPropagation()"
+                  >
+                    drag_indicator
+                  </mat-icon>
                   <span class="pratica-nome">{{ pr.nome }}</span>
                   @if (pr.situacao === 'INATIVO') {
                     <span class="tag-inativo">Inativo</span>
@@ -68,34 +87,110 @@
                 <p class="pratica-desc">{{ pr.descricao }}</p>
               }
 
-              <div class="atividades">
-                @for (atv of atividadesDa(pr.prtCod); track atv.ameCod) {
-                  <div class="atividade" [class.inativa]="atv.situacao === 'INATIVO'">
-                    <div class="atividade-info">
-                      <span class="atividade-nome">
-                        {{ atv.nome }}
-                        @if (atv.situacao === 'INATIVO') {
-                          <span class="tag-inativo">Inativo</span>
-                        }
-                      </span>
-                      @if (atv.observacoes) {
-                        <span class="atividade-desc">{{ atv.observacoes }}</span>
+              <div
+                class="grupos"
+                cdkDropList
+                [cdkDropListDisabled]="algumFiltro()"
+                (cdkDropListDropped)="reordenarAgrupamento(pr, $event)"
+              >
+                @for (g of gruposDaPratica(pr.prtCod); track g.agrCod ?? '__sem__') {
+                  <div
+                    class="grupo"
+                    cdkDrag
+                    [cdkDragDisabled]="g.fonte == null"
+                    [class.inativa]="g.fonte?.situacao === 'INATIVO'"
+                    [class.recolhido]="grupoRecolhido(pr.prtCod, g)"
+                  >
+                    <div class="grupo-titulo" (click)="alternarRecolherGrupo(pr.prtCod, g)">
+                      <mat-icon class="recolher">
+                        {{ grupoRecolhido(pr.prtCod, g) ? 'chevron_right' : 'expand_more' }}
+                      </mat-icon>
+                      @if (g.fonte != null) {
+                        <mat-icon class="arrastar" cdkDragHandle matTooltip="Arrastar para ordenar"
+                                  (click)="$event.stopPropagation()">
+                          drag_indicator
+                        </mat-icon>
+                      } @else {
+                        <mat-icon class="grupo-icone">inbox</mat-icon>
+                      }
+                      <span class="grupo-nome">{{ g.nome }}</span>
+                      @if (g.fonte?.situacao === 'INATIVO') {
+                        <span class="tag-inativo">Inativo</span>
+                      }
+                      <span class="grupo-cont">{{ g.atividades.length }}</span>
+                      @if (g.fonte != null) {
+                        <span class="grupo-acoes" (click)="$event.stopPropagation()">
+                          <button mat-icon-button matTooltip="Editar grupo" (click)="editarAgrupamento(pr, g.fonte)">
+                            <mat-icon>edit</mat-icon>
+                          </button>
+                          <button
+                            mat-icon-button
+                            [matTooltip]="g.fonte.situacao === 'ATIVO' ? 'Inativar' : 'Ativar'"
+                            (click)="alternarAgrupamento(g.fonte)"
+                          >
+                            <mat-icon>{{ g.fonte.situacao === 'ATIVO' ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+                          </button>
+                          <button mat-icon-button matTooltip="Excluir grupo" (click)="excluirAgrupamento(g.fonte)">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                          <button
+                            mat-icon-button
+                            color="primary"
+                            matTooltip="Adicionar atividade ao grupo"
+                            (click)="adicionarAtividade(pr, g.agrCod)"
+                          >
+                            <mat-icon>add</mat-icon>
+                          </button>
+                        </span>
                       }
                     </div>
-                    <div class="atividade-acoes">
-                      <button mat-icon-button matTooltip="Editar atividade" (click)="editarAtividade(atv)">
-                        <mat-icon>edit</mat-icon>
-                      </button>
-                      <button
-                        mat-icon-button
-                        [matTooltip]="atv.situacao === 'ATIVO' ? 'Inativar' : 'Ativar'"
-                        (click)="alternarAtividade(atv)"
-                      >
-                        <mat-icon>{{ atv.situacao === 'ATIVO' ? 'toggle_on' : 'toggle_off' }}</mat-icon>
-                      </button>
-                      <button mat-icon-button matTooltip="Excluir atividade" (click)="excluirAtividade(atv)">
-                        <mat-icon>delete</mat-icon>
-                      </button>
+
+                    <div class="atividades" cdkDropList (cdkDropListDropped)="reordenarAtividade(pr, g.agrCod, $event)">
+                      @for (atv of g.atividades; track atv.ameCod) {
+                        <div class="atividade" cdkDrag [class.inativa]="atv.situacao === 'INATIVO'">
+                          <mat-icon class="arrastar" cdkDragHandle matTooltip="Arrastar para ordenar">
+                            drag_indicator
+                          </mat-icon>
+                          <div class="atividade-info">
+                            <span class="atividade-nome">
+                              {{ atv.nome }}
+                              @if (atv.situacao === 'INATIVO') {
+                                <span class="tag-inativo">Inativo</span>
+                              }
+                              @if (atv.porEmpreendimento) {
+                                <span class="tag-incubada">Por empreendimento</span>
+                              }
+                            </span>
+                            @if (atv.observacoes) {
+                              <span class="atividade-desc">{{ atv.observacoes }}</span>
+                            }
+                          </div>
+                          <div class="atividade-acoes">
+                            <button mat-icon-button matTooltip="Editar atividade" (click)="editarAtividade(atv)">
+                              <mat-icon>edit</mat-icon>
+                            </button>
+                            <button
+                              mat-icon-button
+                              [matTooltip]="atv.porEmpreendimento ? 'Não repetir por empreendimento' : 'Repetir por empreendimento'"
+                              (click)="alternarPorEmpreendimentoAtividade(atv)"
+                            >
+                              <mat-icon>{{ atv.porEmpreendimento ? 'groups' : 'group_add' }}</mat-icon>
+                            </button>
+                            <button
+                              mat-icon-button
+                              [matTooltip]="atv.situacao === 'ATIVO' ? 'Inativar' : 'Ativar'"
+                              (click)="alternarAtividade(atv)"
+                            >
+                              <mat-icon>{{ atv.situacao === 'ATIVO' ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+                            </button>
+                            <button mat-icon-button matTooltip="Excluir atividade" (click)="excluirAtividade(atv)">
+                              <mat-icon>delete</mat-icon>
+                            </button>
+                          </div>
+                        </div>
+                      } @empty {
+                        <p class="vazio">Grupo sem atividades.</p>
+                      }
                     </div>
                   </div>
                 } @empty {
@@ -111,6 +206,10 @@
                 <button mat-button (click)="alternarPratica(p, pr)">
                   <mat-icon>{{ pr.situacao === 'ATIVO' ? 'block' : 'check_circle' }}</mat-icon>
                   {{ pr.situacao === 'ATIVO' ? 'Inativar' : 'Ativar' }}
+                </button>
+                <button mat-button (click)="adicionarAgrupamento(pr)">
+                  <mat-icon>add</mat-icon>
+                  Adicionar agrupamento
                 </button>
                 <button mat-button color="primary" (click)="adicionarAtividade(pr)">
                   <mat-icon>add</mat-icon>

@@ -66,7 +66,7 @@ public class EvidenciaController {
         return service.corrigir(evdCod, dto);
     }
 
-    /** Avalia a versão corrente (só se EM_VALIDACAO): validar ou solicitar correção (motivo obrigatório). */
+    /** Avalia a versão corrente (só se PENDENTE_VALIDACAO): validar ou solicitar correção (motivo obrigatório). */
     @PostMapping("/{evdCod}/avaliacoes")
     @ResponseStatus(HttpStatus.CREATED)
     public EvidenciaDTO avaliar(@PathVariable Long evdCod, @Valid @RequestBody AvaliacaoDTO dto) {

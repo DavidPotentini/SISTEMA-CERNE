@@ -1,11 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MetodologiaService } from '../../core/services/metodologia/metodologia.service';
+import { GerarCicloDialog } from './gerar-ciclo.dialog';
 import { IndicadoresTabComponent } from './indicadores-tab.component';
 import { ProcessosTabComponent } from './processos-tab.component';
 
@@ -31,6 +33,7 @@ import { ProcessosTabComponent } from './processos-tab.component';
 })
 export class MetodologiaComponent {
   private readonly service = inject(MetodologiaService);
+  private readonly dialog = inject(MatDialog);
 
   /** Ciclo em foco que receberá a materialização (alimenta o rótulo/estado do botão). */
   readonly alvoRes = rxResource({ stream: () => this.service.alvoMaterializacao() });
@@ -42,18 +45,24 @@ export class MetodologiaComponent {
   materializar(): void {
     const alvo = this.alvoRes.value();
     if (alvo == null) return;
-    const ok = window.confirm(
-      `Materializar a metodologia no ciclo em foco "${alvo.nome}"? Isto substitui os indicadores e o ` +
-        `planejamento gerados do ciclo (os complementares são mantidos).`,
-    );
-    if (!ok) return;
+    // Escolhe as incubadas participantes antes de gerar (duplica as atividades que repetem por empreendimento).
+    this.dialog
+      .open(GerarCicloDialog, { width: '90vw', maxWidth: '560px', data: { ciclo: alvo.nome } })
+      .afterClosed()
+      .subscribe((empCods: number[] | undefined) => {
+        if (empCods == null) return;
+        this.gerar(alvo.nome, empCods);
+      });
+  }
+
+  private gerar(cicloNome: string, empCods: number[]): void {
     this.materializando.set(true);
     this.feedback.set(null);
     this.erro.set(null);
-    this.service.materializarMetodologia().subscribe({
+    this.service.materializarMetodologia(empCods).subscribe({
       next: () => {
         this.materializando.set(false);
-        this.feedback.set(`Metodologia materializada no ciclo "${alvo.nome}".`);
+        this.feedback.set(`Metodologia publicada no ciclo "${cicloNome}".`);
       },
       error: e => {
         this.materializando.set(false);

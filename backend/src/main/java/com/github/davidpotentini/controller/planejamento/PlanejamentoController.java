@@ -54,16 +54,30 @@ public class PlanejamentoController {
         return service.adicionarComplementar(prtcCod, dto);
     }
 
+    /** Reordena as atividades de uma prática (arrastar-e-soltar): o corpo é a sequência de {@code atpCod}. */
+    @PutMapping("/praticas/{prtcCod}/atividades/ordem")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void reordenarAtividades(@PathVariable Long prtcCod, @RequestBody List<Long> atpCods) {
+        service.reordenarAtividades(prtcCod, atpCods);
+    }
+
+    /** Reordena os agrupamentos de uma prática (arrastar-e-soltar): o corpo é a sequência de {@code agrcCod}. */
+    @PutMapping("/praticas/{prtcCod}/agrupamentos/ordem")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void reordenarAgrupamentos(@PathVariable Long prtcCod, @RequestBody List<Long> agrcCods) {
+        service.reordenarAgrupamentos(prtcCod, agrcCods);
+    }
+
     @PutMapping("/atividades/{atpCod}")
     public AtividadePlanejadaDTO ajustar(@PathVariable Long atpCod,
                                          @Valid @RequestBody AtividadePlanejadaDTO dto) {
         return service.ajustarAtividade(atpCod, dto);
     }
 
-    /** Remove uma atividade complementar (as do modelo só são ajustadas). */
+    /** Exclui uma atividade do plano (do modelo ou complementar), salvo se tiver evidências. */
     @DeleteMapping("/atividades/{atpCod}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remover(@PathVariable Long atpCod) {
-        service.removerComplementar(atpCod);
+        service.removerAtividade(atpCod);
     }
 }

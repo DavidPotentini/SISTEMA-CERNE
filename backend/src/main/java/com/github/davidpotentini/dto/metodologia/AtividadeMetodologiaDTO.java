@@ -13,9 +13,11 @@ import jakarta.validation.constraints.NotNull;
 public record AtividadeMetodologiaDTO(
         Long ameCod,
         @NotNull Long prtCod,
+        Long agrCod,
         String vinculoMetodologico,
         @NotBlank String nome,
         String observacoes,
+        boolean porEmpreendimento,
         EAtivoInativo situacao
 ) {
 }

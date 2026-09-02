@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { EmpreendimentoService } from '../../core/services/empreendimento/empreendimento.service';
+import { EquipeService } from '../../core/services/equipe/equipe.service';
 import { MonitoramentoService } from '../../core/services/monitoramento/monitoramento.service';
 import {
   ETipoRodada,
@@ -35,6 +36,7 @@ import {
 export class PlanejarRodadaDialog {
   private readonly service = inject(MonitoramentoService);
   private readonly empreendimentoService = inject(EmpreendimentoService);
+  private readonly equipeService = inject(EquipeService);
   private readonly ref = inject(MatDialogRef<PlanejarRodadaDialog>);
 
   readonly tipos = Object.entries(TIPO_RODADA_LABEL) as [ETipoRodada, string][];
@@ -43,7 +45,7 @@ export class PlanejarRodadaDialog {
     stream: () => this.empreendimentoService.listar(),
   });
   readonly responsaveisRes = rxResource({
-    stream: () => this.empreendimentoService.listarResponsaveis(),
+    stream: () => this.equipeService.listarResponsaveis(),
   });
 
   readonly nome = signal('');

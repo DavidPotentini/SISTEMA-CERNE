@@ -7,6 +7,7 @@ import { UsuarioService } from '../../core/services/usuario/usuario.service';
 import { EStatusConta, STATUS_CONTA_LABEL, UsuarioResumo } from '../../models/usuario/usuario.model';
 import { UsuarioFormDialog } from './usuario-form.dialog';
 import { NgClass } from '@angular/common';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /** Tela "Usuários da plataforma" do administrador: listagem, convidar e suspender/reativar. */
 @Component({
@@ -22,21 +23,21 @@ export class UsuariosListComponent {
   readonly colunas = ['nome', 'email', 'incubadora', 'papel', 'status', 'acoes'];
 
   /** Refaz a busca sempre que houver mutação (convidar / suspender / reativar). */
-  readonly dados = rxResource({
+  readonly dados = reterRecurso(rxResource({
     params: () => ({ versao: this.service.versao() }),
     stream: () => this.service.listar(),
-  });
+  }));
 
   label(s: EStatusConta): string {
     return STATUS_CONTA_LABEL[s];
   }
 
   adicionar(): void {
-    this.dialog.open(UsuarioFormDialog, { data: null, width: '480px' });
+    this.dialog.open(UsuarioFormDialog, { data: null, width: '90vw', maxWidth: '1200px' });
   }
 
   editar(u: UsuarioResumo): void {
-    this.dialog.open(UsuarioFormDialog, { data: u, width: '480px' });
+    this.dialog.open(UsuarioFormDialog, { data: u, width: '90vw', maxWidth: '1200px' });
   }
 
   alternar(u: UsuarioResumo): void {

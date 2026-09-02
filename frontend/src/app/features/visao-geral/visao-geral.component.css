@@ -1,3 +1,8 @@
+:host {
+  display: block;
+  padding-bottom: 32px;
+}
+
 .topo {
   display: flex;
   align-items: baseline;

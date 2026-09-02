@@ -6,7 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { of } from 'rxjs';
-import { EmpreendimentoService } from '../../../core/services/empreendimento/empreendimento.service';
+import { EquipeService } from '../../../core/services/equipe/equipe.service';
 
 /** Opção de processo do filtro (identificada pelo nome, que é único na metodologia viva). */
 export interface OpcaoProcesso {
@@ -68,7 +68,7 @@ export function casaFiltros(
   styleUrl: './filtros-bar.component.css',
 })
 export class FiltrosBarComponent {
-  private readonly empreendimentoService = inject(EmpreendimentoService);
+  private readonly equipeService = inject(EquipeService);
 
   readonly filtros = model.required<FiltrosState>();
 
@@ -82,7 +82,7 @@ export class FiltrosBarComponent {
   /** Equipe da incubadora — só busca quando o filtro de responsável está habilitado. */
   readonly responsaveisRes = rxResource({
     params: () => ({ on: this.comResponsavel() }),
-    stream: () => (this.comResponsavel() ? this.empreendimentoService.listarResponsaveis() : of([])),
+    stream: () => (this.comResponsavel() ? this.equipeService.listarResponsaveis() : of([])),
   });
 
   /** Práticas do processo selecionado (a prática só fica habilitada com um processo escolhido). */

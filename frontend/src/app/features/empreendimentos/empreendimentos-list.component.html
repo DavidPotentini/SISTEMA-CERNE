@@ -13,28 +13,24 @@
       <th mat-header-cell *matHeaderCellDef>Nome</th>
       <td mat-cell *matCellDef="let e">{{ e.nome }}</td>
     </ng-container>
-    <ng-container matColumnDef="setor">
-      <th mat-header-cell *matHeaderCellDef>Setor</th>
-      <td mat-cell *matCellDef="let e">{{ e.setor || '—' }}</td>
+    <ng-container matColumnDef="cnpj">
+      <th mat-header-cell *matHeaderCellDef>CNPJ</th>
+      <td mat-cell *matCellDef="let e">{{ e.cnpj || '—' }}</td>
     </ng-container>
     <ng-container matColumnDef="estagio">
       <th mat-header-cell *matHeaderCellDef>Estágio</th>
       <td mat-cell *matCellDef="let e">{{ estagioLabel(e.estagio) }}</td>
     </ng-container>
-    <ng-container matColumnDef="situacao">
-      <th mat-header-cell *matHeaderCellDef>Situação</th>
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
       <td mat-cell *matCellDef="let e">
-        <span class="chip" [class]="'s-' + e.situacao">{{ situacaoLabel(e.situacao) }}</span>
+        <span class="chip" [class]="'s-' + e.status">{{ statusLabel(e.status) }}</span>
       </td>
-    </ng-container>
-    <ng-container matColumnDef="responsavel">
-      <th mat-header-cell *matHeaderCellDef>Responsável</th>
-      <td mat-cell *matCellDef="let e">{{ e.responsavelNome || '—' }}</td>
     </ng-container>
     <ng-container matColumnDef="acoes">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let e" class="acoes">
-        <button mat-stroked-button (click)="gerenciar(e)">Gerenciar</button>
+        <button mat-stroked-button (click)="editar(e)">Editar</button>
       </td>
     </ng-container>
 

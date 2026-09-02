@@ -8,6 +8,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MonitoramentoService } from '../../core/services/monitoramento/monitoramento.service';
 import { RodadaAplicacoesComponent } from './rodada-aplicacoes.component';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /**
  * Aba "Aplicações e pontuação": barra de filtro (nome do empreendimento / status) e a lista de
@@ -34,8 +35,8 @@ export class AplicacoesTabComponent {
   readonly filtroNome = signal('');
   readonly filtroStatus = signal('TODOS');
 
-  readonly rodadasRes = rxResource({
+  readonly rodadasRes = reterRecurso(rxResource({
     params: () => ({ v: this.service.versao() }),
     stream: () => this.service.listarRodadas(),
-  });
+  }));
 }

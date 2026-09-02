@@ -9,3 +9,9 @@ export interface PessoaEquipe {
   papel: string | null;
   situacao: EStatusConta;
 }
+
+/** Candidato a responsável: pessoa da equipe da incubadora (para atividades, indicadores, rodadas). */
+export interface Responsavel {
+  pesCod: number;
+  nome: string;
+}

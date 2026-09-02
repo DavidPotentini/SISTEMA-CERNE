@@ -57,9 +57,16 @@
     @if (estruturaRes.error()) {
       <p class="estado erro">Não foi possível carregar a estrutura.</p>
     } @else if (estruturaRes.hasValue()) {
+      <div class="acordeao-acoes">
+        <button mat-stroked-button (click)="alternarTudo()">
+          <mat-icon>{{ tudoExpandido() ? 'unfold_less' : 'unfold_more' }}</mat-icon>
+          {{ tudoExpandido() ? 'Recolher tudo' : 'Expandir tudo' }}
+        </button>
+      </div>
+
       <mat-accordion multi>
         @for (proc of estruturaFiltrada(); track proc.prccCod) {
-          <mat-expansion-panel>
+          <mat-expansion-panel [expanded]="tudoExpandido()">
             <mat-expansion-panel-header>
               <mat-panel-title>
                 <span class="ordem">{{ proc.ordem }}</span>
@@ -74,27 +81,41 @@
               <p class="proc-desc">{{ proc.descricao }}</p>
             }
 
+            <div class="proc-progresso">
+              <mat-progress-bar mode="determinate" [value]="progresso(proc)"></mat-progress-bar>
+              <span class="proc-progresso-num">{{ progresso(proc) }}%</span>
+            </div>
+
             <mat-accordion class="praticas" multi>
               @for (pr of proc.praticas; track pr.prtcCod) {
-                <mat-expansion-panel class="pratica">
+                <mat-expansion-panel class="pratica" [expanded]="tudoExpandido()">
                   <mat-expansion-panel-header>
                     <mat-panel-title>
                       <span class="pratica-nome">{{ pr.nome }}</span>
                     </mat-panel-title>
                     <mat-panel-description>
-                      {{ pr.atividades.length }}
-                      {{ pr.atividades.length === 1 ? 'atividade' : 'atividades' }}
+                      {{ concluidasPratica(pr) }}/{{ totalPratica(pr) }} concluídas
                     </mat-panel-description>
                   </mat-expansion-panel-header>
 
-                  <div class="atividades">
-                    @for (atv of pr.atividades; track atv.atpCod) {
+                  @for (g of pr.grupos; track g.agrcCod ?? g.nome) {
+                    <div class="grupo" [class.recolhido]="grupoRecolhido(pr.prtcCod, g)">
+                      <div class="grupo-titulo" (click)="alternarRecolherGrupo(pr.prtcCod, g)">
+                        <mat-icon class="recolher">
+                          {{ grupoRecolhido(pr.prtcCod, g) ? 'chevron_right' : 'expand_more' }}
+                        </mat-icon>
+                        <mat-icon>{{ g.empCod != null ? 'business' : 'segment' }}</mat-icon>
+                        <span class="grupo-nome">{{ g.nome }}</span>
+                        <span class="grupo-cont">{{ concluidasGrupo(g) }}/{{ g.atividades.length }}</span>
+                      </div>
+                      <div class="atividades">
+                        @for (atv of g.atividades; track atv.atpCod) {
                       <div class="atividade">
                         <div class="atividade-info">
                           <span class="atividade-nome">
                             {{ atv.nome }}
                             <span class="status-atv" [attr.data-status]="atv.status">
-                              {{ statusLabel[atv.status] }}
+                              <mat-icon>{{ statusIcone[atv.status] }}</mat-icon>{{ statusLabel[atv.status] }}
                             </span>
                           </span>
                           <span class="atividade-meta">
@@ -104,7 +125,43 @@
                               </span>
                             }
                             @if (atv.prazo) {
-                              <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
+                              <span class="atividade-prazo" [class.atrasada]="prazoVencido(atv)">
+                                Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}
+                                @if (prazoRelativo(atv); as rel) {
+                                  <span class="prazo-rel">· {{ rel }}</span>
+                                }
+                              </span>
+                            }
+                          </span>
+
+                          @let ev = contagemEvid(atv.atpCod);
+                          <span class="evid-chips">
+                            <span class="evid-rotulo">
+                              <mat-icon>description</mat-icon>Evidências:
+                            </span>
+                            @if (ev.total === 0) {
+                              <span class="evid-sem">
+                                <mat-icon>folder_off</mat-icon>Sem evidências
+                              </span>
+                            } @else {
+                              @if (ev.validadas) {
+                                <span class="evid-chip validada">
+                                  <mat-icon>check_circle</mat-icon>
+                                  {{ ev.validadas }} {{ ev.validadas === 1 ? 'validada' : 'validadas' }}
+                                </span>
+                              }
+                              @if (ev.pendentes) {
+                                <span class="evid-chip pendente">
+                                  <mat-icon>hourglass_empty</mat-icon>
+                                  {{ ev.pendentes }} {{ ev.pendentes === 1 ? 'pendente' : 'pendentes' }}
+                                </span>
+                              }
+                              @if (ev.correcao) {
+                                <span class="evid-chip correcao">
+                                  <mat-icon>report_problem</mat-icon>
+                                  {{ ev.correcao }} em correção
+                                </span>
+                              }
                             }
                           </span>
                         </div>
@@ -113,10 +170,12 @@
                           Registrar
                         </button>
                       </div>
-                    } @empty {
-                      <p class="vazio">Nenhuma atividade nesta prática.</p>
-                    }
-                  </div>
+                        }
+                      </div>
+                    </div>
+                  } @empty {
+                    <p class="vazio">Nenhuma atividade nesta prática.</p>
+                  }
                 </mat-expansion-panel>
               } @empty {
                 <p class="vazio">Nenhuma prática ativa neste processo.</p>

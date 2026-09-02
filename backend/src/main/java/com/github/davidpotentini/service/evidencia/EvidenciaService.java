@@ -5,6 +5,7 @@ import com.github.davidpotentini.comum.erro.RegraNegocioException;
 import com.github.davidpotentini.comum.tenant.SessaoContext;
 import com.github.davidpotentini.dto.evidencia.AtividadeOpcaoDTO;
 import com.github.davidpotentini.dto.evidencia.EvidenciaDTO;
+import com.github.davidpotentini.enums.EStatusAtividade;
 import com.github.davidpotentini.enums.EStatusEvidencia;
 import com.github.davidpotentini.enums.EStatusPlanejamento;
 import com.github.davidpotentini.mapper.evidencia.EvidenciaMapper;
@@ -105,15 +106,16 @@ public class EvidenciaService {
         EvidenciaModel evidencia = mapper.toModel(dto);
         evidencia.setEvdCod(evidencias.proximoEvdCod());
         evidencia.setEvdCodSeq(1);
-        evidencia.setStatus(EStatusEvidencia.EM_VALIDACAO);
+        evidencia.setStatus(EStatusEvidencia.PENDENTE_VALIDACAO);
         evidencia.setRegPesCod(pessoaAtual());
         evidencia.setData(LocalDateTime.now());
         evidencias.save(evidencia);
+        marcarEmAndamentoPorEvidencia(dto.atpCod());
         return toDTO(evidencia);
     }
 
     /**
-     * Corrige a evidência gerando a próxima versão (mesmo id lógico), que nasce {@code EM_VALIDACAO}
+     * Corrige a evidência gerando a próxima versão (mesmo id lógico), que nasce {@code PENDENTE_VALIDACAO}
      * sem motivo. Só é permitido quando a versão corrente está em {@code CORRECAO_SOLICITADA} — a
      * própria nova versão (arquivo/título) é a correção.
      */
@@ -130,7 +132,7 @@ public class EvidenciaService {
         EvidenciaModel nova = mapper.toModel(dto);
         nova.setEvdCod(evdCod);
         nova.setEvdCodSeq(proximaSeq);
-        nova.setStatus(EStatusEvidencia.EM_VALIDACAO);
+        nova.setStatus(EStatusEvidencia.PENDENTE_VALIDACAO);
         nova.setRegPesCod(pessoaAtual());
         nova.setData(LocalDateTime.now());
         evidencias.save(nova);
@@ -139,7 +141,7 @@ public class EvidenciaService {
 
     /**
      * Avalia a versão corrente (acompanhamento de execução) — decisão única: só quem está
-     * {@code EM_VALIDACAO} pode ser avaliado. Validar é final; solicitar correção exige um
+     * {@code PENDENTE_VALIDACAO} pode ser avaliado. Validar é final; solicitar correção exige um
      * {@code motivo}, que fica gravado na própria versão para orientar a correção.
      */
     @Transactional(rollbackFor = Exception.class)
@@ -149,7 +151,7 @@ public class EvidenciaService {
         }
         EvidenciaModel corrente = evidencias.versaoCorrente(evdCod)
                 .orElseThrow(() -> new NaoEncontradoException("Evidência", evdCod));
-        if (corrente.getStatus() != EStatusEvidencia.EM_VALIDACAO) {
+        if (corrente.getStatus() != EStatusEvidencia.PENDENTE_VALIDACAO) {
             throw new RegraNegocioException("Esta evidência já foi avaliada.");
         }
         if (status == EStatusEvidencia.CORRECAO_SOLICITADA && (motivo == null || motivo.isBlank())) {
@@ -173,19 +175,23 @@ public class EvidenciaService {
         if (plano == null) {
             return List.of();
         }
-        Map<Long, PraticaCicloModel> cachePratica = new HashMap<>();
-        Map<Long, ProcessoCicloModel> cacheProcesso = new HashMap<>();
+        // Atividades por prática (cada uma já na ordem de ORDEM dentro da prática).
+        Map<Long, List<AtividadePlanejadaModel>> porPratica = new HashMap<>();
+        for (AtividadePlanejadaModel a : atividades.findByPlnCodOrderByOrdemAscAtpCodAsc(plano.getPlnCod())) {
+            porPratica.computeIfAbsent(a.getPrtcCod(), k -> new ArrayList<>()).add(a);
+        }
+
+        // Emite na ordem estrutural: processos por ORDEM → práticas por ORDEM → atividades.
         List<AtividadeOpcaoDTO> opcoes = new ArrayList<>();
-        for (AtividadePlanejadaModel a : atividades.findByPlnCodOrderByAtpCodAsc(plano.getPlnCod())) {
-            PraticaCicloModel pratica = cachePratica.computeIfAbsent(
-                    a.getPrtcCod(), id -> praticasCiclo.findById(id).orElse(null));
-            Long prccCod = pratica == null ? null : pratica.getPrccCod();
-            ProcessoCicloModel processo = prccCod == null ? null
-                    : cacheProcesso.computeIfAbsent(prccCod, id -> processosCiclo.findById(id).orElse(null));
-            opcoes.add(new AtividadeOpcaoDTO(
-                    a.getAtpCod(), a.getNome(),
-                    a.getPrtcCod(), pratica == null ? null : pratica.getNome(),
-                    prccCod, processo == null ? null : processo.getNome()));
+        for (ProcessoCicloModel proc : processosCiclo.findByCicCodOrderByOrdemAscPrccCodAsc(plano.getCicCod())) {
+            for (PraticaCicloModel pratica : praticasCiclo.findByPrccCodOrderByOrdemAscPrtcCodAsc(proc.getPrccCod())) {
+                for (AtividadePlanejadaModel a : porPratica.getOrDefault(pratica.getPrtcCod(), List.of())) {
+                    opcoes.add(new AtividadeOpcaoDTO(
+                            a.getAtpCod(), a.getNome(),
+                            a.getPrtcCod(), pratica.getNome(),
+                            proc.getPrccCod(), proc.getNome()));
+                }
+            }
         }
         return opcoes;
     }
@@ -206,6 +212,22 @@ public class EvidenciaService {
     private void exigirAtividade(Long atpCod) {
         if (atpCod == null || !atividades.existsById(atpCod)) {
             throw new NaoEncontradoException("Atividade planejada", atpCod);
+        }
+    }
+
+    /**
+     * Ao registrar uma evidência (que nasce pendente), a atividade volta a EM_ANDAMENTO se estava
+     * PLANEJADA (1ª evidência) ou CONCLUIDA (nova evidência reabre a execução). Intermediário derivado.
+     */
+    private void marcarEmAndamentoPorEvidencia(Long atpCod) {
+        AtividadePlanejadaModel atv = atividades.findById(atpCod).orElse(null);
+        if (atv == null) {
+            return;
+        }
+        EStatusAtividade status = atv.getStatus();
+        if (status == EStatusAtividade.PLANEJADA || status == EStatusAtividade.CONCLUIDA) {
+            atv.setStatus(EStatusAtividade.EM_ANDAMENTO);
+            atividades.save(atv);
         }
     }
 

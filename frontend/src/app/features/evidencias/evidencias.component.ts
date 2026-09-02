@@ -24,6 +24,7 @@ import {
 } from '../../shared/ui/filtros-bar/filtros-bar.component';
 import { EvidenciaDetalheDialog } from './evidencia-detalhe.dialog';
 import { EvidenciaFormDialog } from './evidencia-form.dialog';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /**
  * Tela "Registros de evidência": lista a versão corrente de cada evidência (título, atividade/contexto,
@@ -50,15 +51,15 @@ export class EvidenciasComponent {
   private readonly dialog = inject(MatDialog);
   private readonly route = inject(ActivatedRoute);
 
-  /** Deep-link do Painel Operacional já tratado? (evita reabrir quando a lista recarrega). */
+  /** Deep-link de Pendências já tratado? (evita reabrir quando a lista recarrega). */
   private correcaoAberta = false;
 
   readonly colunas = ['titulo', 'atividade', 'responsavel', 'arquivo', 'status', 'acoes'];
 
-  readonly evidenciasRes = rxResource({
+  readonly evidenciasRes = reterRecurso(rxResource({
     params: () => ({ v: this.service.versao() }),
     stream: () => this.service.listar(),
-  });
+  }));
 
   readonly todas = computed<Evidencia[]>(() => this.evidenciasRes.value() ?? []);
 
@@ -101,7 +102,7 @@ export class EvidenciasComponent {
   });
 
   constructor() {
-    // Vindo do Painel Operacional (?corrigir=evdCod): abre "Corrigir" da evidência quando a lista
+    // Vindo de Pendências (?corrigir=evdCod): abre "Corrigir" da evidência quando a lista
     // carregar. Só uma vez, e só se ainda estiver em correção solicitada.
     effect(() => {
       const todas = this.evidenciasRes.value();
@@ -125,19 +126,19 @@ export class EvidenciasComponent {
   }
 
   registrar(): void {
-    this.dialog.open(EvidenciaFormDialog, { width: '560px', data: { modo: 'registrar' } });
+    this.dialog.open(EvidenciaFormDialog, { width: '90vw', maxWidth: '1200px', data: { modo: 'registrar' } });
   }
 
   corrigir(evidencia: Evidencia): void {
     this.dialog.open(EvidenciaFormDialog, {
-      width: '560px',
+      width: '90vw', maxWidth: '1200px',
       data: { modo: 'corrigir', evidencia },
     });
   }
 
   abrir(evidencia: Evidencia): void {
     this.dialog.open(EvidenciaDetalheDialog, {
-      width: '620px',
+      width: '90vw', maxWidth: '1200px',
       data: { evdCod: evidencia.evdCod },
     });
   }

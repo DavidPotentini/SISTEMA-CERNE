@@ -11,7 +11,7 @@
 
 @if (empCod() == null) {
   <p class="estado">Selecione um empreendimento para ver a evolução por eixo.</p>
-} @else if (evolucaoRes.isLoading()) {
+} @else if (evolucaoRes.isLoading() && !evolucaoRes.hasValue()) {
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 } @else if (evolucaoRes.error()) {
   <p class="estado erro">Não foi possível carregar a evolução.</p>

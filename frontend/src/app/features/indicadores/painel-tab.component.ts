@@ -5,6 +5,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ApuracaoService } from '../../core/services/apuracao/apuracao.service';
 import { PainelIndicador } from '../../models/indicador/indicador.model';
 import { EPeriodicidade, PERIODICIDADE_LABEL } from '../../models/metodologia/metodologia.model';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /** Consolidação de "atingidos / total" por processo CERNE (denominador = todos os indicadores do processo). */
 interface ConsolidacaoProcesso {
@@ -28,10 +29,10 @@ interface ConsolidacaoProcesso {
 export class PainelTabComponent {
   private readonly service = inject(ApuracaoService);
 
-  readonly painelRes = rxResource({
+  readonly painelRes = reterRecurso(rxResource({
     params: () => ({ v: this.service.versao() }),
     stream: () => this.service.painel(),
-  });
+  }));
 
   readonly indicadores = computed<PainelIndicador[]>(() => this.painelRes.value() ?? []);
 

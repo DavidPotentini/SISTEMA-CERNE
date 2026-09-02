@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -36,17 +36,30 @@ export class IncubadoraLayoutComponent {
   /** Alimenta o rodapé (nome + nível). */
   readonly incubadora = rxResource({ stream: () => this.service.buscar() });
 
+  /** Menu lateral atual: navegação principal ou o submenu de Configuração (engrenagem do rodapé). */
+  readonly modo = signal<'principal' | 'config'>('principal');
+
+  /** Trilho recolhido (só ícones) quando true; o botão do topo alterna. */
+  readonly recolhido = signal(false);
+
   nivelLabel(n: ENivelIncubadora): string {
     return NIVEL_LABEL[n];
   }
 
-  /** Abre a ficha institucional (pouco consultada) num modal, com a incubadora já carregada. */
+  /** Abre a ficha institucional (editável) num modal; ao salvar, recarrega o rodapé. */
   sobre(): void {
     const inc = this.incubadora.value();
     if (!inc) {
       return;
     }
-    this.dialog.open(IncubadoraSobreDialog, { width: '520px', data: { incubadora: inc } });
+    this.dialog
+      .open(IncubadoraSobreDialog, { width: '90vw', maxWidth: '1200px', data: { incubadora: inc } })
+      .afterClosed()
+      .subscribe(salvou => {
+        if (salvou) {
+          this.incubadora.reload();
+        }
+      });
   }
 
   sair(): void {

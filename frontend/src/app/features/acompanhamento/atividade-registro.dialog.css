@@ -26,8 +26,40 @@
   gap: 12px;
   flex-wrap: wrap;
 }
-.status-linha mat-form-field {
-  min-width: 200px;
+
+/* Chip do status atual (só leitura; o intermediário é derivado das evidências). */
+.status-atual {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.6);
+}
+.status-atual mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+.status-atual[data-status='EM_ANDAMENTO'] {
+  background: rgba(25, 118, 210, 0.14);
+  color: #1976d2;
+}
+.status-atual[data-status='CONCLUIDA'] {
+  background: rgba(46, 125, 50, 0.14);
+  color: #2e7d32;
+}
+.status-atual[data-status='ATRASADA'] {
+  background: rgba(176, 32, 32, 0.14);
+  color: #b02020;
+}
+.dica {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .aviso,

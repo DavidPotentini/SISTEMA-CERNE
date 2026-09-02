@@ -13,4 +13,10 @@ public interface IndicadorRepository extends JpaRepository<IndicadorModel, Long>
 
     /** Remove os indicadores de uma origem no ciclo — usado para regerar os da metodologia. */
     void deleteByCicCodAndOrigem(Long cicCod, EOrigemIndicador origem);
+
+    /** Existe indicador de uma origem no ciclo (ex.: {@code COMPLEMENTAR} = incluído pelo usuário). */
+    boolean existsByCicCodAndOrigem(Long cicCod, EOrigemIndicador origem);
+
+    /** Existe indicador do ciclo com responsável definido (ajuste do usuário). */
+    boolean existsByCicCodAndRespPesCodNotNull(Long cicCod);
 }

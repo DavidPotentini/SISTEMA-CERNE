@@ -8,7 +8,7 @@ import com.github.davidpotentini.enums.EEstadoProcesso;
 import com.github.davidpotentini.enums.EStatusAtividade;
 import com.github.davidpotentini.enums.EStatusEvidencia;
 import com.github.davidpotentini.enums.EStatusPlanejamento;
-import com.github.davidpotentini.enums.ESituacaoEmpreendimento;
+import com.github.davidpotentini.enums.EStatusEmpreendimento;
 import com.github.davidpotentini.model.ciclos.CiclosModel;
 import com.github.davidpotentini.model.empreendimentos.EmpreendimentosModel;
 import com.github.davidpotentini.model.estruturaciclo.PraticaCicloModel;
@@ -39,7 +39,7 @@ import java.util.Set;
  * ativos, evidências registradas/validadas, indicadores com meta atingida/total — mais o fluxo de
  * processos com o estado de cada um (concluído/em andamento/não iniciado).
  *
- * <p>Reaproveita o mesmo escopo do Painel Operacional (planejamento vigente + versões correntes de
+ * <p>Reaproveita o mesmo escopo de Pendências (planejamento vigente + versões correntes de
  * evidência) e a regra de "meta atingida" da apuração ({@link ApuracaoService}), para não divergir.
  */
 @Service
@@ -81,7 +81,7 @@ public class PainelVisaoGeralService {
         List<AtividadePlanejadaModel> ativs = planejamentos
                 .findByCicCodAndStatus(ciclo.getCicCod(), EStatusPlanejamento.PUBLICADO)
                 .map(PlanejamentoModel::getPlnCod)
-                .map(atividades::findByPlnCodOrderByAtpCodAsc)
+                .map(atividades::findByPlnCodOrderByOrdemAscAtpCodAsc)
                 .orElse(List.of());
 
         long atividadesTotal = ativs.size();
@@ -112,7 +112,7 @@ public class PainelVisaoGeralService {
         // Empreendimentos ativos (da incubadora — não são por ciclo).
         long empreendimentosAtivos = 0;
         for (EmpreendimentosModel emp : empreendimentos.findAllByOrderByNomeAsc()) {
-            if (emp.getSituacao() == ESituacaoEmpreendimento.ATIVO) {
+            if (emp.getStatus() == EStatusEmpreendimento.ATIVO) {
                 empreendimentosAtivos++;
             }
         }
@@ -156,7 +156,7 @@ public class PainelVisaoGeralService {
         for (ProcessoCicloModel proc : processosCiclo.findByCicCodOrderByOrdemAscPrccCodAsc(cicCod)) {
             long concluidas = 0;
             long total = 0;
-            for (PraticaCicloModel pr : praticasCiclo.findByPrccCodOrderByPrtcCodAsc(proc.getPrccCod())) {
+            for (PraticaCicloModel pr : praticasCiclo.findByPrccCodOrderByOrdemAscPrtcCodAsc(proc.getPrccCod())) {
                 long[] c = contagemPorPratica.get(pr.getPrtcCod());
                 if (c != null) {
                     concluidas += c[0];

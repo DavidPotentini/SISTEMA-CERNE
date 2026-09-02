@@ -6,7 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { EmpreendimentoService } from '../../core/services/empreendimento/empreendimento.service';
+import { EquipeService } from '../../core/services/equipe/equipe.service';
 import { PlanejamentoService } from '../../core/services/planejamento/planejamento.service';
 import { AtividadePlanejada } from '../../models/planejamento/planejamento.model';
 
@@ -19,7 +19,7 @@ interface AtividadePlanejadaFormData {
 }
 
 /**
- * Modal de atividade planejada: ajusta uma existente (do modelo ou complementar) ou inclui uma
+ * Modal de atividade planejada: ajusta uma existente (da metodologia ou complementar) ou inclui uma
  * complementar na prática de onde foi aberta. Campos: nome, observação e prazo.
  */
 @Component({
@@ -37,7 +37,7 @@ interface AtividadePlanejadaFormData {
 })
 export class AtividadePlanejadaFormDialog {
   private readonly service = inject(PlanejamentoService);
-  private readonly empreendimentoService = inject(EmpreendimentoService);
+  private readonly equipeService = inject(EquipeService);
   private readonly ref = inject(MatDialogRef<AtividadePlanejadaFormDialog>);
   private readonly data = inject<AtividadePlanejadaFormData>(MAT_DIALOG_DATA);
 
@@ -45,7 +45,7 @@ export class AtividadePlanejadaFormDialog {
   readonly edicao = this.data.atividade != null;
 
   readonly responsaveisRes = rxResource({
-    stream: () => this.empreendimentoService.listarResponsaveis(),
+    stream: () => this.equipeService.listarResponsaveis(),
   });
 
   readonly salvando = signal(false);

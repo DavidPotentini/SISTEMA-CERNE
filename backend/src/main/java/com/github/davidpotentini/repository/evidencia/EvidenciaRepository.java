@@ -11,6 +11,14 @@ import java.util.Optional;
 
 public interface EvidenciaRepository extends JpaRepository<EvidenciaModel, EvidenciaId> {
 
+    /** Há alguma evidência vinculada à atividade? (trava para excluir a atividade planejada). */
+    boolean existsByAtpCod(Long atpCod);
+
+    /** Há alguma evidência em qualquer atividade do planejamento? (trava para regerar o ciclo). */
+    @Query(value = "SELECT COUNT(*) > 0 FROM EVIDENCIAS WHERE ATP_COD IN "
+            + "(SELECT ATP_COD FROM ATIVIDADES_PLANEJADAS WHERE PLN_COD = :plnCod)", nativeQuery = true)
+    boolean existsByPlanejamento(@Param("plnCod") Long plnCod);
+
     /** Próximo id lógico de evidência (nova evidência = nova raiz). */
     @Query(value = "SELECT nextval('SEQ_EVIDENCIA')", nativeQuery = true)
     Long proximoEvdCod();

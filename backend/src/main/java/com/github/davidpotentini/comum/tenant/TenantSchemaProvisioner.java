@@ -20,7 +20,7 @@ public class TenantSchemaProvisioner {
     private static final String DDL_LOCATION = "classpath:sql/create_tenant_schema_tables.sql";
 
     // Registros padrão carregados na criação do tenant, na ordem: metodologia
-    // (processos/práticas/indicadores) e depois o modelo padrão, que depende dela.
+    // (processos/práticas/indicadores) e depois as atividades-padrão, que dependem dela.
     private static final String[] SEED_LOCATIONS = {
         "classpath:sql/seed_cerne1_metodologia.sql",
         "classpath:sql/seed_cerne1_atividades_metodologia.sql"

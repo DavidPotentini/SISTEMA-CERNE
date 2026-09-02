@@ -58,13 +58,21 @@
         [comResponsavel]="true"
       />
 
+      <div class="acordeao-acoes">
+        <button mat-stroked-button (click)="alternarTudo()">
+          <mat-icon>{{ tudoExpandido() ? 'unfold_less' : 'unfold_more' }}</mat-icon>
+          {{ tudoExpandido() ? 'Recolher tudo' : 'Expandir tudo' }}
+        </button>
+      </div>
+
       <mat-accordion multi>
         @for (proc of estruturaFiltrada(); track proc.prccCod) {
-          <mat-expansion-panel>
+          <mat-expansion-panel [expanded]="tudoExpandido()">
             <mat-expansion-panel-header>
               <mat-panel-title>
                 <span class="ordem">{{ proc.ordem }}</span>
                 {{ proc.nome }}
+                <span class="tag-nivel">{{ nivelLabel[proc.nivel] }}</span>
               </mat-panel-title>
               <mat-panel-description>
                 {{ proc.praticas.length }} {{ proc.praticas.length === 1 ? 'prática' : 'práticas' }}
@@ -77,63 +85,97 @@
 
             <mat-accordion class="praticas" multi>
               @for (pr of proc.praticas; track pr.prtcCod) {
-                <mat-expansion-panel class="pratica">
+                <mat-expansion-panel class="pratica" [expanded]="tudoExpandido()">
                   <mat-expansion-panel-header>
                     <mat-panel-title>
                       <span class="pratica-nome">{{ pr.nome }}</span>
                     </mat-panel-title>
                     <mat-panel-description>
-                      {{ pr.atividades.length }}
-                      {{ pr.atividades.length === 1 ? 'atividade' : 'atividades' }}
+                      {{ totalPratica(pr) }}
+                      {{ totalPratica(pr) === 1 ? 'atividade' : 'atividades' }}
                     </mat-panel-description>
                   </mat-expansion-panel-header>
 
-                  <div class="atividades">
-                    @for (atv of pr.atividades; track atv.atpCod) {
-                      <div class="atividade">
-                        <div class="atividade-info">
-                          <span class="atividade-nome">
-                            {{ atv.nome }}
-                            @if (atv.origem === 'COMPLEMENTAR') {
-                              <span class="tag-origem">Complementar</span>
-                            }
-                          </span>
-                          @if (atv.observacoes) {
-                            <span class="atividade-desc">{{ atv.observacoes }}</span>
+                  <div
+                    class="grupos"
+                    cdkDropList
+                    [cdkDropListDisabled]="!editavel()"
+                    (cdkDropListDropped)="reordenarAgrupamento(pr, $event)"
+                  >
+                    @for (g of pr.grupos; track g.agrcCod ?? '__sem__') {
+                      <div
+                        class="grupo"
+                        cdkDrag
+                        [cdkDragDisabled]="!editavel() || g.agrcCod == null"
+                        [class.recolhido]="grupoRecolhido(pr.prtcCod, g)"
+                      >
+                        <div class="grupo-titulo" (click)="alternarRecolherGrupo(pr.prtcCod, g)">
+                          <mat-icon class="recolher">
+                            {{ grupoRecolhido(pr.prtcCod, g) ? 'chevron_right' : 'expand_more' }}
+                          </mat-icon>
+                          @if (editavel() && g.agrcCod != null) {
+                            <mat-icon class="arrastar" cdkDragHandle matTooltip="Arrastar para ordenar"
+                                      (click)="$event.stopPropagation()">
+                              drag_indicator
+                            </mat-icon>
                           }
-                          <span class="atividade-meta">
-                            @if (atv.responsavelNome) {
-                              <span class="atividade-resp">
-                                <mat-icon>person</mat-icon>{{ atv.responsavelNome }}
-                              </span>
-                            } @else {
-                              <span class="n-atividade-resp">
-                                <mat-icon>person</mat-icon>Responsável não definido
-                              </span>
-                            }
-                            @if (atv.prazo) {
-                              <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
-                            }@else {
-                              <span class="n-atividade-prazo">Prazo não definido</span>
-                            }
-                          </span>
+                          <mat-icon>{{ g.empCod != null ? 'business' : 'segment' }}</mat-icon>
+                          <span class="grupo-nome">{{ g.nome }}</span>
+                          <span class="grupo-cont">{{ g.atividades.length }}</span>
                         </div>
-                        @if (editavel()) {
-                          <div class="atividade-acoes">
-                            <button mat-icon-button matTooltip="Ajustar" (click)="ajustarAtividade(pr, atv)">
-                              <mat-icon>edit</mat-icon>
-                            </button>
-                            @if (atv.origem === 'COMPLEMENTAR') {
-                              <button
-                                mat-icon-button
-                                matTooltip="Remover"
-                                (click)="removerAtividade(atv)"
-                              >
-                                <mat-icon>delete</mat-icon>
-                              </button>
-                            }
-                          </div>
-                        }
+                        <div
+                          class="atividades"
+                          cdkDropList
+                          [cdkDropListDisabled]="!editavel()"
+                          (cdkDropListDropped)="reordenarAtividade(pr, g.agrcCod, $event)"
+                        >
+                          @for (atv of g.atividades; track atv.atpCod) {
+                            <div class="atividade" cdkDrag [cdkDragDisabled]="!editavel()">
+                              @if (editavel()) {
+                                <mat-icon class="arrastar" cdkDragHandle matTooltip="Arrastar para ordenar">
+                                  drag_indicator
+                                </mat-icon>
+                              }
+                              <div class="atividade-info">
+                                <span class="atividade-nome">
+                                  {{ atv.nome }}
+                                  @if (atv.origem === 'COMPLEMENTAR') {
+                                    <span class="tag-origem">Complementar</span>
+                                  }
+                                </span>
+                                @if (atv.observacoes) {
+                                  <span class="atividade-desc">{{ atv.observacoes }}</span>
+                                }
+                                <span class="atividade-meta">
+                                  @if (atv.responsavelNome) {
+                                    <span class="atividade-resp">
+                                      <mat-icon>person</mat-icon>{{ atv.responsavelNome }}
+                                    </span>
+                                  } @else {
+                                    <span class="n-atividade-resp">
+                                      <mat-icon>person</mat-icon>Responsável não definido
+                                    </span>
+                                  }
+                                  @if (atv.prazo) {
+                                    <span class="atividade-prazo">Prazo: {{ atv.prazo | date: 'dd/MM/yyyy' }}</span>
+                                  }@else {
+                                    <span class="n-atividade-prazo">Prazo não definido</span>
+                                  }
+                                </span>
+                              </div>
+                              @if (editavel()) {
+                                <div class="atividade-acoes">
+                                  <button mat-icon-button matTooltip="Ajustar" (click)="ajustarAtividade(pr, atv)">
+                                    <mat-icon>edit</mat-icon>
+                                  </button>
+                                  <button mat-icon-button matTooltip="Excluir" (click)="removerAtividade(atv)">
+                                    <mat-icon>delete</mat-icon>
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
                       </div>
                     } @empty {
                       <p class="vazio">Nenhuma atividade nesta prática.</p>

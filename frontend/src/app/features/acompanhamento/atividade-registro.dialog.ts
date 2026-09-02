@@ -6,7 +6,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSelectModule } from '@angular/material/select';
 import { ArquivoService } from '../../core/services/arquivo/arquivo.service';
 import { EvidenciaService } from '../../core/services/evidencia/evidencia.service';
 import { ExecucaoService } from '../../core/services/execucao/execucao.service';
@@ -26,13 +25,19 @@ interface AtividadeRegistroData {
   atividade: AtividadePlanejada;
 }
 
-/** Estados que o usuário pode definir manualmente (ATRASADA é derivado do prazo). */
-const STATUS_MANUAIS: EStatusAtividade[] = ['PLANEJADA', 'EM_ANDAMENTO', 'CONCLUIDA'];
+/** Ícone por status da atividade, para o chip de estado atual. */
+const STATUS_ICONE: Record<EStatusAtividade, string> = {
+  PLANEJADA: 'schedule',
+  EM_ANDAMENTO: 'autorenew',
+  CONCLUIDA: 'check_circle',
+  ATRASADA: 'error',
+};
 
 /**
- * Modal "Registrar" do acompanhamento: mostra a atividade em só leitura, permite mudar seu status
- * (concluir só se todas as evidências estiverem validadas — o backend valida) e lista as evidências
- * da atividade para validar ou solicitar correção (com motivo) em cada uma — só enquanto EM_VALIDACAO.
+ * Modal "Registrar" do acompanhamento: mostra a atividade em só leitura. O status intermediário
+ * (planejada/em andamento) é derivado das evidências — aqui só há a ação de concluir (habilitada com
+ * ≥1 evidência e todas validadas; o backend valida) ou reabrir. Lista as evidências para validar ou
+ * solicitar correção (com motivo) em cada uma — só enquanto PENDENTE_VALIDACAO.
  */
 @Component({
   selector: 'app-atividade-registro',
@@ -42,7 +47,6 @@ const STATUS_MANUAIS: EStatusAtividade[] = ['PLANEJADA', 'EM_ANDAMENTO', 'CONCLU
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule,
     MatIconModule,
     MatProgressBarModule,
   ],
@@ -57,14 +61,13 @@ export class AtividadeRegistroDialog {
   private readonly data = inject<AtividadeRegistroData>(MAT_DIALOG_DATA);
 
   readonly atividade = signal<AtividadePlanejada>(this.data.atividade);
-  readonly statusManuais = STATUS_MANUAIS;
+  readonly statusIcone = STATUS_ICONE;
   readonly statusAtividadeLabel = STATUS_ATIVIDADE_LABEL;
   readonly statusEvidenciaLabel = STATUS_EVIDENCIA_LABEL;
 
+  readonly concluida = computed(() => this.atividade().status === 'CONCLUIDA');
+
   // status da atividade
-  readonly novoStatus = signal<EStatusAtividade>(
-    STATUS_MANUAIS.includes(this.data.atividade.status) ? this.data.atividade.status : 'EM_ANDAMENTO',
-  );
   readonly salvandoStatus = signal(false);
   readonly erroStatus = signal<string | null>(null);
   readonly statusSalvo = signal(false);
@@ -101,11 +104,18 @@ export class AtividadeRegistroDialog {
     });
   }
 
-  salvarStatus(): void {
+  concluir(): void {
+    this.mudarStatus('CONCLUIDA');
+  }
+
+  reabrir(): void {
+    this.mudarStatus('EM_ANDAMENTO');
+  }
+
+  private mudarStatus(status: EStatusAtividade): void {
     this.salvandoStatus.set(true);
     this.erroStatus.set(null);
     this.statusSalvo.set(false);
-    const status = this.novoStatus();
     this.execucao.mudarStatus(this.data.atividade.atpCod, status).subscribe({
       next: () => {
         this.atividade.update(a => ({ ...a, status }));

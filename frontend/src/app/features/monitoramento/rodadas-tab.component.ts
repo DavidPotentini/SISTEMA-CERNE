@@ -15,6 +15,7 @@ import {
   TIPO_RODADA_LABEL,
 } from '../../models/monitoramento/monitoramento.model';
 import { PlanejarRodadaDialog } from './planejar-rodada.dialog';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /**
  * Aba "Rodadas": botão "Planejar Rodada" (abre o modal) e a listagem de todas as rodadas
@@ -40,10 +41,10 @@ export class RodadasTabComponent {
 
   readonly colunas = ['nome', 'tipo', 'responsavel', 'prazo', 'situacao'];
 
-  readonly rodadasRes = rxResource({
+  readonly rodadasRes = reterRecurso(rxResource({
     params: () => ({ v: this.service.versao() }),
     stream: () => this.service.listarRodadas(),
-  });
+  }));
 
   tipoLabel(t: ETipoRodada): string {
     return TIPO_RODADA_LABEL[t];
@@ -54,6 +55,6 @@ export class RodadasTabComponent {
   }
 
   planejar(): void {
-    this.dialog.open(PlanejarRodadaDialog, { width: '640px' });
+    this.dialog.open(PlanejarRodadaDialog, { width: '90vw', maxWidth: '1200px' });
   }
 }

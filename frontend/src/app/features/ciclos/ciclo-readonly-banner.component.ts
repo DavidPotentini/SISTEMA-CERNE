@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { CicloService } from '../../core/services/ciclo/ciclo.service';
+import { reterRecurso } from '../../shared/util/reter-recurso';
 
 /**
  * Faixa "somente leitura" das telas que dependem de ciclo: aparece quando o ciclo em foco está
@@ -44,10 +45,10 @@ import { CicloService } from '../../core/services/ciclo/ciclo.service';
 export class CicloReadonlyBannerComponent {
   private readonly service = inject(CicloService);
 
-  private readonly ciclosRes = rxResource({
+  private readonly ciclosRes = reterRecurso(rxResource({
     params: () => this.service.versao(),
     stream: () => this.service.listar(),
-  });
+  }));
 
   /** Ciclo em foco quando está ENCERRADO, ou {@code null} (foco ativo / sem ciclo). */
   readonly cicloEncerrado = computed(

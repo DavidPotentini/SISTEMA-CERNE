@@ -13,7 +13,7 @@
     <p class="estado erro">{{ erroAcao() }}</p>
   }
 
-  @if (indicadoresRes.isLoading()) {
+  @if (indicadoresRes.isLoading() && !indicadoresRes.hasValue()) {
     <p class="estado">Carregando…</p>
   } @else if (indicadoresRes.error()) {
     <p class="estado erro">Não foi possível carregar os indicadores.</p>

@@ -3,7 +3,7 @@
     <h2>Metas do ciclo</h2>
   </div>
 
-  @if (indicadoresRes.isLoading()) {
+  @if (indicadoresRes.isLoading() && !indicadoresRes.hasValue()) {
     <p class="estado">Carregando…</p>
   } @else if (indicadoresRes.error()) {
     <p class="estado erro">Não foi possível carregar os indicadores.</p>

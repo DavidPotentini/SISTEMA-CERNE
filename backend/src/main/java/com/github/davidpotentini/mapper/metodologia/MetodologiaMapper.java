@@ -1,9 +1,11 @@
 package com.github.davidpotentini.mapper.metodologia;
 
+import com.github.davidpotentini.dto.metodologia.AgrupamentoDTO;
 import com.github.davidpotentini.dto.metodologia.AtividadeMetodologiaDTO;
 import com.github.davidpotentini.dto.metodologia.IndicadorDTO;
 import com.github.davidpotentini.dto.metodologia.PraticaDTO;
 import com.github.davidpotentini.dto.metodologia.ProcessoDTO;
+import com.github.davidpotentini.model.metodologia.AgrupamentoModel;
 import com.github.davidpotentini.model.metodologia.AtividadeMetodologiaModel;
 import com.github.davidpotentini.model.metodologia.IndicadorMetodologiaModel;
 import com.github.davidpotentini.model.metodologia.PraticaModel;
@@ -29,28 +31,48 @@ public interface MetodologiaMapper {
     ProcessoDTO toDTO(ProcessoModel processo, List<PraticaDTO> praticas);
 
     @Mapping(target = "prcCod", ignore = true)
+    @Mapping(target = "nivel", ignore = true)
     @Mapping(target = "ordem", ignore = true)
     @Mapping(target = "situacao", ignore = true)
     ProcessoModel toModel(ProcessoDTO dto);
 
     @Mapping(target = "prtCod", ignore = true)
     @Mapping(target = "prcCod", ignore = true)
+    @Mapping(target = "ordem", ignore = true)
     @Mapping(target = "situacao", ignore = true)
     PraticaModel toModel(PraticaDTO dto);
 
     List<PraticaModel> toModelList(List<PraticaDTO> dtos);
 
-    /** Edição de processo: aplica nome/descrição; preserva código, ordem (gerida por arrastar) e situação. */
+    /** Edição de processo: aplica nome/descrição; preserva código, nível, ordem (gerida por arrastar) e situação. */
     @Mapping(target = "prcCod", ignore = true)
+    @Mapping(target = "nivel", ignore = true)
     @Mapping(target = "ordem", ignore = true)
     @Mapping(target = "situacao", ignore = true)
     void atualizar(ProcessoDTO dto, @MappingTarget ProcessoModel processo);
 
-    /** Edição de prática: aplica nome/descrição; preserva código, vínculo e situação. */
+    /** Edição de prática: aplica nome/descrição; preserva código, vínculo, ordem e situação. */
     @Mapping(target = "prtCod", ignore = true)
     @Mapping(target = "prcCod", ignore = true)
+    @Mapping(target = "ordem", ignore = true)
     @Mapping(target = "situacao", ignore = true)
     void atualizar(PraticaDTO dto, @MappingTarget PraticaModel pratica);
+
+    // ---- agrupamento ----
+
+    AgrupamentoDTO toDTO(AgrupamentoModel agrupamento, String vinculoMetodologico);
+
+    @Mapping(target = "agrCod", ignore = true)
+    @Mapping(target = "ordem", ignore = true)
+    @Mapping(target = "situacao", ignore = true)
+    AgrupamentoModel toModel(AgrupamentoDTO dto);
+
+    /** Edição de agrupamento: aplica nome/descrição; preserva código, vínculo, ordem e situação. */
+    @Mapping(target = "agrCod", ignore = true)
+    @Mapping(target = "prtCod", ignore = true)
+    @Mapping(target = "ordem", ignore = true)
+    @Mapping(target = "situacao", ignore = true)
+    void atualizar(AgrupamentoDTO dto, @MappingTarget AgrupamentoModel agrupamento);
 
     // ---- indicador ----
 
@@ -72,11 +94,14 @@ public interface MetodologiaMapper {
     AtividadeMetodologiaDTO toDTO(AtividadeMetodologiaModel atividade, String vinculoMetodologico);
 
     @Mapping(target = "ameCod", ignore = true)
+    @Mapping(target = "ordem", ignore = true)
     @Mapping(target = "situacao", ignore = true)
     AtividadeMetodologiaModel toModel(AtividadeMetodologiaDTO dto);
 
-    /** Edição de atividade: aplica prática (vínculo)/nome/observações; preserva código e situação. */
+    /** Edição de atividade: aplica prática (vínculo)/grupo/nome/observações; preserva código, ordem, flag e situação. */
     @Mapping(target = "ameCod", ignore = true)
+    @Mapping(target = "ordem", ignore = true)
+    @Mapping(target = "porEmpreendimento", ignore = true)
     @Mapping(target = "situacao", ignore = true)
     void atualizar(AtividadeMetodologiaDTO dto, @MappingTarget AtividadeMetodologiaModel atividade);
 }

@@ -32,11 +32,23 @@ public class AtividadeMetodologiaModel {
     @Column(name = "PRT_COD", nullable = false)
     private Long prtCod;
 
+    /** Agrupamento (sub-plano) da prática ao qual pertence → {@code AGRUPAMENTOS(AGR_COD)}. Opcional. */
+    @Column(name = "AGR_COD")
+    private Long agrCod;
+
+    /** Ordem da atividade dentro da prática (sequência de exibição). */
+    @Column(name = "ORDEM", nullable = false)
+    private Integer ordem;
+
     @Column(name = "NOME", nullable = false)
     private String nome;
 
     @Column(name = "OBSERVACOES")
     private String observacoes;
+
+    /** Atividade "da incubada": repete por empreendimento na geração do ciclo (ou pela prática marcada). */
+    @Column(name = "POR_EMPREENDIMENTO", nullable = false)
+    private boolean porEmpreendimento = false;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "SITUACAO", nullable = false)
