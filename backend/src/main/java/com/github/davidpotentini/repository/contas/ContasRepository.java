@@ -9,13 +9,10 @@ import java.util.Optional;
 
 public interface ContasRepository extends JpaRepository<ContasModel, Long> {
 
-    /** Busca a conta pela identidade de login. Usada no {@code POST /login}. */
     Optional<ContasModel> findByEmail(String email);
 
-    /** E-mail já cadastrado (identidade de login é única). Usado no convite. */
     boolean existsByEmail(String email);
 
-    /** Todas as contas da plataforma (Menos Administrador), ordenadas por nome — listagem de usuários. */
     @Query(value = """
             SELECT *
               FROM CONTAS

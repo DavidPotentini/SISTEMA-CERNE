@@ -14,12 +14,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-/**
- * Ciclo da incubadora — schema do tenant. Dois eixos independentes: {@code status}
- * ({@code ATIVO} edita / {@code ENCERRADO} só consulta) e {@code emFoco} (o ciclo refletido nas
- * telas). Índices parciais no banco garantem no máx. um {@code ATIVO} e um {@code EM_FOCO} por
- * incubadora.
- */
 @Entity
 @Table(name = "CICLOS")
 @Getter

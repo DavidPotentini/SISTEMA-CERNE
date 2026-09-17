@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>Pessoas · {{ data.nome }}</h2>
+
+<mat-dialog-content>
+  @if (pessoas.isLoading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  } @else if (pessoas.error()) {
+    <p class="erro">Falha ao carregar as pessoas.</p>
+  } @else if ((pessoas.value()?.length ?? 0) === 0) {
+    <p class="vazio">Nenhuma pessoa cadastrada.</p>
+  } @else {
+    <ul class="lista">
+      @for (p of pessoas.value() ?? []; track p.pseCod) {
+        <li class="pessoa">
+          <div class="pessoa-topo">
+            <span class="pessoa-nome">{{ p.nome }}</span>
+            @if (p.representanteLegal) {
+              <span class="rep"><mat-icon>badge</mat-icon>Representante legal</span>
+            }
+          </div>
+          <div class="pessoa-contato">
+            <span><mat-icon>mail</mat-icon>{{ p.email || '—' }}</span>
+            <span><mat-icon>call</mat-icon>{{ p.telefone || '—' }}</span>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Fechar</button>
+</mat-dialog-actions>

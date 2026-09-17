@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
-/** Chave composta de {@code PAPEL_PERMISSOES} (PAP_COD + RECURSO). */
 @NoArgsConstructor
 @EqualsAndHashCode
 public class PapelPermissaoId implements Serializable {

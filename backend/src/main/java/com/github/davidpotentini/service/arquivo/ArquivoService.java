@@ -21,11 +21,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * Upload e leitura de arquivos. O binário vai para o object storage (S3/MinIO) sob uma chave única; os
- * metadados ficam em {@code ARQUIVOS} (schema do tenant). A URL de download é temporária (presigned),
- * gerada a cada leitura — nunca persistida.
- */
 @Service
 public class ArquivoService {
 
@@ -42,7 +37,6 @@ public class ArquivoService {
         this.presigner = presigner;
     }
 
-    /** Sobe o arquivo para o storage e registra os metadados; devolve o DTO com a URL temporária. */
     @Transactional
     public ArquivoDTO upload(MultipartFile arquivo) {
         if (arquivo == null || arquivo.isEmpty()) {
@@ -71,7 +65,6 @@ public class ArquivoService {
         return toDTO(model);
     }
 
-    /** Metadados + URL temporária de download de um arquivo. */
     @Transactional(readOnly = true)
     public ArquivoDTO buscar(Long arqCod) {
         ArquivoModel model = arquivos.findById(arqCod)
@@ -84,7 +77,6 @@ public class ArquivoService {
                 model.getTamanhoBytes(), url(model.getStorageKey()));
     }
 
-    /** URL de download temporária (15 min) para a chave de storage. */
     private String url(String chave) {
         if (chave == null) {
             return null;

@@ -12,14 +12,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * Esqueleto de segurança reaproveitado do projeto antigo: STATELESS, CSRF desligado,
- * CORS (bean {@code CorsConfig}) e o {@link JwtAuthenticationFilter} antes do filtro
- * de usuário/senha.
- *
- * <p><b>Mudança em relação ao antigo:</b> o bloco {@code authorizeHttpRequests} não lista
- * mais rotas por {@code hasRole(...)}. A autorização fina é <b>papel × recurso × estado</b>,
- * feita pelo interceptor {@code @RequerPermissao} (ver ESTRUTURA-BACKEND.md §7). Aqui só se
- * libera o que é público (login/cadastro/OPTIONS) e exige autenticação no resto.
+ * STATELESS, CSRF desligado, CORS e o {@link JwtAuthenticationFilter}. Aqui só se libera o público
+ * (login/cadastro/OPTIONS) e exige autenticação no resto; a autorização fina (papel × recurso × estado)
+ * é do interceptor {@code @RequerPermissao}, não deste bloco.
  */
 @Configuration
 @EnableWebSecurity

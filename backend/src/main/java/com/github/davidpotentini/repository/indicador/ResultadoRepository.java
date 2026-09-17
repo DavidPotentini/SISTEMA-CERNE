@@ -8,6 +8,5 @@ import java.util.List;
 
 public interface ResultadoRepository extends JpaRepository<ResultadoModel, Long> {
 
-    /** Resultados das metas informadas — para saber quais períodos já foram apurados. */
     List<ResultadoModel> findByMetCodIn(Collection<Long> metCods);
 }

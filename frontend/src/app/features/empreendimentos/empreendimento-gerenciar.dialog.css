@@ -8,8 +8,62 @@
   grid-column: 1 / -1;
 }
 
-.pessoas {
-  margin-top: 8px;
+.pessoas,
+.ciclos {
+  margin-top: 12px;
+}
+
+.ciclos-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ciclo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+.ciclo-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ciclo-nome {
+  font-weight: 600;
+}
+.ciclo-periodo {
+  font-size: 0.82rem;
+  color: rgba(0, 0, 0, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+.ciclo-tags {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tag {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(46, 125, 50, 0.14);
+  color: #2e7d32;
+}
+.tag.encerrado {
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.6);
+}
+.tag.foco {
+  background: rgba(21, 101, 192, 0.12);
+  color: #1565c0;
 }
 .pessoas-topo {
   display: flex;

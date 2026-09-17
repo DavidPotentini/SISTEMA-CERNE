@@ -25,13 +25,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Módulo "Usuários da plataforma" do administrador. Opera no schema {@code public}
- * (CONTAS), mas resolve e grava o <b>papel</b> de cada usuário na gaveta do tenant da sua
- * incubadora (ref. fraca cross-schema) via {@link AutorizacaoTenantService}.
- *
- * <p>O papel exibido: rótulo fixo para o admin da plataforma; papel local da incubadora
- * quando a conta tem incubadora <b>já provisionada</b>; {@code null} ("—") caso contrário.
- * O admin pode atribuir incubadora + papel (papéis padrão do tenant) no convite ou depois.
+ * "Usuários da plataforma" do administrador. Opera no schema {@code public} (CONTAS), mas resolve e
+ * grava o papel de cada usuário na gaveta do tenant da sua incubadora via {@link AutorizacaoTenantService}.
  */
 @Service
 public class UsuarioService {
@@ -67,7 +62,6 @@ public class UsuarioService {
         return resumos;
     }
 
-    /** Papéis (ativos) disponíveis para atribuição na incubadora — vazio se não provisionada. */
     @Transactional(readOnly = true)
     public List<PapelResumoDTO> listarPapeis(Long incCod) {
         IncubadorasModel inc = incubadoras.findById(incCod)
@@ -78,7 +72,6 @@ public class UsuarioService {
         return TenantContext.callWithin(inc.getNomeSchema(), autorizacao::listarPapeis);
     }
 
-    /** Convite: cria a conta como {@code CONVIDADO} e, se informado, já vincula incubadora + papel. */
     @Transactional(rollbackFor = Exception.class)
     public UsuarioResumoDTO convidar(UsuarioConviteDTO dto) {
         if (contas.existsByEmail(dto.email())) {
@@ -97,7 +90,6 @@ public class UsuarioService {
         return montarResumo(conta, buscarIncubadora(conta.getIncCod()));
     }
 
-    /** Edição de um usuário existente: nome, incubadora e (opcional) papel. */
     @Transactional(rollbackFor = Exception.class)
     public UsuarioResumoDTO editar(Long id, UsuarioEdicaoDTO dto) {
         ContasModel conta = buscarConta(id);
@@ -108,7 +100,6 @@ public class UsuarioService {
         return montarResumo(conta, buscarIncubadora(conta.getIncCod()));
     }
 
-    /** Alterna a situação: {@code SUSPENSO → ATIVO} (reativar) ou → {@code SUSPENSO} (suspender). */
     @Transactional(rollbackFor = Exception.class)
     public UsuarioResumoDTO alternarStatus(Long id) {
         ContasModel conta = buscarConta(id);
@@ -120,9 +111,6 @@ public class UsuarioService {
         return montarResumo(conta, buscarIncubadora(conta.getIncCod()));
     }
 
-    // ---- apoio ----
-
-    /** Cria/atualiza a pessoa (papel) no tenant. No-op se incubadora ou papel não informados. */
     private void vincular(Long ctaCod, Long incCod, Long papCod) {
         if (incCod == null || papCod == null) {
             return;
@@ -136,7 +124,6 @@ public class UsuarioService {
         TenantContext.runWithin(inc.getNomeSchema(), () -> autorizacao.vincularPapel(ctaCod, papCod));
     }
 
-    /** Incubadora da conta (ou {@code null} se sem incubadora / não encontrada). */
     private IncubadorasModel buscarIncubadora(Long incCod) {
         if (incCod == null) {
             return null;

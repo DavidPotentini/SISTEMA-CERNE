@@ -17,12 +17,6 @@ interface IncubadoraSobreData {
   incubadora: IncubadoraDetalhe;
 }
 
-/**
- * Diálogo "Informações da incubadora": ficha institucional (CNPJ, mantenedora, contatos, cidade) que
- * a própria incubadora pode editar. Nível, status e responsável ficam em só-leitura (gestão do admin).
- * Aberto pelo botão do rodapé do menu; recebe a incubadora já carregada pelo layout. Ao salvar, fecha
- * com {@code true} para o layout recarregar o rodapé.
- */
 @Component({
   selector: 'app-incubadora-sobre',
   imports: [FormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],
@@ -34,7 +28,6 @@ export class IncubadoraSobreDialog {
   private readonly service = inject(MinhaIncubadoraService);
   private readonly ref = inject(MatDialogRef<IncubadoraSobreDialog>);
 
-  /** Cópia editável (não altera o objeto do layout enquanto não salvar). */
   dados: IncubadoraDetalhe = { ...this.data.incubadora };
 
   readonly editando = signal(false);

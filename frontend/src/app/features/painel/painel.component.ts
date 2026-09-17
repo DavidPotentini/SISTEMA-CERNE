@@ -12,11 +12,6 @@ import {
 } from '../../models/incubadora/incubadora.model';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/**
- * Painel da plataforma: cards com as contagens por status e a listagem das incubadoras
- * (mesma da tela "Incubadoras", sem ações). As contagens saem do próprio array — a
- * listagem já traz todas as incubadoras com o status.
- */
 @Component({
   selector: 'app-painel',
   imports: [RouterLink, MatButtonModule, MatCardModule, MatTableModule],
@@ -28,7 +23,6 @@ export class PainelComponent {
 
   readonly colunas = ['nome', 'mantenedora', 'responsavel', 'usuarios', 'status'];
 
-  /** Refaz a busca sempre que houver mutação em incubadoras (ativar/suspender/salvar). */
   readonly dados = reterRecurso(rxResource({
     params: () => ({ versao: this.service.versao() }),
     stream: () => this.service.listar(),

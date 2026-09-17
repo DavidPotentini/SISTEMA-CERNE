@@ -38,12 +38,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Monitoramento das incubadas (schema do tenant vem do JWT). Uma rodada aplica a avaliação por eixos
- * CERNE a um conjunto de empreendimentos; a avaliação de cada um é criada ao revisar. A listagem de
- * rodadas alimenta a aba "Rodadas"; as aplicações (cards com pontuações, recomendação e status)
- * alimentam a aba "Aplicações e pontuação".
- */
 @Service
 public class MonitoramentoService {
 
@@ -76,7 +70,6 @@ public class MonitoramentoService {
         this.mapper = mapper;
     }
 
-    // ---- rodadas ----
 
     @Transactional(readOnly = true)
     public List<RodadaDTO> listarRodadas() {
@@ -87,7 +80,6 @@ public class MonitoramentoService {
         return lista;
     }
 
-    /** Planeja uma rodada no ciclo ativo e registra os empreendimentos participantes. */
     @Transactional(rollbackFor = Exception.class)
     public RodadaDTO planejar(RodadaDTO dto) {
         RodadaModel rodada = mapper.toModel(dto);
@@ -110,7 +102,6 @@ public class MonitoramentoService {
         return mapper.toDTO(rodada, nomeResponsavel(rodada.getRespPesCod()));
     }
 
-    /** Encerra a rodada (situação {@code CONCLUIDA}). */
     @Transactional(rollbackFor = Exception.class)
     public RodadaDTO concluir(Long rodCod) {
         RodadaModel rodada = exigirRodada(rodCod);
@@ -119,9 +110,7 @@ public class MonitoramentoService {
         return mapper.toDTO(rodada, nomeResponsavel(rodada.getRespPesCod()));
     }
 
-    // ---- aplicações e pontuação ----
 
-    /** Cards da rodada: um por empreendimento participante, com a avaliação (quando revisado). */
     @Transactional(readOnly = true)
     public List<AplicacaoDTO> aplicacoes(Long rodCod) {
         exigirRodada(rodCod);
@@ -161,7 +150,6 @@ public class MonitoramentoService {
         return cards;
     }
 
-    /** Revisa a incubada: define pontuações por eixo, recomendação, observação e status. */
     @Transactional(rollbackFor = Exception.class)
     public AplicacaoDTO revisar(Long rodCod, Long empCod, AplicacaoDTO dto) {
         exigirRodada(rodCod);
@@ -206,13 +194,8 @@ public class MonitoramentoService {
         return montarAplicacao(empCod, empNome, avaliacao, pts);
     }
 
-    // ---- radar de evolução ----
 
-    /**
-     * Série do radar de evolução de um empreendimento: uma entrada por rodada em que ele foi avaliado,
-     * com as notas por eixo ({@code pontuacoes}, cada uma com {@code dimensao}), em ordem cronológica
-     * (rodada mais antiga primeiro). Sem avaliações → lista vazia.
-     */
+    /** Uma entrada por rodada avaliada, com as notas por eixo, em ordem cronológica. */
     @Transactional(readOnly = true)
     public List<EvolucaoRodadaDTO> evolucao(Long empCod) {
         if (!empreendimentos.existsById(empCod)) {
@@ -255,7 +238,6 @@ public class MonitoramentoService {
         return serie;
     }
 
-    // ---- apoio ----
 
     private AplicacaoDTO montarAplicacao(Long empCod, String empNome, AvaliacaoModel av,
                                          List<PontuacaoModel> pts) {
@@ -281,7 +263,6 @@ public class MonitoramentoService {
                 .orElseThrow(() -> new NaoEncontradoException("Rodada", rodCod));
     }
 
-    /** Nome do responsável (equipe → conta), ou {@code null} se não definido/inexistente. */
     private String nomeResponsavel(Long respPesCod) {
         if (respPesCod == null) {
             return null;

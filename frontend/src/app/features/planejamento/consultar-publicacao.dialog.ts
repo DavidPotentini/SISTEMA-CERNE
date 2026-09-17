@@ -8,10 +8,6 @@ import {
   STATUS_PLANEJAMENTO_LABEL,
 } from '../../models/planejamento/planejamento.model';
 
-/**
- * Modal "Consultar publicação": mostra, só leitura, o status do planejamento, o período (início/fim),
- * o responsável e o progresso (% de atividades concluídas).
- */
 @Component({
   selector: 'app-consultar-publicacao',
   imports: [DatePipe, MatDialogModule, MatButtonModule, MatProgressBarModule],

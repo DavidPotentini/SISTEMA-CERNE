@@ -19,9 +19,25 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
+      <mat-label>Empreendimento</mat-label>
+      <mat-select
+        [ngModel]="empCod() ?? SEM_VALOR"
+        (ngModelChange)="empCod.set($event === SEM_VALOR ? null : $event)"
+      >
+        <mat-option [value]="SEM_VALOR">Institucional</mat-option>
+        @for (e of empreedimentosRes.value() ?? []; track e.empCod) {
+          <mat-option [value]="e.empCod">{{ e.nome }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
       <mat-label>Responsável</mat-label>
-      <mat-select [ngModel]="respPesCod()" (ngModelChange)="respPesCod.set($event)">
-        <mat-option [value]="null">— Sem responsável —</mat-option>
+      <mat-select
+        [ngModel]="respPesCod() ?? SEM_VALOR"
+        (ngModelChange)="respPesCod.set($event === SEM_VALOR ? null : $event)"
+      >
+        <mat-option [value]="SEM_VALOR">Sem responsável</mat-option>
         @for (r of responsaveisRes.value() ?? []; track r.pesCod) {
           <mat-option [value]="r.pesCod">{{ r.nome }}</mat-option>
         }
@@ -30,7 +46,9 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Prazo</mat-label>
-      <input matInput type="date" [ngModel]="prazo()" (ngModelChange)="prazo.set($event)" />
+      <input matInput [matDatepicker]="dpPrazo" [ngModel]="isoParaData(prazo())" (ngModelChange)="prazo.set(dataParaIso($event) ?? '')" />
+      <mat-datepicker-toggle matIconSuffix [for]="dpPrazo"></mat-datepicker-toggle>
+      <mat-datepicker #dpPrazo></mat-datepicker>
     </mat-form-field>
   </div>
 

@@ -13,12 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Acompanhamento de execução: muda o estado de uma atividade planejada. Os estados definidos
- * manualmente são {@code PLANEJADA}, {@code EM_ANDAMENTO} e {@code CONCLUIDA} — {@code ATRASADA} é
- * derivado do prazo, nunca escolhido aqui. Concluir exige que a atividade tenha ao menos uma
- * evidência e que todas as versões correntes estejam {@code VALIDADA}.
- */
 @Service
 public class ExecucaoService {
 
@@ -46,7 +40,6 @@ public class ExecucaoService {
         atividades.save(atividade);
     }
 
-    /** Só conclui com ao menos uma evidência e todas as versões correntes validadas. */
     private void exigirEvidenciasValidadas(Long atpCod) {
         List<EvidenciaModel> correntes = evidencias.versoesCorrentesDaAtividade(atpCod);
         if (correntes.isEmpty()) {

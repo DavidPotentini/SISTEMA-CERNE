@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/** Módulo "Usuários da plataforma" do administrador. Todas as rotas exigem admin. */
 @RestController
 @RequestMapping("/admin/usuarios")
 @RequerAdmin
@@ -33,33 +32,28 @@ public class UsuarioController {
         this.service = service;
     }
 
-    /** Listagem de todos os usuários da plataforma. */
     @GetMapping
     public List<UsuarioResumoDTO> listar() {
         return service.listar();
     }
 
-    /** Papéis disponíveis para atribuição na incubadora informada (papéis do tenant). */
     @GetMapping("/papeis")
     public List<PapelResumoDTO> listarPapeis(@RequestParam Long incCod) {
         return service.listarPapeis(incCod);
     }
 
-    /** Adicionar usuário: convite — nasce em "Convidado". */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UsuarioResumoDTO convidar(@Valid @RequestBody UsuarioConviteDTO dto) {
         return service.convidar(dto);
     }
 
-    /** Editar um usuário existente: nome, incubadora e papel. */
     @PutMapping("/{id}")
     public UsuarioResumoDTO editar(@PathVariable Long id,
                                    @Valid @RequestBody UsuarioEdicaoDTO dto) {
         return service.editar(id, dto);
     }
 
-    /** Reativar/Suspender: alterna a situação da conta. */
     @PatchMapping("/{id}/status")
     public UsuarioResumoDTO alternarStatus(@PathVariable Long id) {
         return service.alternarStatus(id);

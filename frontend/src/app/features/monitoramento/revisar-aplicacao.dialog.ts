@@ -22,11 +22,6 @@ interface RevisarData {
   aplicacao: Aplicacao;
 }
 
-/**
- * Modal "Revisar": atribui a nota de cada eixo CERNE (0–5), a recomendação do monitor, a observação
- * e o status do monitoramento de um empreendimento na rodada. A data de avaliação é carimbada pelo
- * backend. Ao salvar, o `recarregar()` atualiza os cards da rodada.
- */
 @Component({
   selector: 'app-revisar-aplicacao',
   imports: [

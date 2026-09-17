@@ -2,16 +2,6 @@ import { Directive, TemplateRef, ViewContainerRef, effect, inject, input } from 
 import { PermissaoService } from './permissao.service';
 import { ENivel, ERecurso } from '../../enums/autorizacao';
 
-/**
- * Diretiva estrutural que renderiza o conteúdo só quando o papel logado tem o nível
- * exigido no recurso. Substitui o esconder/mostrar por papel fixo do projeto antigo.
- *
- * Uso:
- * ```html
- * <button *temPermissao="[ERecurso.Planejamento, ENivel.Edicao]">Novo</button>
- * ```
- * O nível é opcional (default LEITURA).
- */
 @Directive({ selector: '[temPermissao]' })
 export class TemPermissaoDirective {
   private readonly tpl = inject(TemplateRef<unknown>);

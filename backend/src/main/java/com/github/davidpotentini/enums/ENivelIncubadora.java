@@ -1,9 +1,8 @@
 package com.github.davidpotentini.enums;
 
 /**
- * Espelha o tipo Postgres {@code VLD_NIVEL_INCUBADORA}. O rótulo no banco contém espaço
- * ({@code 'CERNE 1'}), por isso a constante Java usa {@code _} e um rótulo à parte — a
- * ponte é feita por {@code NivelIncubadoraConverter}.
+ * Espelha o tipo Postgres {@code VLD_NIVEL_INCUBADORA}. O rótulo no banco tem espaço ({@code 'CERNE 1'}),
+ * por isso a constante usa {@code _} e um rótulo à parte — a ponte é o {@code NivelIncubadoraConverter}.
  */
 public enum ENivelIncubadora {
     CERNE_1("CERNE 1");

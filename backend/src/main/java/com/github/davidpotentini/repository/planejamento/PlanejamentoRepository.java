@@ -8,10 +8,5 @@ import java.util.Optional;
 
 public interface PlanejamentoRepository extends JpaRepository<PlanejamentoModel, Long> {
 
-    /**
-     * Planejamento vigente de um ciclo (o {@code PUBLICADO}). Pode haver vários registros para o
-     * mesmo ciclo — os anteriores ficam {@code ENCERRADO} como histórico quando se regera —, mas no
-     * máx. um {@code PUBLICADO} por vez.
-     */
     Optional<PlanejamentoModel> findByCicCodAndStatus(Long cicCod, EStatusPlanejamento status);
 }

@@ -9,11 +9,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Pessoa de um empreendimento (membro da startup; NÃO é usuário do sistema) — schema do tenant.
- * {@code representanteLegal} marca o representante legal perante a incubadora; no máximo um por
- * empreendimento.
- */
 @Entity
 @Table(name = "PESSOAS_EMPREENDIMENTO")
 @Getter

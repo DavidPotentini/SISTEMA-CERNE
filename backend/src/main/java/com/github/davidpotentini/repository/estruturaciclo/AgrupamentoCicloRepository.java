@@ -8,15 +8,11 @@ import java.util.Optional;
 
 public interface AgrupamentoCicloRepository extends JpaRepository<AgrupamentoCicloModel, Long> {
 
-    /** Agrupamentos (instância) de um ciclo — usado para remapear template → instância na geração. */
     List<AgrupamentoCicloModel> findByCicCodOrderByAgrcCodAsc(Long cicCod);
 
-    /** Agrupamentos (instância) de uma prática do ciclo, na ordem de exibição ({@code ordem}). */
     List<AgrupamentoCicloModel> findByPrtcCodOrderByOrdemAscAgrcCodAsc(Long prtcCod);
 
-    /** Instância de um agrupamento do template dentro do ciclo (para remapear na geração). */
     Optional<AgrupamentoCicloModel> findByCicCodAndAgrCodOrigem(Long cicCod, Long agrCodOrigem);
 
-    /** Grupo dinâmico "por incubada" de uma prática do ciclo (find-or-create na geração). */
     Optional<AgrupamentoCicloModel> findByCicCodAndPrtcCodAndEmpCod(Long cicCod, Long prtcCod, Long empCod);
 }

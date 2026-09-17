@@ -9,9 +9,13 @@ import java.util.List;
 public interface CicloEmpreendimentoRepository
         extends JpaRepository<CicloEmpreendimentoModel, CicloEmpreendimentoId> {
 
-    /** Empreendimentos participantes de um ciclo. */
     List<CicloEmpreendimentoModel> findByCicCod(Long cicCod);
 
-    /** Limpa os participantes de um ciclo (antes de regravar a seleção ao gerar). */
+    List<CicloEmpreendimentoModel> findByEmpCod(Long empCod);
+
     void deleteByCicCod(Long cicCod);
+
+    boolean existsByCicCodAndEmpCod(Long cicCod, Long empCod);
+
+    void deleteByCicCodAndEmpCod(Long cicCod, Long empCod);
 }

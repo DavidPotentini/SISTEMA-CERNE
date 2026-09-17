@@ -48,13 +48,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Planejamento institucional do ciclo ativo (schema do tenant vem do JWT).
- *
- * <p>Há no máx. um planejamento vigente ({@code PUBLICADO}) por ciclo. "Gerar do ciclo" cria um
- * planejamento para o ciclo em foco copiando as atividades ATIVAS da metodologia vigente; se já houver
- * um vigente, ele é <b>substituído</b> — o anterior é inativado ({@code ENCERRADO}) e fica como
- * histórico. A estrutura de processos/práticas é a instância do ciclo (não copiada); as atividades
- * copiadas podem ser ajustadas e complementares podem ser incluídas.
+ * Planejamento institucional do ciclo. No máx. um vigente ({@code PUBLICADO}) por ciclo; "Gerar do
+ * ciclo" substitui o anterior (que vira {@code ENCERRADO}, como histórico).
  */
 @Service
 public class PlanejamentoService {
@@ -97,12 +92,7 @@ public class PlanejamentoService {
         this.mapper = mapper;
     }
 
-    // ---- planejamento (cabeçalho) ----
 
-    /**
-     * Situação do ciclo ativo: se existe e, em caso afirmativo, o planejamento vigente (ou {@code null}
-     * quando ainda não foi gerado).
-     */
     @Transactional(readOnly = true)
     public PlanejamentoAtualDTO atual() {
         CiclosModel ciclo = cicloContexto.emFoco();
@@ -116,18 +106,9 @@ public class PlanejamentoService {
     }
 
     /**
-     * Materializa o planejamento do ciclo em foco a partir das atividades-padrão da metodologia (parte
-     * do "Gerar do ciclo"). Substitui o vigente, se houver (o anterior vira {@code ENCERRADO}). O
-     * responsável do plano é o usuário logado. Copia as atividades ATIVAS da metodologia
-     * ({@code nome}/{@code observacoes}); "quem"/"quando" ficam nulos, para o ajuste no planejamento.
-     *
-     * <p>É <b>consumidor</b> da estrutura: casa a prática do template com a do ciclo por proveniência
-     * (find-only), sem criar prática — a estrutura já foi materializada por
-     * {@link com.github.davidpotentini.service.estruturaciclo.EstruturaCicloService#materializarEstrutura}.
-     *
-     * <p>Atividades marcadas "da incubada" (pela atividade ou pela prática) são duplicadas por
-     * empreendimento de {@code empCods}, cada cópia num grupo dinâmico da incubada (find-or-create em
-     * {@code AGRUPAMENTOS_CICLO} por prática+incubada). Sem incubadas, essas atividades não são geradas.
+     * Consumidor da estrutura (find-only, já materializada por {@code EstruturaCicloService}): copia as
+     * atividades ATIVAS da metodologia. As marcadas "da incubada" duplicam por empreendimento de
+     * {@code empCods}, cada cópia num grupo dinâmico da incubada.
      */
     @Transactional(rollbackFor = Exception.class)
     public PlanejamentoDTO gerarDoCiclo(List<Long> empCods) {
@@ -205,7 +186,6 @@ public class PlanejamentoService {
         return toDTO(plano);
     }
 
-    /** Copia uma atividade-padrão para o planejamento (opcionalmente vinculada a grupo/empreendimento). */
     private void salvarCopiaAtividade(PlanejamentoModel plano, AtividadeMetodologiaModel base,
                                       Long prtcCod, Long agrcCod, Long empCod) {
         AtividadePlanejadaModel atv = new AtividadePlanejadaModel();
@@ -221,10 +201,7 @@ public class PlanejamentoService {
         atividades.save(atv);
     }
 
-    /**
-     * Grupo dinâmico da incubada numa prática do ciclo (find-or-create por {@code (cicCod, prtcCod,
-     * empCod)}). Nasce sem origem no template ({@code AGR_COD_ORIGEM} nulo), nome = nome da incubada.
-     */
+    /** Grupo dinâmico da incubada (find-or-create por {@code (cicCod, prtcCod, empCod)}); sem origem no template. */
     private Long garantirGrupoEmpreendimento(Long cicCod, Long prtcCod, Long empCod, String nome, int ordem) {
         AgrupamentoCicloModel existente = agrupamentosCiclo
                 .findByCicCodAndPrtcCodAndEmpCod(cicCod, prtcCod, empCod).orElse(null);
@@ -240,12 +217,7 @@ public class PlanejamentoService {
         return agrupamentosCiclo.save(g).getAgrcCod();
     }
 
-    /**
-     * O planejamento vigente do ciclo já tem edições do usuário? (trava do "Gerar do ciclo": regerar
-     * substituiria o plano vigente e perderia esses ajustes). Conta como edição: atividade complementar,
-     * responsável ou prazo definidos, execução iniciada (status ≠ PLANEJADA) ou evidência registrada.
-     * Sem plano vigente, não há edições.
-     */
+    /** Trava do "Gerar do ciclo": conta como edição um complementar, responsável/prazo definidos, execução iniciada ou evidência. */
     @Transactional(readOnly = true)
     public boolean cicloTemEdicoes(Long cicCod) {
         PlanejamentoModel plano = planejamentoVigente(cicCod).orElse(null);
@@ -260,12 +232,20 @@ public class PlanejamentoService {
                 || evidencias.existsByPlanejamento(plnCod);
     }
 
-    // ---- estrutura (processos/práticas herdados + atividades planejadas) ----
+    @Transactional(readOnly = true)
+    public boolean empreendimentoTemEdicoes(Long cicCod, Long empCod) {
+        PlanejamentoModel plano = planejamentoVigente(cicCod).orElse(null);
+        if (plano == null) {
+            return false;
+        }
+        Long plnCod = plano.getPlnCod();
+        return atividades.existsByPlnCodAndEmpCodAndOrigem(plnCod, empCod, EOrigemAtividade.COMPLEMENTAR)
+                || atividades.existsByPlnCodAndEmpCodAndRespPesCodNotNull(plnCod, empCod)
+                || atividades.existsByPlnCodAndEmpCodAndPrazoNotNull(plnCod, empCod)
+                || atividades.existsByPlnCodAndEmpCodAndStatusNot(plnCod, empCod, EStatusAtividade.PLANEJADA);
+    }
 
-    /**
-     * Estrutura do planejamento vigente do ciclo ativo: processos e práticas ATIVOS da metodologia
-     * (só leitura), cada prática com suas atividades planejadas. Sem planejamento, devolve vazio.
-     */
+
     @Transactional(readOnly = true)
     public List<PlanProcessoDTO> estrutura() {
         PlanejamentoModel plano = vigenteDoCicloAtivo();
@@ -273,12 +253,11 @@ public class PlanejamentoService {
             return List.of();
         }
 
-        Map<Long, String> nomeResponsavel = new HashMap<>();
         // Atividades por agrupamento (AGRC_COD); as sem grupo ficam por prática, para o grupo sintético.
         Map<Long, List<AtividadePlanejadaDTO>> porGrupo = new HashMap<>();
         Map<Long, List<AtividadePlanejadaDTO>> semGrupoPorPratica = new HashMap<>();
         for (AtividadePlanejadaModel a : atividades.findByPlnCodOrderByOrdemAscAtpCodAsc(plano.getPlnCod())) {
-            AtividadePlanejadaDTO dto = mapper.toDTO(a, rotuloResponsavel(a.getRespPesCod(), nomeResponsavel));
+            AtividadePlanejadaDTO dto = mapper.toDTO(a, rotuloEmpreendimento(a.getEmpCod()), rotuloResponsavel(a.getRespPesCod()));
             if (a.getAgrcCod() != null) {
                 porGrupo.computeIfAbsent(a.getAgrcCod(), k -> new ArrayList<>()).add(dto);
             } else {
@@ -314,9 +293,7 @@ public class PlanejamentoService {
         return arvore;
     }
 
-    // ---- atividades ----
 
-    /** Inclui uma atividade complementar na prática do ciclo (do planejamento vigente). */
     @Transactional(rollbackFor = Exception.class)
     public AtividadePlanejadaDTO adicionarComplementar(Long prtcCod, AtividadePlanejadaDTO dto) {
         PlanejamentoModel plano = exigirVigente();
@@ -329,23 +306,18 @@ public class PlanejamentoService {
         atv.setOrigem(EOrigemAtividade.COMPLEMENTAR);
         atv.setStatus(EStatusAtividade.PLANEJADA);
         atividades.save(atv);
-        return mapper.toDTO(atv, rotuloResponsavel(atv.getRespPesCod()));
+        return mapper.toDTO(atv, rotuloEmpreendimento(atv.getEmpCod()), rotuloResponsavel(atv.getRespPesCod()));
     }
 
-    /** Ajusta nome/descrição/responsável/prazo de uma atividade (do modelo ou complementar). */
     @Transactional(rollbackFor = Exception.class)
     public AtividadePlanejadaDTO ajustarAtividade(Long atpCod, AtividadePlanejadaDTO dto) {
         PlanejamentoModel plano = exigirVigente();
         AtividadePlanejadaModel atv = buscarAtividade(plano.getPlnCod(), atpCod);
         mapper.atualizar(dto, atv);
         atividades.save(atv);
-        return mapper.toDTO(atv, rotuloResponsavel(atv.getRespPesCod()));
+        return mapper.toDTO(atv, rotuloEmpreendimento(atv.getEmpCod()), rotuloResponsavel(atv.getRespPesCod()));
     }
 
-    /**
-     * Exclui uma atividade do plano (do modelo ou complementar) — como na metodologia. Bloqueia se já
-     * houver evidências vinculadas (a versão volta ao regerar o ciclo, se for do modelo).
-     */
     @Transactional(rollbackFor = Exception.class)
     public void removerAtividade(Long atpCod) {
         PlanejamentoModel plano = exigirVigente();
@@ -357,11 +329,6 @@ public class PlanejamentoService {
         atividades.delete(atv);
     }
 
-    /**
-     * Reordena as atividades de uma prática do plano vigente conforme a sequência de {@code atpCods}
-     * (arrastar-e-soltar): a posição na lista vira a nova {@code ordem}. A lista deve conter exatamente
-     * as atividades da prática.
-     */
     @Transactional(rollbackFor = Exception.class)
     public void reordenarAtividades(Long prtcCod, List<Long> atpCods) {
         PlanejamentoModel plano = exigirVigente();
@@ -386,11 +353,7 @@ public class PlanejamentoService {
         atividades.saveAll(todas);
     }
 
-    /**
-     * Reordena os agrupamentos (instância do ciclo) de uma prática conforme {@code agrcCods}. Os
-     * informados assumem a ordem 1..n; os demais (ex.: grupos ocultos por não terem atividades no plano)
-     * vão depois, na ordem atual. Reflete na estrutura do ciclo (compartilhada entre planos).
-     */
+    /** Os informados assumem 1..n; os demais (ex.: grupos ocultos) vão depois. Reflete na estrutura do ciclo (compartilhada entre planos). */
     @Transactional(rollbackFor = Exception.class)
     public void reordenarAgrupamentos(Long prtcCod, List<Long> agrcCods) {
         PlanejamentoModel plano = exigirVigente();
@@ -417,13 +380,29 @@ public class PlanejamentoService {
         agrupamentosCiclo.saveAll(todos);
     }
 
-    // ---- apoio ----
+    @Transactional(rollbackFor = Exception.class)
+    public void excluirAgrupamento(Long agrcCod) {
+        PlanejamentoModel plano = exigirVigente();
+        AgrupamentoCicloModel grupo = agrupamentosCiclo.findById(agrcCod)
+                .orElseThrow(() -> new NaoEncontradoException("Agrupamento", agrcCod));
+        exigirPraticaCiclo(plano.getCicCod(), grupo.getPrtcCod());
+        if (grupo.getEmpCod() != null) {
+            throw new RegraNegocioException(
+                    "Grupos por empreendimento são regerados ao gerar o ciclo e não podem ser excluídos.");
+        }
+        if (atividades.existsByAgrcCod(agrcCod)) {
+            throw new RegraNegocioException(
+                    "Este agrupamento tem atividades e não pode ser excluído. "
+                    + "Mova ou exclua as atividades antes.");
+        }
+        agrupamentosCiclo.delete(grupo);
+    }
+
 
     private java.util.Optional<PlanejamentoModel> planejamentoVigente(Long cicCod) {
         return planejamentos.findByCicCodAndStatus(cicCod, EStatusPlanejamento.PUBLICADO);
     }
 
-    /** Planejamento vigente do ciclo ativo, ou {@code null} (sem ciclo/sem plano). */
     private PlanejamentoModel vigenteDoCicloAtivo() {
         CiclosModel ciclo = cicloContexto.emFoco();
         return ciclo == null ? null : planejamentoVigente(ciclo.getCicCod()).orElse(null);
@@ -437,7 +416,6 @@ public class PlanejamentoService {
         return plano;
     }
 
-    /** Busca a atividade garantindo que pertence ao planejamento informado. */
     private AtividadePlanejadaModel buscarAtividade(Long plnCod, Long atpCod) {
         AtividadePlanejadaModel atv = atividades.findById(atpCod)
                 .orElseThrow(() -> new NaoEncontradoException("Atividade", atpCod));
@@ -447,14 +425,12 @@ public class PlanejamentoService {
         return atv;
     }
 
-    /** Próxima {@code ordem} da prática no plano (anexa a complementar no fim). */
     private int proximaOrdemAtividade(Long plnCod, Long prtcCod) {
         AtividadePlanejadaModel ultima = atividades
                 .findFirstByPlnCodAndPrtcCodOrderByOrdemDesc(plnCod, prtcCod).orElse(null);
         return ultima == null ? 1 : ultima.getOrdem() + 1;
     }
 
-    /** Garante que a prática (instância) existe e pertence ao ciclo informado. */
     private void exigirPraticaCiclo(Long cicCod, Long prtcCod) {
         PraticaCicloModel pratica = praticasCiclo.findById(prtcCod).orElse(null);
         if (pratica == null || !pratica.getCicCod().equals(cicCod)) {
@@ -462,7 +438,6 @@ public class PlanejamentoService {
         }
     }
 
-    /** Monta o DTO do cabeçalho com rótulos e o resumo de execução (total/concluídas/progresso). */
     private PlanejamentoDTO toDTO(PlanejamentoModel plano) {
         int total = (int) atividades.countByPlnCod(plano.getPlnCod());
         int concluidas = (int) atividades.countByPlnCodAndStatus(
@@ -478,7 +453,6 @@ public class PlanejamentoService {
         return ciclos.findById(cicCod).map(CiclosModel::getNome).orElse(null);
     }
 
-    /** Pessoa ({@code PES_COD}) do usuário logado neste tenant, ou {@code null} se não resolvível. */
     private Long pessoaAtual() {
         Long ctaCod = SessaoContext.contaAtual();
         if (ctaCod == null) {
@@ -487,7 +461,6 @@ public class PlanejamentoService {
         return pessoas.findByCtaCod(ctaCod).map(PessoasModel::getPesCod).orElse(null);
     }
 
-    /** Nome do responsável (PESSOAS → public.CONTAS); {@code null} se não definido ou não resolvível. */
     private String rotuloResponsavel(Long pesCod) {
         if (pesCod == null) {
             return null;
@@ -499,16 +472,15 @@ public class PlanejamentoService {
         return contas.findById(pessoa.getCtaCod()).map(ContasModel::getNome).orElse(null);
     }
 
-    /** Como {@link #rotuloResponsavel(Long)}, memorizando por {@code PES_COD} (evita relê-lo por atividade). */
-    private String rotuloResponsavel(Long pesCod, Map<Long, String> cache) {
-        if (pesCod == null) {
+    private String rotuloEmpreendimento(Long empCod) {
+        if (empCod == null) {
             return null;
         }
-        if (cache.containsKey(pesCod)) {
-            return cache.get(pesCod);
+        EmpreendimentosModel empreendimento = empreendimentos.findById(empCod).orElse(null);
+        if (empreendimento == null) {
+            return null;
         }
-        String nome = rotuloResponsavel(pesCod);
-        cache.put(pesCod, nome);
-        return nome;
+        return empreendimento.getNome();
     }
+
 }

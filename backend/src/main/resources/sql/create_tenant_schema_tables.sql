@@ -99,7 +99,6 @@ CREATE TABLE IF NOT EXISTS EMPREENDIMENTOS (
     NIVEL_MATURIDADE    VLD_NIVEL_MATURIDADE,
     ENTRADA             DATE,
     SAIDA               DATE
-
 );
 
 -- DOCUMENTOS_EMPREENDIMENTO (arquivos por empreendimento) é criada adiante, junto de ARQUIVOS

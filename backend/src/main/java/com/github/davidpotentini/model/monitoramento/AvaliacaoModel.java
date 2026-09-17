@@ -15,11 +15,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-/**
- * Avaliação de um empreendimento numa rodada ({@code AVALIACOES_MONITORAMENTO}). Guarda o status do
- * monitoramento, a recomendação do monitor e a observação; as notas por eixo ficam em
- * {@link PontuacaoModel}. Criada ao revisar (uma por rodada × empreendimento).
- */
 @Entity
 @Table(name = "AVALIACOES_MONITORAMENTO")
 @Getter

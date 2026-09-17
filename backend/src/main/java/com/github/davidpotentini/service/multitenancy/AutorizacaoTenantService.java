@@ -20,9 +20,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Resolve, dentro do schema de um tenant, o papel e a matriz de permissões de uma conta.
- * Usado no login: o chamador define o schema com {@code TenantContext.callWithin(...)} e
- * este método roda em {@code REQUIRES_NEW} para o Hibernate abrir a sessão já na gaveta certa.
+ * Resolve, dentro do schema de um tenant, o papel e as permissões de uma conta. O chamador define o
+ * schema com {@code TenantContext.callWithin(...)}; os métodos rodam em {@code REQUIRES_NEW}.
  */
 @Service
 public class AutorizacaoTenantService {
@@ -39,7 +38,6 @@ public class AutorizacaoTenantService {
         this.papelPermissaoRepository = papelPermissaoRepository;
     }
 
-    /** Papel resolvido + permissões; campos nulos/vazios se a pessoa não tem papel. */
     public record PapelResolvido(Long papCod, String papelNome, Map<ERecurso, ENivel> permissoes) {
         public static PapelResolvido vazio() {
             return new PapelResolvido(null, null, Map.of());
@@ -64,17 +62,13 @@ public class AutorizacaoTenantService {
         return new PapelResolvido(papCod, papelNome, permissoes);
     }
 
-    /** Papel local da conta neste tenant (código + nome); ambos nulos se sem pessoa/papel. */
     public record PapelPessoa(Long papCod, String nome) {
         public static PapelPessoa vazio() {
             return new PapelPessoa(null, null);
         }
     }
 
-    /**
-     * Papel local (código + nome) da conta neste tenant. Versão enxuta de {@link #resolver}
-     * para a listagem de usuários (não monta a matriz de permissões).
-     */
+    /** Versão enxuta de {@link #resolver} para a listagem: sem a matriz de permissões. */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     public PapelPessoa resolverPapelPessoa(Long ctaCod) {
         PessoasModel pessoa = pessoasRepository.findByCtaCod(ctaCod).orElse(null);
@@ -87,7 +81,6 @@ public class AutorizacaoTenantService {
         return new PapelPessoa(pessoa.getPapCod(), nome);
     }
 
-    /** Papéis ativos deste tenant (opções de atribuição), ordenados por nome. */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     public List<PapelResumoDTO> listarPapeis() {
         return papeisRepository.findAll().stream()
@@ -97,10 +90,6 @@ public class AutorizacaoTenantService {
                 .toList();
     }
 
-    /**
-     * Vincula (ou revincula) a conta a um papel neste tenant: cria/atualiza a linha em
-     * {@code PESSOAS}. {@code CTA_COD} é a ref. fraca a {@code public.CONTAS}.
-     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void vincularPapel(Long ctaCod, Long papCod) {
         PessoasModel pessoa = pessoasRepository.findByCtaCod(ctaCod).orElseGet(PessoasModel::new);

@@ -15,10 +15,6 @@ import {
 import { IndicadorFormDialog } from './indicador-form.dialog';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/**
- * Aba "Indicadores": lista os indicadores da metodologia (nome, vínculo metodológico, unidade,
- * periodicidade), com editar e ativar/inativar por item, e "Adicionar Indicador" no topo direito.
- */
 @Component({
   selector: 'app-indicadores-tab',
   imports: [

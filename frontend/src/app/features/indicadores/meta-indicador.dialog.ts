@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,6 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { addMonths, format, parseISO } from 'date-fns';
 import { CicloService } from '../../core/services/ciclo/ciclo.service';
 import { IndicadorService } from '../../core/services/indicador/indicador.service';
+import { dataParaIso, isoParaData } from '../../shared/util/data';
 import { Ciclo } from '../../models/ciclo/ciclo.model';
 import { IndicadorCiclo, Meta } from '../../models/indicador/indicador.model';
 import {
@@ -22,7 +24,6 @@ interface MetaIndicadorData {
   indicador: IndicadorCiclo;
 }
 
-/** Duração de um período em meses, por periodicidade. POR_CICLO/NAO_SE_APLICA não têm passo fixo. */
 const MESES_POR_PERIODICIDADE: Partial<Record<EPeriodicidade, number>> = {
   MENSAL: 1,
   BIMESTRAL: 2,
@@ -31,10 +32,6 @@ const MESES_POR_PERIODICIDADE: Partial<Record<EPeriodicidade, number>> = {
   ANUAL: 12,
 };
 
-/**
- * Modal de meta: mostra o indicador (só leitura) e a lista de períodos, cada um com a meta estipulada
- * e a janela de apuração. Permite cadastrar, editar e remover períodos no mesmo formulário.
- */
 @Component({
   selector: 'app-meta-indicador',
   imports: [
@@ -47,6 +44,7 @@ const MESES_POR_PERIODICIDADE: Partial<Record<EPeriodicidade, number>> = {
     MatIconModule,
     MatTooltipModule,
     MatProgressBarModule,
+    MatDatepickerModule,
   ],
   templateUrl: './meta-indicador.dialog.html',
   styleUrl: './meta-indicador.dialog.css',
@@ -62,17 +60,19 @@ export class MetaIndicadorDialog {
   readonly metas = signal<Meta[]>([]);
   readonly erro = signal<string | null>(null);
 
-  /** Ciclo ativo — usado para inferir o período quando a periodicidade é POR_CICLO. */
+  /** Usado para inferir o período quando a periodicidade é POR_CICLO. */
   private readonly cicloAtivo = signal<Ciclo | null>(null);
 
-  // formulário de período (novo ou edição)
   readonly editandoCod = signal<number | null>(null);
   readonly valor = signal<number | null>(null);
   readonly inicio = signal<string | null>(null);
   readonly fim = signal<string | null>(null);
+
+  protected readonly isoParaData = isoParaData;
+  protected readonly dataParaIso = dataParaIso;
   readonly salvando = signal(false);
 
-  /** Último fim sugerido automaticamente; quando o usuário altera para outro valor, pedimos confirmação. */
+  /** Último fim sugerido automaticamente; se o usuário mudar para outro valor, pedimos confirmação. */
   private readonly fimSugerido = signal<string | null>(null);
 
   constructor() {
@@ -83,7 +83,6 @@ export class MetaIndicadorDialog {
     });
   }
 
-  /** Em POR_CICLO, ao abrir um período novo, pré-preenche a janela com o período do ciclo ativo. */
   private prefillPorCiclo(): void {
     if (this.indicador.periodicidade !== 'POR_CICLO' || this.editando) return;
     const ciclo = this.cicloAtivo();
@@ -99,11 +98,7 @@ export class MetaIndicadorDialog {
     return PERIODICIDADE_LABEL[p];
   }
 
-  /**
-   * Ao informar o início da apuração, sugere o fim somando os meses da periodicidade
-   * (bimestral → +2 meses). POR_CICLO (janela do ciclo, ver {@link prefillPorCiclo}) e
-   * NAO_SE_APLICA não têm passo fixo — o fim fica manual. É só sugestão: o fim continua editável.
-   */
+  /** Sugere o fim somando os meses da periodicidade ao início; só sugestão, o fim continua editável. */
   sugerirFim(valor: string | null): void {
     this.inicio.set(valor || null);
 
@@ -117,10 +112,6 @@ export class MetaIndicadorDialog {
     this.fimSugerido.set(fim);
   }
 
-  /**
-   * Handler do campo Fim: se o usuário mudar a data sugerida automaticamente, pede confirmação.
-   * Ao confirmar, mantém o valor digitado; ao cancelar, restaura a sugestão.
-   */
   aoMudarFim(valor: string | null): void {
     const novo = valor || null;
     const sugerido = this.fimSugerido();
@@ -135,7 +126,7 @@ export class MetaIndicadorDialog {
         this.fim.set(sugerido);
         return;
       }
-      this.fimSugerido.set(null); // alteração aceita: não perguntar de novo
+      this.fimSugerido.set(null);
     }
     this.fim.set(novo);
   }
@@ -173,7 +164,7 @@ export class MetaIndicadorDialog {
     this.valor.set(m.valor);
     this.inicio.set(m.dataInicioApuracao);
     this.fim.set(m.dataFimApuracao);
-    this.fimSugerido.set(null); // valores existentes: sem sugestão a confirmar
+    this.fimSugerido.set(null);
     this.erro.set(null);
   }
 

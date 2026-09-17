@@ -30,12 +30,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Metodologia CERNE da incubadora logada. Roda no schema do próprio tenant (o JWT já deixou o
- * {@code TenantContext} ativo), então as tabelas são lidas/gravadas direto.
- *
- * <p>Documento vivo (sem versionamento): a árvore {@code processos → práticas → indicadores} é única
- * e sempre editável. Qualquer correção passa a valer na hora para os planos que a leem ao vivo. A
- * geração do planejamento e a dos indicadores do ciclo consomem esta metodologia.
+ * Metodologia CERNE da incubadora. Documento vivo (sem versionamento): a árvore é única e sempre
+ * editável, e a geração do planejamento e a dos indicadores do ciclo a consomem.
  */
 @Service
 public class MetodologiaService {
@@ -59,9 +55,7 @@ public class MetodologiaService {
         this.mapper = mapper;
     }
 
-    // ---- processos ----
 
-    /** Processos da metodologia (accordions ordenados por {@code ordem}), cada um com suas práticas. */
     @Transactional(readOnly = true)
     public List<ProcessoDTO> listarProcessos() {
         List<ProcessoDTO> lista = new ArrayList<>();
@@ -71,7 +65,6 @@ public class MetodologiaService {
         return lista;
     }
 
-    /** Novo processo, anexado no fim (a ordem é definida depois por arrastar). */
     @Transactional(rollbackFor = Exception.class)
     public ProcessoDTO criarProcesso(ProcessoDTO dto) {
         ProcessoModel processo = mapper.toModel(dto);
@@ -81,7 +74,6 @@ public class MetodologiaService {
         return mapper.toDTO(processo, List.of());
     }
 
-    /** Edita nome/descrição do processo (a ordem é gerida por arrastar). */
     @Transactional(rollbackFor = Exception.class)
     public ProcessoDTO editarProcesso(Long prcCod, ProcessoDTO dto) {
         ProcessoModel processo = buscarProcesso(prcCod);
@@ -90,10 +82,6 @@ public class MetodologiaService {
         return montarProcesso(processo);
     }
 
-    /**
-     * Reordena os processos conforme a sequência de {@code prcCods} (arrastar-e-soltar): a posição na
-     * lista vira a nova {@code ordem}. A lista deve conter exatamente os processos existentes.
-     */
     @Transactional(rollbackFor = Exception.class)
     public List<ProcessoDTO> reordenarProcessos(List<Long> prcCods) {
         List<ProcessoModel> todos = processos.findAllByOrderByOrdemAscPrcCodAsc();
@@ -117,7 +105,6 @@ public class MetodologiaService {
         return listarProcessos();
     }
 
-    /** Ativa/inativa o processo. Inativo continua visível, mas não entra na geração do planejamento. */
     @Transactional(rollbackFor = Exception.class)
     public ProcessoDTO alterarSituacaoProcesso(Long prcCod, EAtivoInativo situacao) {
         ProcessoModel processo = buscarProcesso(prcCod);
@@ -131,9 +118,7 @@ public class MetodologiaService {
         return ultimo == null ? 1 : ultimo.getOrdem() + 1;
     }
 
-    // ---- práticas ----
 
-    /** Adiciona uma prática ao processo (accordion expandido). */
     @Transactional(rollbackFor = Exception.class)
     public PraticaDTO adicionarPratica(Long prcCod, PraticaDTO dto) {
         buscarProcesso(prcCod);
@@ -145,13 +130,11 @@ public class MetodologiaService {
         return mapper.toDTO(pratica);
     }
 
-    /** Próxima {@code ordem} dentro do processo (anexa a prática no fim). */
     private int proximaOrdemPratica(Long prcCod) {
         PraticaModel ultima = praticas.findFirstByPrcCodOrderByOrdemDesc(prcCod).orElse(null);
         return ultima == null ? 1 : ultima.getOrdem() + 1;
     }
 
-    /** Edita nome/descrição da prática (validando o vínculo com o processo). */
     @Transactional(rollbackFor = Exception.class)
     public PraticaDTO editarPratica(Long prcCod, Long prtCod, PraticaDTO dto) {
         PraticaModel pratica = buscarPratica(prcCod, prtCod);
@@ -160,7 +143,6 @@ public class MetodologiaService {
         return mapper.toDTO(pratica);
     }
 
-    /** Ativa/inativa a prática. */
     @Transactional(rollbackFor = Exception.class)
     public PraticaDTO alterarSituacaoPratica(Long prcCod, Long prtCod, EAtivoInativo situacao) {
         PraticaModel pratica = buscarPratica(prcCod, prtCod);
@@ -169,10 +151,6 @@ public class MetodologiaService {
         return mapper.toDTO(pratica);
     }
 
-    /**
-     * Reordena as práticas de um processo conforme a sequência de {@code prtCods} (arrastar-e-soltar):
-     * a posição na lista vira a nova {@code ordem}. A lista deve conter exatamente as práticas do processo.
-     */
     @Transactional(rollbackFor = Exception.class)
     public List<ProcessoDTO> reordenarPraticas(Long prcCod, List<Long> prtCods) {
         buscarProcesso(prcCod);
@@ -197,13 +175,7 @@ public class MetodologiaService {
         return listarProcessos();
     }
 
-    // ---- agrupamentos ----
 
-    /**
-     * Agrupamentos (sub-planos) da metodologia. O agrupamento aponta para uma prática (PRT_COD); reúno
-     * as práticas (processos → práticas) e busco os agrupamentos delas numa só query; o mesmo mapa de
-     * nomes preenche o "Vínculo metodológico".
-     */
     @Transactional(readOnly = true)
     public List<AgrupamentoDTO> listarAgrupamentos() {
         List<Long> prcCods = new ArrayList<>();
@@ -224,7 +196,6 @@ public class MetodologiaService {
         return lista;
     }
 
-    /** Adiciona um agrupamento à prática (anexado no fim). */
     @Transactional(rollbackFor = Exception.class)
     public AgrupamentoDTO adicionarAgrupamento(Long prtCod, AgrupamentoDTO dto) {
         PraticaModel pratica = buscarPraticaPorId(prtCod);
@@ -236,13 +207,11 @@ public class MetodologiaService {
         return mapper.toDTO(grupo, pratica.getNome());
     }
 
-    /** Próxima {@code ordem} dentro da prática (anexa o agrupamento no fim). */
     private int proximaOrdemAgrupamento(Long prtCod) {
         AgrupamentoModel ultimo = agrupamentos.findFirstByPrtCodOrderByOrdemDesc(prtCod).orElse(null);
         return ultimo == null ? 1 : ultimo.getOrdem() + 1;
     }
 
-    /** Edita nome/descrição do agrupamento. */
     @Transactional(rollbackFor = Exception.class)
     public AgrupamentoDTO editarAgrupamento(Long agrCod, AgrupamentoDTO dto) {
         AgrupamentoModel grupo = buscarAgrupamento(agrCod);
@@ -251,10 +220,6 @@ public class MetodologiaService {
         return mapper.toDTO(grupo, buscarPraticaPorId(grupo.getPrtCod()).getNome());
     }
 
-    /**
-     * Reordena os agrupamentos de uma prática conforme a sequência de {@code agrCods} (arrastar-e-soltar):
-     * a posição na lista vira a nova {@code ordem}. A lista deve conter exatamente os agrupamentos da prática.
-     */
     @Transactional(rollbackFor = Exception.class)
     public List<AgrupamentoDTO> reordenarAgrupamentos(Long prtCod, List<Long> agrCods) {
         buscarPraticaPorId(prtCod);
@@ -279,7 +244,6 @@ public class MetodologiaService {
         return listarAgrupamentos();
     }
 
-    /** Ativa/inativa o agrupamento. */
     @Transactional(rollbackFor = Exception.class)
     public AgrupamentoDTO alterarSituacaoAgrupamento(Long agrCod, EAtivoInativo situacao) {
         AgrupamentoModel grupo = buscarAgrupamento(agrCod);
@@ -288,7 +252,6 @@ public class MetodologiaService {
         return mapper.toDTO(grupo, buscarPraticaPorId(grupo.getPrtCod()).getNome());
     }
 
-    /** Exclui o agrupamento. Bloqueia se ainda houver atividades nele (mova-as ou exclua antes). */
     @Transactional(rollbackFor = Exception.class)
     public void excluirAgrupamento(Long agrCod) {
         AgrupamentoModel grupo = buscarAgrupamento(agrCod);
@@ -300,13 +263,7 @@ public class MetodologiaService {
         agrupamentos.delete(grupo);
     }
 
-    // ---- indicadores ----
 
-    /**
-     * Indicadores da metodologia. O indicador aponta para uma prática (PRT_COD), então reúno as
-     * práticas (processos → práticas) e busco os indicadores delas numa só query; o mesmo mapa de
-     * nomes preenche o "Vínculo metodológico".
-     */
     @Transactional(readOnly = true)
     public List<IndicadorDTO> listarIndicadores() {
         List<Long> prcCods = new ArrayList<>();
@@ -345,7 +302,6 @@ public class MetodologiaService {
         return mapper.toDTO(indicador, pratica.getNome());
     }
 
-    /** Ativa/inativa o indicador. */
     @Transactional(rollbackFor = Exception.class)
     public IndicadorDTO alterarSituacaoIndicador(Long inmCod, EAtivoInativo situacao) {
         IndicadorMetodologiaModel indicador = buscarIndicador(inmCod);
@@ -355,13 +311,7 @@ public class MetodologiaService {
         return mapper.toDTO(indicador, vinculo);
     }
 
-    // ---- atividades ----
 
-    /**
-     * Atividades-padrão da metodologia. A atividade aponta para uma prática (PRT_COD); reúno as
-     * práticas (processos → práticas) e busco as atividades delas numa só query; o mesmo mapa de nomes
-     * preenche o "Vínculo metodológico".
-     */
     @Transactional(readOnly = true)
     public List<AtividadeMetodologiaDTO> listarAtividades() {
         List<Long> prcCods = new ArrayList<>();
@@ -392,7 +342,6 @@ public class MetodologiaService {
         return mapper.toDTO(atividade, pratica.getNome());
     }
 
-    /** Próxima {@code ordem} dentro da prática (anexa a atividade no fim). */
     private int proximaOrdemAtividade(Long prtCod) {
         AtividadeMetodologiaModel ultima = atividades.findFirstByPrtCodOrderByOrdemDesc(prtCod).orElse(null);
         return ultima == null ? 1 : ultima.getOrdem() + 1;
@@ -407,10 +356,6 @@ public class MetodologiaService {
         return mapper.toDTO(atividade, pratica.getNome());
     }
 
-    /**
-     * Reordena as atividades de uma prática conforme a sequência de {@code ameCods} (arrastar-e-soltar):
-     * a posição na lista vira a nova {@code ordem}. A lista deve conter exatamente as atividades da prática.
-     */
     @Transactional(rollbackFor = Exception.class)
     public List<AtividadeMetodologiaDTO> reordenarAtividades(Long prtCod, List<Long> ameCods) {
         buscarPraticaPorId(prtCod);
@@ -435,7 +380,6 @@ public class MetodologiaService {
         return listarAtividades();
     }
 
-    /** Ativa/inativa a atividade. */
     @Transactional(rollbackFor = Exception.class)
     public AtividadeMetodologiaDTO alterarSituacaoAtividade(Long ameCod, EAtivoInativo situacao) {
         AtividadeMetodologiaModel atividade = buscarAtividade(ameCod);
@@ -445,7 +389,6 @@ public class MetodologiaService {
         return mapper.toDTO(atividade, vinculo);
     }
 
-    /** Marca/desmarca a atividade como "da incubada" (repete por empreendimento na geração do ciclo). */
     @Transactional(rollbackFor = Exception.class)
     public AtividadeMetodologiaDTO alterarPorEmpreendimentoAtividade(Long ameCod, boolean valor) {
         AtividadeMetodologiaModel atividade = buscarAtividade(ameCod);
@@ -455,24 +398,18 @@ public class MetodologiaService {
         return mapper.toDTO(atividade, vinculo);
     }
 
-    /**
-     * Exclui a atividade-padrão. Diferente de processos/práticas (que só se inativam), a atividade é
-     * um dado da incubadora e pode ser removida — o que já foi materializado num ciclo não é afetado
-     * (a cópia do ciclo é independente).
-     */
+    /** A atividade pode ser removida (ao contrário de processos/práticas); o que já foi materializado num ciclo não é afetado. */
     @Transactional(rollbackFor = Exception.class)
     public void excluirAtividade(Long ameCod) {
         atividades.delete(buscarAtividade(ameCod));
     }
 
-    // ---- apoio ----
 
     private ProcessoModel buscarProcesso(Long prcCod) {
         return processos.findById(prcCod)
                 .orElseThrow(() -> new NaoEncontradoException("Processo", prcCod));
     }
 
-    /** Busca a prática garantindo que ela pertence ao processo informado. */
     private PraticaModel buscarPratica(Long prcCod, Long prtCod) {
         PraticaModel pratica = praticas.findById(prtCod)
                 .orElseThrow(() -> new NaoEncontradoException("Prática", prtCod));
@@ -502,7 +439,6 @@ public class MetodologiaService {
                 .orElseThrow(() -> new NaoEncontradoException("Agrupamento", agrCod));
     }
 
-    /** Orquestra a busca das práticas do processo; a montagem do DTO fica no mapper. */
     private ProcessoDTO montarProcesso(ProcessoModel processo) {
         List<PraticaDTO> lista = mapper.toDTOList(praticas.findByPrcCodOrderByOrdemAscPrtCodAsc(processo.getPrcCod()));
         return mapper.toDTO(processo, lista);

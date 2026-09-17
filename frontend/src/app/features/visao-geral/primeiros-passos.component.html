@@ -1,0 +1,39 @@
+<app-ciclo-readonly-banner />
+
+<div class="topo">
+  <h1>Primeiros passos</h1>
+  <span class="sub">Siga a ordem para colocar o ciclo em operação.</span>
+</div>
+
+@if (completo()) {
+  <mat-card class="tudo-pronto">
+    <mat-icon>check_circle</mat-icon>
+    <p>Tudo pronto — o ciclo está configurado e em operação.</p>
+  </mat-card>
+}
+
+<mat-card class="passos">
+  <div class="passos-cab">
+    <span class="titulo">Etapas</span>
+    <span class="contador">{{ concluidos() }}/{{ passos().length }}</span>
+  </div>
+
+  <mat-progress-bar mode="determinate" [value]="concluidos() / passos().length * 100"></mat-progress-bar>
+
+  <ol class="lista">
+    @for (p of passos(); track p.titulo; let i = $index) {
+      <li class="passo" [class.feito]="p.feito" [class.proximo]="i === proximo()">
+        <mat-icon class="marca">
+          {{ p.feito ? 'check_circle' : (i === proximo() ? 'radio_button_checked' : 'radio_button_unchecked') }}
+        </mat-icon>
+        <div class="passo-txt">
+          <span class="passo-titulo">{{ p.titulo }}</span>
+          <span class="passo-desc">{{ p.desc }}</span>
+        </div>
+        @if (!p.feito) {
+          <a mat-stroked-button color="primary" [routerLink]="p.rota">Ir</a>
+        }
+      </li>
+    }
+  </ol>
+</mat-card>

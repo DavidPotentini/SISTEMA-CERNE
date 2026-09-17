@@ -27,7 +27,6 @@
   flex-wrap: wrap;
 }
 
-/* Chip do status atual (só leitura; o intermediário é derivado das evidências). */
 .status-atual {
   display: inline-flex;
   align-items: center;

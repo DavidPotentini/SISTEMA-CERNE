@@ -13,11 +13,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Processo da metodologia (documento vivo da incubadora) — agrupa práticas. Exibido como accordion na
- * aba "Processos e Práticas", ordenado por {@code ordem} ({@code ORDEM} é UNIQUE no banco). Schema do
- * tenant.
- */
 @Entity
 @Table(name = "PROCESSOS_METODOLOGIA")
 @Getter
@@ -29,7 +24,6 @@ public class ProcessoModel {
     @Column(name = "PRC_COD")
     private Long prcCod;
 
-    /** Nível CERNE do processo — por ora sempre {@code CERNE_1} (domínio de um valor só). */
     @Enumerated(EnumType.STRING)
     @Column(name = "NIVEL", nullable = false)
     private ENivelCerne nivel = ENivelCerne.CERNE_1;

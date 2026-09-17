@@ -1,7 +1,6 @@
 export type EStatusIncubadora = 'EM_OPERACAO' | 'AGUARDANDO_ATIVACAO' | 'SUSPENSA';
 export type ENivelIncubadora = 'CERNE_1';
 
-/** Linha da listagem (colunas: incubadora, mantenedora, responsável, usuários, status). */
 export interface IncubadoraResumo {
   incCod: number;
   nome: string;
@@ -11,7 +10,6 @@ export interface IncubadoraResumo {
   status: EStatusIncubadora;
 }
 
-/** Detalhe completo (Consultar / Configurar). */
 export interface IncubadoraDetalhe {
   incCod: number;
   nome: string;

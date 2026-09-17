@@ -6,11 +6,7 @@ import com.github.davidpotentini.model.papeis.PapelPermissaoModel;
 import com.github.davidpotentini.repository.papeis.PapelPermissaoRepository;
 import org.springframework.stereotype.Service;
 
-/**
- * Decide se um papel atinge o nível mínimo exigido num recurso, lendo a matriz
- * {@code PAPEL_PERMISSOES} do schema do tenant ativo (resolvido pelo {@code TenantContext}).
- * Negar por padrão: sem papel ou recurso sem linha na matriz ⇒ negado.
- */
+/** Negar por padrão: sem papel, ou recurso sem linha na matriz {@code PAPEL_PERMISSOES}, ⇒ negado. */
 @Service
 public class PermissaoService {
 
@@ -30,7 +26,7 @@ public class PermissaoService {
                 .orElse(false);
     }
 
-    /** Ordena os níveis: um nível cobre todos os abaixo dele. */
+    /** Um nível cobre todos os abaixo dele. */
     private int rank(ENivel nivel) {
         return switch (nivel) {
             case NENHUM -> 0;

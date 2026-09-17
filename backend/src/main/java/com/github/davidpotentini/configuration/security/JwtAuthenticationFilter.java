@@ -20,15 +20,9 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Lê o Bearer token, reconstrói o {@link UsuarioAutenticado} a partir dos claims do
- * modelo novo e popula, por requisição:
- * <ul>
- *   <li>o {@code SecurityContext} (para {@code anyRequest().authenticated()});</li>
- *   <li>o {@link TenantContext} com o {@code nomeSchema} (troca de schema do Hibernate);</li>
- *   <li>o {@link SessaoContext} com a identidade (autorização papel × recurso e eventos).</li>
- * </ul>
- * A autorização fina não sai daqui — fica no interceptor {@code @RequerPermissao}
- * (papel × recurso), que consulta {@code PAPEL_PERMISSOES}.
+ * Lê o Bearer token e popula, por requisição, o {@code SecurityContext}, o {@link TenantContext}
+ * (schema do Hibernate) e o {@link SessaoContext}. A autorização fina fica no interceptor
+ * {@code @RequerPermissao} (papel × recurso), não aqui.
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -60,8 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         Boolean.TRUE.equals(c.get("adminPlataforma", Boolean.class))
                 );
 
-                // Authority informativa (papel local). A checagem fina é por recurso,
-                // no interceptor de permissão — não em hasRole(...).
+                // Authority informativa; a checagem fina é por recurso no interceptor, não em hasRole(...).
                 String papel = principal.papelNome() != null ? principal.papelNome() : "SEM_PAPEL";
                 var auth = new UsernamePasswordAuthenticationToken(
                         principal,

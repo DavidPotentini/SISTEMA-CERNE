@@ -3,17 +3,11 @@ import { Injectable, inject, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { Ciclo } from '../../../models/ciclo/ciclo.model';
 
-/**
- * Ciclos da própria incubadora (o schema do tenant vem do JWT). Criar encerra o ativo anterior;
- * "pôr em foco" alterna o ciclo refletido nas telas. Encerrar fecha o ciclo ativo (irreversível), só
- * quando não há pendências em aberto.
- */
 @Injectable({ providedIn: 'root' })
 export class CicloService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/incubadora/ciclos`;
 
-  /** Incrementa a cada mutação; a lista observa para recarregar. */
   readonly versao = signal(0);
   recarregar(): void {
     this.versao.update(v => v + 1);

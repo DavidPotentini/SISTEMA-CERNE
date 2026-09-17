@@ -9,10 +9,9 @@
 } @else if (atualRes.value(); as atual) {
   <!-- Renderiza enquanto houver valor (mesmo durante reload): preserva o estado dos painéis. -->
   @if (!atual.cicloAtivo) {
-    <mat-card class="vazio-card">
-      <mat-icon>event_busy</mat-icon>
-      <p>Nenhum ciclo ativo. Abra um ciclo para planejar.</p>
-    </mat-card>
+    <app-proximo-passo icone="event_busy" rotulo="Ir para ciclos" rota="/incubadora/minha-incubadora">
+      <p>Nenhum ciclo ativo. Abra um ciclo e ponha-o em foco para planejar.</p>
+    </app-proximo-passo>
   } @else if (plano(); as m) {
     <mat-card class="cabecalho">
       <div class="cab-topo">
@@ -27,6 +26,11 @@
           </button>
         </div>
       </div>
+
+      <p class="cab-sub">
+        Este plano parte da metodologia vigente. Acrescente atividades que faltaram ou específicas
+        deste ciclo — marcadas como Complementar.
+      </p>
 
       <dl class="meta">
         <div><dt>Ciclo</dt><dd>{{ m.cicloNome || '—' }}</dd></div>
@@ -56,6 +60,10 @@
         [processos]="processoOpcoes()"
         [praticas]="praticaOpcoes()"
         [comResponsavel]="true"
+        [comAgrupamento]="true"
+        [comAtividade]="true"
+        [comEmpreendimento]="true"
+        [empreendimentos]="empreendimentos()"
       />
 
       <div class="acordeao-acoes">
@@ -99,7 +107,7 @@
                   <div
                     class="grupos"
                     cdkDropList
-                    [cdkDropListDisabled]="!editavel()"
+                    [cdkDropListDisabled]="!editavel() || algumFiltroAtivo()"
                     (cdkDropListDropped)="reordenarAgrupamento(pr, $event)"
                   >
                     @for (g of pr.grupos; track g.agrcCod ?? '__sem__') {
@@ -122,11 +130,18 @@
                           <mat-icon>{{ g.empCod != null ? 'business' : 'segment' }}</mat-icon>
                           <span class="grupo-nome">{{ g.nome }}</span>
                           <span class="grupo-cont">{{ g.atividades.length }}</span>
+                          @if (editavel() && g.agrcCod != null && g.empCod == null && g.atividades.length === 0) {
+                            <span class="grupo-acoes" (click)="$event.stopPropagation()">
+                              <button mat-icon-button matTooltip="Excluir agrupamento" (click)="removerAgrupamento(g)">
+                                <mat-icon>delete</mat-icon>
+                              </button>
+                            </span>
+                          }
                         </div>
                         <div
                           class="atividades"
                           cdkDropList
-                          [cdkDropListDisabled]="!editavel()"
+                          [cdkDropListDisabled]="!editavel() || algumFiltroAtivo()"
                           (cdkDropListDropped)="reordenarAtividade(pr, g.agrcCod, $event)"
                         >
                           @for (atv of g.atividades; track atv.atpCod) {
@@ -146,7 +161,7 @@
                                 @if (atv.observacoes) {
                                   <span class="atividade-desc">{{ atv.observacoes }}</span>
                                 }
-                                <span class="atividade-meta">
+                                <span class="atividade-info2">
                                   @if (atv.responsavelNome) {
                                     <span class="atividade-resp">
                                       <mat-icon>person</mat-icon>{{ atv.responsavelNome }}
@@ -161,7 +176,16 @@
                                   }@else {
                                     <span class="n-atividade-prazo">Prazo não definido</span>
                                   }
+                                  @if (atv.empreendimentoNome) {
+                                  <span class="atividade-empreendimento">
+                                    <mat-icon>storefront</mat-icon>{{ atv.empreendimentoNome }}
+                                  </span>
+                                  }@else {
+                                  <span class="atividade-empreendimento">
+                                    <mat-icon>storefront</mat-icon>Institucional</span>
+                                  }
                                 </span>
+                                
                               </div>
                               @if (editavel()) {
                                 <div class="atividade-acoes">
@@ -204,11 +228,10 @@
       <p class="estado">Carregando estrutura…</p>
     }
   } @else {
-    <mat-card class="vazio-card">
-      <mat-icon>assignment_add</mat-icon>
+    <app-proximo-passo icone="assignment_add" rotulo="Gerar o ciclo na Metodologia" rota="/incubadora/metodologia">
       <p>Ainda não há planejamento para o ciclo <strong>{{ atual.cicloNome }}</strong>.</p>
       <p class="dica">Use "Publicar metodologia para o ciclo de planejamento" na tela de Metodologia para materializá-lo.</p>
-    </mat-card>
+    </app-proximo-passo>
   }
 } @else {
   <p class="estado">Carregando…</p>

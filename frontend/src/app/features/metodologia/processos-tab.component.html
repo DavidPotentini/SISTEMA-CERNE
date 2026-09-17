@@ -18,12 +18,14 @@
     [(filtros)]="filtros"
     [processos]="processoOpcoes()"
     [praticas]="praticaOpcoes()"
+    [comAgrupamento]="true"
+    [comAtividade]="true"
   />
 
   <mat-accordion
     multi
     cdkDropList
-    [cdkDropListDisabled]="algumFiltro()"
+    [cdkDropListDisabled]="algumFiltroAtivo()"
     (cdkDropListDropped)="reordenar($event)"
   >
     @for (p of processosFiltrados(); track p.prcCod) {
@@ -57,7 +59,7 @@
           class="praticas"
           multi
           cdkDropList
-          [cdkDropListDisabled]="algumFiltro()"
+          [cdkDropListDisabled]="algumFiltroAtivo()"
           (cdkDropListDropped)="reordenarPratica(p, $event)"
         >
           @for (pr of p.praticas; track pr.prtCod) {
@@ -90,10 +92,10 @@
               <div
                 class="grupos"
                 cdkDropList
-                [cdkDropListDisabled]="algumFiltro()"
+                [cdkDropListDisabled]="algumFiltroAtivo()"
                 (cdkDropListDropped)="reordenarAgrupamento(pr, $event)"
               >
-                @for (g of gruposDaPratica(pr.prtCod); track g.agrCod ?? '__sem__') {
+                @for (g of gruposDaPraticaFiltrados(pr.prtCod); track g.agrCod ?? '__sem__') {
                   <div
                     class="grupo"
                     cdkDrag

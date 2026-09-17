@@ -1,44 +1,118 @@
-<mat-card class="cartao">
-  <div class="cabecalho">
-    <h2>Empreendimentos</h2>
-    <button mat-flat-button color="primary" (click)="adicionar()">Adicionar empreendimento</button>
+<div class="topo">
+  <div>
+    <h1>Empreendimentos</h1>
+    <span class="sub">Cadastro dos empreendimentos da incubadora.</span>
   </div>
+  <button mat-flat-button color="primary" (click)="adicionar()">
+    <mat-icon>add</mat-icon>
+    Adicionar empreendimento
+  </button>
+</div>
 
-  @if (dados.error()) {
-    <p class="erro">Falha ao carregar os empreendimentos.</p>
-  }
+@if (dados.isLoading() && !dados.hasValue()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+} @else if (dados.error()) {
+  <p class="estado erro">Falha ao carregar os empreendimentos.</p>
+} @else if ((dados.value()?.length ?? 0) === 0) {
+  <p class="estado vazio">Nenhum empreendimento cadastrado.</p>
+} @else {
+  <div class="tabela-scroll">
+    <table mat-table [dataSource]="dados.value() ?? []" class="tabela">
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let e"><span class="nome">{{ e.nome }}</span></td>
+      </ng-container>
 
-  <table mat-table [dataSource]="dados.value() ?? []" class="tabela">
-    <ng-container matColumnDef="nome">
-      <th mat-header-cell *matHeaderCellDef>Nome</th>
-      <td mat-cell *matCellDef="let e">{{ e.nome }}</td>
-    </ng-container>
-    <ng-container matColumnDef="cnpj">
-      <th mat-header-cell *matHeaderCellDef>CNPJ</th>
-      <td mat-cell *matCellDef="let e">{{ e.cnpj || '—' }}</td>
-    </ng-container>
-    <ng-container matColumnDef="estagio">
-      <th mat-header-cell *matHeaderCellDef>Estágio</th>
-      <td mat-cell *matCellDef="let e">{{ estagioLabel(e.estagio) }}</td>
-    </ng-container>
-    <ng-container matColumnDef="status">
-      <th mat-header-cell *matHeaderCellDef>Status</th>
-      <td mat-cell *matCellDef="let e">
-        <span class="chip" [class]="'s-' + e.status">{{ statusLabel(e.status) }}</span>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="acoes">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let e" class="acoes">
-        <button mat-stroked-button (click)="editar(e)">Editar</button>
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="cnpj">
+        <th mat-header-cell *matHeaderCellDef>CNPJ</th>
+        <td mat-cell *matCellDef="let e">{{ e.cnpj || '—' }}</td>
+      </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="colunas"></tr>
-    <tr mat-row *matRowDef="let row; columns: colunas"></tr>
-  </table>
+      <ng-container matColumnDef="cnae">
+        <th mat-header-cell *matHeaderCellDef>CNAE</th>
+        <td mat-cell *matCellDef="let e">{{ e.cnae || '—' }}</td>
+      </ng-container>
 
-  @if (!dados.isLoading() && (dados.value()?.length ?? 0) === 0) {
-    <p class="vazio">Nenhum empreendimento cadastrado.</p>
-  }
-</mat-card>
+      <ng-container matColumnDef="atividadeEconomica">
+        <th mat-header-cell *matHeaderCellDef>Atividade econômica</th>
+        <td mat-cell *matCellDef="let e">{{ e.atividadeEconomica || '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="estagio">
+        <th mat-header-cell *matHeaderCellDef>Estágio</th>
+        <td mat-cell *matCellDef="let e">{{ estagioLabel(e.estagio) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="nivelMaturidade">
+        <th mat-header-cell *matHeaderCellDef>Maturidade</th>
+        <td mat-cell *matCellDef="let e">{{ maturidadeLabel(e.nivelMaturidade) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="situacaoContrato">
+        <th mat-header-cell *matHeaderCellDef>Contrato</th>
+        <td mat-cell *matCellDef="let e">{{ contratoLabel(e.situacaoContrato) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="periodo">
+        <th mat-header-cell *matHeaderCellDef>Período</th>
+        <td mat-cell *matCellDef="let e" class="periodo">{{ periodo(e) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="contatos">
+        <th mat-header-cell *matHeaderCellDef>Contatos</th>
+        <td mat-cell *matCellDef="let e">
+          <div class="contatos">
+            @if (e.instagram) {
+              <a class="contato" [href]="instagramUrl(e.instagram)" target="_blank" rel="noopener" matTooltip="Instagram" aria-label="Instagram">
+                <mat-icon>photo_camera</mat-icon>
+              </a>
+            }
+            @if (e.site) {
+              <a class="contato" [href]="siteUrl(e.site)" target="_blank" rel="noopener" matTooltip="Site" aria-label="Site">
+                <mat-icon>language</mat-icon>
+              </a>
+            }
+            @if (e.email) {
+              <a class="contato" [href]="'mailto:' + e.email" [matTooltip]="e.email" aria-label="E-mail">
+                <mat-icon>mail</mat-icon>
+              </a>
+            }
+            @if (!e.instagram && !e.site && !e.email) {
+              <span class="sem">—</span>
+            }
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let e">
+          <span class="chip" [class]="'s-' + e.status">{{ statusLabel(e.status) }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="pessoas">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let e">
+          <button mat-stroked-button (click)="verPessoas(e)">
+            <mat-icon>group</mat-icon>
+            Pessoas
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let e" class="acoes">
+          <button mat-stroked-button color="primary" (click)="editar(e)">
+            <mat-icon>edit</mat-icon>
+            Editar
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+      <tr mat-row *matRowDef="let row; columns: colunas"></tr>
+    </table>
+  </div>
+}

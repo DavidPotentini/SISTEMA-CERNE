@@ -8,7 +8,6 @@ export class IncubadoraService {
   private readonly http = inject(HttpClient);
   readonly base = `${environment.apiUrl}/admin/incubadoras`;
 
-  /** Incrementa a cada mutação; a lista e o rodapé observam para recarregar. */
   readonly versao = signal(0);
   recarregar(): void {
     this.versao.update(v => v + 1);

@@ -7,13 +7,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Atribui um papel a uma pessoa no schema do tenant. Usa {@code REQUIRES_NEW}; o chamador
- * deve definir o schema com {@code TenantContext} antes de invocar.
- *
- * <p><b>Mudança em relação ao antigo:</b> não há mais tabela de junção
- * {@code USER_PERMISSIONS} nem {@code ERole}. O papel é uma coluna em {@code PESSOAS}
- * ({@code PAP_COD} → {@code PAPEIS}); atribuir papel = atualizar essa coluna. Quem cria
- * papéis {@code PADRAO}/{@code PERSONALIZADO} é o CRUD de PAPEIS; aqui só se vincula.
+ * Atribui um papel a uma pessoa no schema do tenant. Usa {@code REQUIRES_NEW}; o chamador deve
+ * definir o schema com {@code TenantContext} antes de invocar.
  */
 @Service
 public class CadastroPermissaoTenantService {

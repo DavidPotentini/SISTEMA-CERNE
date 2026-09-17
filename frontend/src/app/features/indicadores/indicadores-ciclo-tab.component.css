@@ -24,6 +24,12 @@
   gap: 8px;
   flex-wrap: wrap;
 }
+.cab-sub {
+  margin: 0 0 12px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+  max-width: 760px;
+}
 .estado {
   padding: 20px 4px;
   color: rgba(0, 0, 0, 0.5);

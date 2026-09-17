@@ -15,12 +15,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-/**
- * Rodada de monitoramento das incubadas — schema do tenant. Aplica um instrumento de avaliação a um
- * conjunto de empreendimentos (participação em {@code RODADA_INCUBADAS}). Nasce {@code EM_ANDAMENTO}
- * e é encerrada ({@code CONCLUIDA}) quando as avaliações terminam. {@code cicCod} é o ciclo ativo no
- * momento do planejamento; {@code respPesCod} é o responsável interno da rodada ({@code PESSOAS}).
- */
 @Entity
 @Table(name = "RODADAS_MONITORAMENTO")
 @Getter
@@ -42,7 +36,6 @@ public class RodadaModel {
     @Column(name = "CIC_COD")
     private Long cicCod;
 
-    /** Responsável da rodada: pessoa da equipe da incubadora ({@code PESSOAS}, ref. via {@code PES_COD}). */
     @Column(name = "RESP_PES_COD")
     private Long respPesCod;
 

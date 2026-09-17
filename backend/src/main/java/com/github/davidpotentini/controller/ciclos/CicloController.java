@@ -15,11 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Ciclos da própria incubadora (usuário logado, não admin). O tenant vem do JWT — basta estar
- * autenticado. Card da tela "Minha Incubadora". Encerrar é ação da própria tela de Ciclos, guardada
- * pelas pendências do ciclo (ver {@link com.github.davidpotentini.service.ciclos.CicloService}).
- */
 @RestController
 @RequestMapping("/incubadora/ciclos")
 public class CicloController {
@@ -41,13 +36,11 @@ public class CicloController {
         return service.criar(dto);
     }
 
-    /** Põe o ciclo em foco (o refletido nas telas). */
     @PatchMapping("/{cicCod}/foco")
     public CicloDTO porEmFoco(@PathVariable Long cicCod) {
         return service.porEmFoco(cicCod);
     }
 
-    /** Encerra o ciclo ativo (irreversível); só passa sem pendências em aberto. */
     @PatchMapping("/{cicCod}/encerramento")
     public CicloDTO encerrar(@PathVariable Long cicCod) {
         return service.encerrar(cicCod);

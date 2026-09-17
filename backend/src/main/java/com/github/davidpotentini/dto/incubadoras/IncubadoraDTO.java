@@ -6,11 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
 
-/**
- * Detalhe completo da incubadora (Consultar/Configurar). Campos de exibição
- * ({@code responsavelNome}, {@code nomeSchema}, datas) não são editáveis — o service os
- * preserva/preenche. {@code status} muda pelo endpoint de ativar/suspender, não pelo form.
- */
 public record IncubadoraDTO(
         Long incCod,
         @NotBlank String nome,

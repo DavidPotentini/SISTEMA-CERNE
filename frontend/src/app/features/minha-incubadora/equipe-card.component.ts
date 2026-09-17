@@ -5,7 +5,6 @@ import { MatTableModule } from '@angular/material/table';
 import { EquipeService } from '../../core/services/equipe/equipe.service';
 import { EStatusConta, STATUS_CONTA_LABEL } from '../../models/usuario/usuario.model';
 
-/** Card da equipe vinculada da incubadora. Carrega o próprio dado, independente. */
 @Component({
   selector: 'app-equipe-card',
   imports: [MatCardModule, MatTableModule],

@@ -1,9 +1,6 @@
 package com.github.davidpotentini.enums;
 
-/**
- * Tipo de pendência (tela Pendências). Enum <b>só de API</b> (não espelha tipo do banco):
- * discrimina as linhas da lista unificada de pendências para o front agrupar em seções e contar.
- */
+/** Tipo de pendência (enum só de API, não espelha tipo do banco). */
 public enum ETipoPendencia {
     ATIVIDADE_ABERTA,
     ATIVIDADE_ATRASADA,

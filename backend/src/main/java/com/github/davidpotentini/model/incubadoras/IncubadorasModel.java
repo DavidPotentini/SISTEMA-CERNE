@@ -16,11 +16,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- * Incubadora (schema {@code public}) — também é o registro do tenant. O {@code nomeSchema}
- * é a gaveta Postgres do inquilino. Os níveis CERNE adotados ficam em {@code INCUBADORA_NIVEIS}
- * (1FN), orquestrados pelo service. {@code respCtaCod} aponta para a conta responsável.
- */
+/** Incubadora (schema {@code public}) e também o registro do tenant: {@code nomeSchema} é a gaveta Postgres dele. */
 @Entity
 @Table(name = "INCUBADORAS")
 @Getter
@@ -41,7 +37,6 @@ public class IncubadorasModel {
     @Column(name = "MANTENEDORA")
     private String mantenedora;
 
-    /** Responsável → conta em public.CONTAS (FK real, mesmo schema). */
     @Column(name = "RESP_CTA_COD")
     private Long respCtaCod;
 
@@ -54,7 +49,6 @@ public class IncubadorasModel {
     @Column(name = "CIDADE")
     private String cidade;
 
-    /** Nível CERNE da incubadora (hoje só CERNE 1). Enum Postgres via converter. */
     @Convert(converter = NivelIncubadoraConverter.class)
     @Column(name = "NIVEL")
     private ENivelIncubadora nivel;

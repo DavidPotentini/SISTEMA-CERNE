@@ -24,12 +24,6 @@ import {
 import { RevisarAplicacaoDialog } from './revisar-aplicacao.dialog';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/**
- * Uma rodada na aba "Aplicações e pontuação": seção recolhível com cabeçalho (tipo/situação,
- * contagem e "Concluir rodada") e uma tabela densa — 1 linha por empreendimento, colunas dos 5 eixos
- * CERNE + recomendação + status. Aplica o filtro (nome/status) vindo da aba; expande sozinha quando o
- * filtro está ativo e há resultados.
- */
 @Component({
   selector: 'app-rodada-aplicacoes',
   imports: [
@@ -47,15 +41,13 @@ export class RodadaAplicacoesComponent {
   private readonly dialog = inject(MatDialog);
 
   readonly rodada = input.required<Rodada>();
-  /** Filtro por nome do empreendimento (vindo da aba). */
   readonly filtroNome = input('');
-  /** Filtro por status: TODOS | CONCLUIDO | EM_ANDAMENTO | NAO_REVISADO. */
+  /** TODOS | CONCLUIDO | EM_ANDAMENTO | NAO_REVISADO. */
   readonly filtroStatus = input('TODOS');
 
   readonly eixos = EIXOS;
   readonly concluindo = signal(false);
 
-  /** Seção aberta manualmente (o filtro pode forçar a abertura). */
   private readonly abertaManual = signal(false);
 
   readonly aplicacoesRes = reterRecurso(rxResource({
@@ -67,7 +59,6 @@ export class RodadaAplicacoesComponent {
     () => this.filtroNome().trim() !== '' || this.filtroStatus() !== 'TODOS',
   );
 
-  /** Linhas após o filtro (nome/status). */
   readonly linhas = computed<Aplicacao[]>(() => {
     const nome = this.filtroNome().trim().toLowerCase();
     const status = this.filtroStatus();
@@ -110,13 +101,11 @@ export class RodadaAplicacoesComponent {
     return EIXO_LABEL[e];
   }
 
-  /** Nota do eixo na aplicação, ou {@code null} se não pontuado. */
   notaDoEixo(aplicacao: Aplicacao, eixo: EEixoCerne): number | null {
     const p = aplicacao.pontuacoes.find(x => x.dimensao === eixo);
     return p != null ? p.pontuacao : null;
   }
 
-  /** Chave de status para o filtro (não revisado quando não há status). */
   chaveStatus(a: Aplicacao): string {
     return a.status ?? 'NAO_REVISADO';
   }

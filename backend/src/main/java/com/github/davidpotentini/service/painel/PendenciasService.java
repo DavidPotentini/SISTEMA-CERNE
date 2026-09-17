@@ -37,11 +37,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Pendências do ciclo ativo (schema do tenant vem do JWT): reúne todas as pendências numa
- * lista única para o front agrupar em seções. Quatro origens: atividades em aberto e atrasadas
- * (planejamento vigente), evidências com correção solicitada (versão corrente) e metas de indicadores
- * já vencidas sem resultado. Cada item carrega o processo/prática CERNE a que pertence. Reaproveita
- * {@link IndicadorService} para os rótulos dos indicadores.
+ * Reúne as pendências do ciclo em foco numa lista única. Quatro origens: atividades em aberto e
+ * atrasadas (planejamento vigente), evidências em correção (versão corrente) e metas vencidas sem resultado.
  */
 @Service
 public class PendenciasService {
@@ -76,7 +73,6 @@ public class PendenciasService {
         this.resultados = resultados;
     }
 
-    /** Todas as pendências do ciclo ativo, numa lista única (o front agrupa por {@code tipo}). */
     @Transactional(readOnly = true)
     public List<PendenciaDTO> pendencias() {
         List<PendenciaDTO> pendencias = new ArrayList<>();
@@ -118,9 +114,8 @@ public class PendenciasService {
     }
 
     /**
-     * Nº de impedimentos ao encerramento do ciclo em foco: atividades não concluídas e evidências em
-     * correção (mesma regra do painel) mais as metas ainda sem resultado — aqui TODAS, não só as
-     * vencidas: encerrar exige o ciclo integralmente apurado. Zero = liberado para encerrar.
+     * Impedimentos ao encerramento: atividades não concluídas, evidências em correção e as metas ainda
+     * sem resultado — aqui TODAS, não só as vencidas: encerrar exige o ciclo integralmente apurado.
      */
     @Transactional(readOnly = true)
     public long impedimentosDeEncerramento() {
@@ -133,7 +128,6 @@ public class PendenciasService {
         return total + metasSemResultado();
     }
 
-    /** Quantas metas dos indicadores do ciclo em foco ainda não têm resultado apurado (todas). */
     private long metasSemResultado() {
         List<IndicadorCicloDTO> indicadores = indicadorService.listar();
         if (indicadores.isEmpty()) {
@@ -161,7 +155,6 @@ public class PendenciasService {
         return semResultado;
     }
 
-    // ---- atividades (em aberto / atrasadas) ----
 
     private void pendenciasDeAtividades(List<AtividadePlanejadaModel> ativs,
                                         Map<Long, String> praticaNomePorPrt, Map<Long, Long> prcPorPrt,
@@ -200,7 +193,6 @@ public class PendenciasService {
         return nomes;
     }
 
-    // ---- evidências com correção solicitada ----
 
     private void pendenciasDeEvidencias(Map<Long, Long> prtPorAtp, Map<Long, String> praticaNomePorPrt,
                                         Map<Long, Long> prcPorPrt, Map<Long, String> processoNomePorPrc,
@@ -223,7 +215,6 @@ public class PendenciasService {
         }
     }
 
-    // ---- metas de indicadores vencidas (sem resultado) ----
 
     private void pendenciasDeMetas(List<PendenciaDTO> pendencias) {
         List<IndicadorCicloDTO> indicadores = indicadorService.listar();
@@ -265,9 +256,7 @@ public class PendenciasService {
         }
     }
 
-    // ---- apoio ----
 
-    /** Nome do processo da prática {@code prtCod}, resolvido pelos índices em lote (ou {@code null}). */
     private String processoNome(Long prtCod, Map<Long, Long> prcPorPrt,
                                 Map<Long, String> processoNomePorPrc) {
         Long prcCod = prcPorPrt.get(prtCod);

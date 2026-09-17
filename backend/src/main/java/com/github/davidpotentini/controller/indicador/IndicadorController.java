@@ -18,11 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Indicadores do ciclo ativo (tenant vem do JWT). Listagem da aba "Indicadores do ciclo"; a geração a
- * partir da metodologia é feita no "Gerar do ciclo" (Metodologia). "Definir complementar" inclui um
- * indicador manual. {@code /vinculos} alimenta o seletor processo → prática do cadastro complementar.
- */
 @RestController
 @EscopoCiclo
 @RequestMapping("/incubadora/indicadores")
@@ -34,26 +29,22 @@ public class IndicadorController {
         this.service = service;
     }
 
-    /** Indicadores do ciclo ativo (nome, origem, unidade, periodicidade, situação, vínculo CERNE). */
     @GetMapping
     public List<IndicadorCicloDTO> listar() {
         return service.listar();
     }
 
-    /** Práticas da metodologia vigente para o seletor de vínculo do indicador complementar. */
     @GetMapping("/vinculos")
     public List<PraticaOpcaoDTO> vinculos() {
         return service.vinculos();
     }
 
-    /** Define um indicador complementar no ciclo ativo. */
     @PostMapping("/complementares")
     @ResponseStatus(HttpStatus.CREATED)
     public IndicadorCicloDTO definirComplementar(@Valid @RequestBody IndicadorCicloDTO dto) {
         return service.definirComplementar(dto);
     }
 
-    /** Define (ou desvincula, com {@code respPesCod} ausente) o responsável pela apuração do indicador. */
     @PutMapping("/{indCod}/responsavel")
     public IndicadorCicloDTO definirResponsavel(@PathVariable Long indCod,
                                                 @RequestParam(required = false) Long respPesCod) {

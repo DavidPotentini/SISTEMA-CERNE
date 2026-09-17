@@ -7,10 +7,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import static java.util.stream.Collectors.joining;
 
-/**
- * Traduz as exceções de domínio em respostas HTTP padronizadas — tira {@code try/catch}
- * dos controllers e uniformiza o corpo do erro ({@link ErroResponse}).
- */
 @RestControllerAdvice
 public class TratadorDeErros {
 

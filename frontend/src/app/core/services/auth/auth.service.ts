@@ -4,10 +4,6 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { CadastroUsuario, LoginRequest, LoginResponse } from '../../../models/auth/auth.model';
 
-/**
- * Fonte única da sessão. Diferente do projeto antigo, o estado é um **signal**
- * (`ChangeDetectorRef`/`detectChanges` desaparecem) e a URL vem de `environment`.
- */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -27,7 +23,6 @@ export class AuthService {
     return this.http.post<void>(`${this.base}/cadastro`, body);
   }
 
-  /** Ativa uma conta convidada (e-mail do admin + senha escolhida). */
   ativarConta(body: { email: string; senha: string }): Observable<void> {
     return this.http.post<void>(`${this.base}/login/ativar`, body);
   }
@@ -37,12 +32,10 @@ export class AuthService {
     this.sessao.set(null);
   }
 
-  /** Schema do tenant — enviado no header X-Tenant pelo interceptor. */
   getTenantSchema(): string | null {
     return this.sessao()?.nomeSchema ?? null;
   }
 
-  /** JWT — enviado no header Authorization pelo interceptor. */
   getToken(): string | null {
     return this.sessao()?.token ?? null;
   }

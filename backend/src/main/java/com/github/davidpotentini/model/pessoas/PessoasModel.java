@@ -13,9 +13,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Vínculo local de uma conta global ({@code public.CONTAS}) com este tenant. Nome/e-mail
- * <b>não</b> são duplicados aqui — vêm por JOIN em {@code VW_PESSOAS}. {@code ctaCod} é
- * referência fraca cross-schema (sem FK); {@code papCod} é o papel local (FK em PAPEIS).
+ * Vínculo local de uma conta global ({@code public.CONTAS}) com este tenant. Nome/e-mail não são
+ * duplicados aqui — vêm por JOIN em {@code VW_PESSOAS}. {@code ctaCod} é referência fraca cross-schema (sem FK).
  */
 @Entity
 @Table(name = "PESSOAS")

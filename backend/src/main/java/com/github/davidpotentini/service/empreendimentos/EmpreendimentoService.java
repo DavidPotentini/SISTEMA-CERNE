@@ -1,46 +1,100 @@
 package com.github.davidpotentini.service.empreendimentos;
 
+import com.github.davidpotentini.comum.ciclo.CicloContexto;
 import com.github.davidpotentini.comum.erro.NaoEncontradoException;
 import com.github.davidpotentini.comum.erro.RegraNegocioException;
+import com.github.davidpotentini.dto.ciclos.CicloDTO;
 import com.github.davidpotentini.dto.empreendimentos.EmpreendimentoDTO;
 import com.github.davidpotentini.dto.empreendimentos.PessoaEmpreendimentoDTO;
+import com.github.davidpotentini.mapper.ciclos.CicloMapper;
 import com.github.davidpotentini.mapper.empreendimentos.EmpreendimentoMapper;
+import com.github.davidpotentini.model.ciclos.CicloEmpreendimentoModel;
+import com.github.davidpotentini.model.ciclos.CiclosModel;
 import com.github.davidpotentini.model.empreendimentos.EmpreendimentosModel;
 import com.github.davidpotentini.model.empreendimentos.PessoaEmpreendimentoModel;
+import com.github.davidpotentini.repository.ciclos.CicloEmpreendimentoRepository;
+import com.github.davidpotentini.repository.ciclos.CiclosRepository;
 import com.github.davidpotentini.repository.empreendimentos.EmpreendimentosRepository;
 import com.github.davidpotentini.repository.empreendimentos.PessoaEmpreendimentoRepository;
+import com.github.davidpotentini.service.planejamento.PlanejamentoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-/**
- * Empreendimentos da incubadora do usuário logado. Roda no schema do próprio tenant (o JWT já
- * deixou o {@code TenantContext} ativo), então {@code EMPREENDIMENTOS}/{@code PESSOAS_EMPREENDIMENTO}
- * são lidos e gravados direto — sem {@code callWithin}. O contato principal entre os membros da
- * startup é a pessoa {@code REPRESENTANTE_LEGAL}.
- */
 @Service
 public class EmpreendimentoService {
 
     private final EmpreendimentosRepository empreendimentos;
     private final PessoaEmpreendimentoRepository pessoasEmp;
+    private final CicloContexto cicloContexto;
+    private final CicloEmpreendimentoRepository cicloEmpreendimentos;
+    private final CiclosRepository ciclos;
+    private final PlanejamentoService planejamento;
     private final EmpreendimentoMapper mapper;
+    private final CicloMapper cicloMapper;
 
     public EmpreendimentoService(EmpreendimentosRepository empreendimentos,
                                  PessoaEmpreendimentoRepository pessoasEmp,
-                                 EmpreendimentoMapper mapper) {
+                                 CicloContexto cicloContexto,
+                                 CicloEmpreendimentoRepository cicloEmpreendimentos,
+                                 CiclosRepository ciclos,
+                                 PlanejamentoService planejamento,
+                                 EmpreendimentoMapper mapper,
+                                 CicloMapper cicloMapper) {
         this.empreendimentos = empreendimentos;
         this.pessoasEmp = pessoasEmp;
+        this.cicloContexto = cicloContexto;
+        this.cicloEmpreendimentos = cicloEmpreendimentos;
+        this.ciclos = ciclos;
+        this.planejamento = planejamento;
         this.mapper = mapper;
+        this.cicloMapper = cicloMapper;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CicloDTO> listarCiclos(Long empCod) {
+        buscar(empCod);
+        Set<Long> cicCods = new HashSet<>();
+        for (CicloEmpreendimentoModel ce : cicloEmpreendimentos.findByEmpCod(empCod)) {
+            cicCods.add(ce.getCicCod());
+        }
+        List<CicloDTO> resultado = new ArrayList<>();
+        for (CiclosModel ciclo : ciclos.findAllByOrderByCicCodDesc()) {
+            if (cicCods.contains(ciclo.getCicCod())) {
+                resultado.add(cicloMapper.toDTO(ciclo));
+            }
+        }
+        return resultado;
     }
 
     @Transactional(readOnly = true)
     public List<EmpreendimentoDTO> listar() {
+        CiclosModel emFoco = cicloContexto.emFoco();
+        Set<Long> membros = membrosDoCiclo(emFoco);
         List<EmpreendimentoDTO> resumos = new ArrayList<>();
         for (EmpreendimentosModel emp : empreendimentos.findAllByOrderByNomeAsc()) {
-            resumos.add(mapper.toDTO(emp));
+            Long cicCod = membros.contains(emp.getEmpCod()) ? emFoco.getCicCod() : null;
+            resumos.add(mapper.toDTO(emp, cicCod));
+        }
+        return resumos;
+    }
+
+    @Transactional(readOnly = true)
+    public List<EmpreendimentoDTO> listarDoCiclo() {
+        CiclosModel emFoco = cicloContexto.emFoco();
+        if (emFoco == null) {
+            return new ArrayList<>();
+        }
+        Set<Long> membros = membrosDoCiclo(emFoco);
+        List<EmpreendimentoDTO> resumos = new ArrayList<>();
+        for (EmpreendimentosModel emp : empreendimentos.findAllByOrderByNomeAsc()) {
+            if (membros.contains(emp.getEmpCod())) {
+                resumos.add(mapper.toDTO(emp, emFoco.getCicCod()));
+            }
         }
         return resumos;
     }
@@ -49,7 +103,6 @@ public class EmpreendimentoService {
     public EmpreendimentoDTO criar(EmpreendimentoDTO dto) {
         EmpreendimentosModel emp = mapper.toModel(dto);
         empreendimentos.save(emp);
-        // Pessoas iniciais da startup (opcionais) gravadas no mesmo fluxo de criação.
         if (dto.pessoas() != null) {
             for (PessoaEmpreendimentoDTO pessoaDto : dto.pessoas()) {
                 PessoaEmpreendimentoModel pessoa = mapper.toModel(pessoaDto);
@@ -57,7 +110,8 @@ public class EmpreendimentoService {
                 pessoasEmp.save(pessoa);
             }
         }
-        return mapper.toDTO(emp);
+        Long cicCod = reconciliarCiclo(emp.getEmpCod(), dto.cicCod());
+        return mapper.toDTO(emp, cicCod);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -65,7 +119,41 @@ public class EmpreendimentoService {
         EmpreendimentosModel emp = buscar(empCod);
         mapper.atualizar(dto, emp);
         empreendimentos.save(emp);
-        return mapper.toDTO(emp);
+        Long cicCod = reconciliarCiclo(empCod, dto.cicCod());
+        return mapper.toDTO(emp, cicCod);
+    }
+
+    private Set<Long> membrosDoCiclo(CiclosModel emFoco) {
+        Set<Long> membros = new HashSet<>();
+        if (emFoco != null) {
+            for (CicloEmpreendimentoModel ce : cicloEmpreendimentos.findByCicCod(emFoco.getCicCod())) {
+                membros.add(ce.getEmpCod());
+            }
+        }
+        return membros;
+    }
+
+    private Long reconciliarCiclo(Long empCod, Long cicCodDto) {
+        CiclosModel emFoco = cicloContexto.emFoco();
+        if (emFoco == null) {
+            return null;
+        }
+        Long cicCod = emFoco.getCicCod();
+        boolean participar = cicCodDto != null;
+        boolean participa = cicloEmpreendimentos.existsByCicCodAndEmpCod(cicCod, empCod);
+        if (participar && !participa) {
+            CicloEmpreendimentoModel ce = new CicloEmpreendimentoModel();
+            ce.setCicCod(cicCod);
+            ce.setEmpCod(empCod);
+            cicloEmpreendimentos.save(ce);
+        } else if (!participar && participa) {
+            if (planejamento.empreendimentoTemEdicoes(cicCod, empCod)) {
+                throw new RegraNegocioException(
+                        "O empreendimento tem atividades com edições no ciclo publicado e não pode ser desvinculado.");
+            }
+            cicloEmpreendimentos.deleteByCicCodAndEmpCod(cicCod, empCod);
+        }
+        return participar ? cicCod : null;
     }
 
     @Transactional(readOnly = true)
@@ -83,7 +171,6 @@ public class EmpreendimentoService {
         return mapper.toDTO(pessoa);
     }
 
-    /** Marca a pessoa como representante legal do empreendimento; no máximo uma por empreendimento. */
     @Transactional(rollbackFor = Exception.class)
     public PessoaEmpreendimentoDTO definirRepresentanteLegal(Long empCod, Long pseCod) {
         PessoaEmpreendimentoModel pessoa = pessoasEmp.findById(pseCod)
@@ -102,8 +189,6 @@ public class EmpreendimentoService {
         pessoasEmp.save(pessoa);
         return mapper.toDTO(pessoa);
     }
-
-    // ---- apoio ----
 
     private EmpreendimentosModel buscar(Long empCod) {
         return empreendimentos.findById(empCod)

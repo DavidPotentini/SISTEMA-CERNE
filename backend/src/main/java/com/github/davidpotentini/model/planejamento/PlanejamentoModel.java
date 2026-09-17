@@ -14,12 +14,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-/**
- * Planejamento institucional de um ciclo — no máx. um por ciclo (o ativo). Gerado a partir da
- * metodologia vigente ("Gerar do ciclo"), copiando as atividades ATIVAS para {@code ATIVIDADES_PLANEJADAS}.
- * O período ({@code inicio}/{@code fim}) nasce do ciclo. A estrutura de processos/práticas é a
- * instância do ciclo ({@code PROCESSOS_CICLO}/{@code PRATICAS_CICLO}). Schema do tenant.
- */
 @Entity
 @Table(name = "PLANEJAMENTOS")
 @Getter
@@ -47,7 +41,6 @@ public class PlanejamentoModel {
     @Column(name = "FIM")
     private LocalDate fim;
 
-    /** Responsável do plano → {@code PESSOAS(PES_COD)}. Opcional. */
     @Column(name = "RESP_PES_COD")
     private Long respPesCod;
 }

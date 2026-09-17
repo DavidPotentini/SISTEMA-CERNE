@@ -1,0 +1,248 @@
+:host {
+  display: block;
+  padding-bottom: 32px;
+}
+.topo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 20px;
+}
+.topo h1 {
+  margin: 0;
+}
+.sub {
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.tabela-scroll {
+  overflow-x: auto;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: #ffffff;
+}
+.tabela {
+  width: 100%;
+  background: transparent;
+}
+.tabela .mat-mdc-header-cell,
+.tabela .mat-mdc-cell {
+  padding: 12px 16px;
+  white-space: nowrap;
+}
+.tabela .nome {
+  font-weight: 600;
+}
+.linha {
+  cursor: pointer;
+}
+.linha:hover {
+  background: #f5f8fd;
+}
+.cel-expandir {
+  width: 40px;
+  padding-right: 0 !important;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.prog {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 150px;
+}
+.prog mat-progress-bar {
+  flex: 1;
+  border-radius: 4px;
+}
+.prog-num {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+  min-width: 34px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.prog-sem {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.linha-detalhe {
+  display: none;
+}
+
+.linha-detalhe.expandida {
+  display: table-row;
+}
+
+.linha-detalhe .mat-mdc-cell {
+  padding: 0;
+  border-bottom: none;
+}
+
+.cel-detalhe {
+  white-space: normal !important;
+}
+.detalhe {
+  padding: 4px 16px 20px 56px;
+}
+
+.contatos {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.contato {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #f2f6fc;
+  color: #1565c0;
+}
+.contato:hover {
+  background: #e9eff9;
+}
+.contato mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+.periodo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+.periodo mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #8695a8;
+}
+
+.chip {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.s-ATIVO {
+  background: #e2f4e6;
+  color: #1b7a37;
+}
+.s-DESLIGADO {
+  background: #f6dede;
+  color: #9c2626;
+}
+.s-GRADUADO {
+  background: #e2ecfb;
+  color: #1c4f9c;
+}
+
+.proc {
+  margin-bottom: 18px;
+}
+.proc:last-child {
+  margin-bottom: 0;
+}
+.proc-cab {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.proc-nome {
+  font-weight: 600;
+}
+.proc-frac {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.prat {
+  display: grid;
+  grid-template-columns: 220px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 0 16px;
+}
+.prat-nome {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.75);
+}
+.prat-frac {
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.55);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bloco {
+  margin-top: 28px;
+}
+.bloco h2 {
+  font-size: 1.1rem;
+  margin: 0 0 14px;
+}
+.consol-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.consol {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.consol h3 {
+  font-size: 0.9rem;
+  margin: 0 0 12px;
+}
+.consol-linha {
+  display: grid;
+  grid-template-columns: 1fr 90px auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.consol-rot {
+  font-size: 0.85rem;
+}
+.consol-num {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  min-width: 24px;
+}
+
+.vazio-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px;
+  color: rgba(0, 0, 0, 0.5);
+}
+.vazio-card mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+.estado {
+  color: rgba(0, 0, 0, 0.55);
+}
+.estado.erro {
+  color: #b02020;
+}
+.estado.vazio {
+  padding: 16px 8px;
+}

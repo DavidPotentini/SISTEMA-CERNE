@@ -10,11 +10,6 @@ import { MonitoramentoService } from '../../core/services/monitoramento/monitora
 import { RodadaAplicacoesComponent } from './rodada-aplicacoes.component';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/**
- * Aba "Aplicações e pontuação": barra de filtro (nome do empreendimento / status) e a lista de
- * rodadas. Cada rodada ({@link RodadaAplicacoesComponent}) é uma seção recolhível com a tabela densa
- * dos seus empreendimentos, recebendo o filtro para aplicar e se expandir quando houver resultados.
- */
 @Component({
   selector: 'app-aplicacoes-tab',
   imports: [

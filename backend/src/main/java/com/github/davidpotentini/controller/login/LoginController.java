@@ -27,7 +27,6 @@ public class LoginController {
         return loginService.login(req);
     }
 
-    /** Ativação de conta convidada: e-mail cadastrado pelo admin + senha escolhida. */
     @PostMapping("/ativar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void ativar(@RequestBody @Valid AtivacaoContaDTO dto) {

@@ -37,12 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Indicadores do ciclo ativo (schema do tenant vem do JWT). "Gerar indicadores do ciclo" copia os
- * indicadores ATIVOS da metodologia vigente (origem {@code METODOLOGIA_CERNE}), substituindo os
- * gerados anteriormente e preservando os {@code COMPLEMENTAR}. "Definir complementar" inclui um
- * indicador manual. O "Vínculo CERNE" (processo/prática) é resolvido a partir do {@code PRT_COD}.
- */
 @Service
 public class IndicadorService {
 
@@ -80,7 +74,6 @@ public class IndicadorService {
         this.mapper = mapper;
     }
 
-    /** Indicadores do ciclo ativo (vazio se não houver ciclo), na ordem estrutural (processo/prática). */
     @Transactional(readOnly = true)
     public List<IndicadorCicloDTO> listar() {
         CiclosModel ciclo = cicloContexto.emFoco();
@@ -91,11 +84,7 @@ public class IndicadorService {
                 ciclo.getCicCod(), indicadores.findByCicCodOrderByNomeAsc(ciclo.getCicCod())));
     }
 
-    /**
-     * Reordena os indicadores (recebidos por nome) pela posição estrutural do ciclo: processos por
-     * {@code ordem} e, dentro de cada um, práticas por {@code ordem}; o nome desempata dentro da prática.
-     * Indicadores sem vínculo de prática vão para o fim.
-     */
+    /** Reordena pela posição estrutural do ciclo (processo/prática por {@code ordem}); sem vínculo vai ao fim. */
     private List<IndicadorModel> emOrdemEstrutural(Long cicCod, List<IndicadorModel> porNome) {
         Map<Long, List<IndicadorModel>> porPratica = new HashMap<>();
         List<IndicadorModel> semVinculo = new ArrayList<>();
@@ -116,11 +105,7 @@ public class IndicadorService {
         return ordenados;
     }
 
-    /**
-     * Gera os indicadores do ciclo a partir da metodologia: copia os indicadores ATIVOS das práticas
-     * ATIVAS, com origem {@code METODOLOGIA_CERNE}. Substitui os gerados anteriormente (os
-     * complementares permanecem).
-     */
+    /** Copia os indicadores ATIVOS da metodologia; substitui os gerados anteriormente (complementares permanecem). */
     @Transactional(rollbackFor = Exception.class)
     public List<IndicadorCicloDTO> gerarDoCiclo() {
         CiclosModel ciclo = cicloEmFocoObrigatorio();
@@ -148,11 +133,7 @@ public class IndicadorService {
         return comLabels(indicadores.findByCicCodOrderByNomeAsc(ciclo.getCicCod()));
     }
 
-    /**
-     * Os indicadores do ciclo já têm edições do usuário? (trava do "Gerar do ciclo": regerar apaga e
-     * recria os indicadores da metodologia, perdendo responsável e metas deles). Conta como edição:
-     * indicador complementar, responsável definido em algum indicador, ou qualquer meta cadastrada.
-     */
+    /** Trava do "Gerar do ciclo": conta como edição um complementar, um responsável definido, ou qualquer meta. */
     @Transactional(readOnly = true)
     public boolean cicloTemEdicoes(Long cicCod) {
         return indicadores.existsByCicCodAndOrigem(cicCod, EOrigemIndicador.COMPLEMENTAR)
@@ -160,7 +141,6 @@ public class IndicadorService {
                 || metas.existsByCiclo(cicCod);
     }
 
-    /** Inclui um indicador complementar no ciclo ativo. O vínculo (prática) é opcional. */
     @Transactional(rollbackFor = Exception.class)
     public IndicadorCicloDTO definirComplementar(IndicadorCicloDTO dto) {
         CiclosModel ciclo = cicloEmFocoObrigatorio();
@@ -175,10 +155,7 @@ public class IndicadorService {
         return comLabels(List.of(ind)).get(0);
     }
 
-    /**
-     * Define o responsável pela apuração de um indicador do ciclo. É o único campo editável dos
-     * indicadores gerados da metodologia; {@code respPesCod} nulo desvincula o responsável.
-     */
+    /** {@code respPesCod} nulo desvincula o responsável. */
     @Transactional(rollbackFor = Exception.class)
     public IndicadorCicloDTO definirResponsavel(Long indCod, Long respPesCod) {
         IndicadorModel ind = indicadores.findById(indCod)
@@ -188,14 +165,12 @@ public class IndicadorService {
         return comLabels(List.of(ind)).get(0);
     }
 
-    /** Práticas da estrutura do ciclo ativo (para o seletor de vínculo do complementar). */
     @Transactional(readOnly = true)
     public List<PraticaOpcaoDTO> vinculos() {
         CiclosModel ciclo = cicloContexto.emFoco();
         if (ciclo == null) {
             return List.of();
         }
-        // Ordem estrutural: processos por ORDEM e, dentro de cada um, práticas por ORDEM.
         List<PraticaOpcaoDTO> opcoes = new ArrayList<>();
         for (ProcessoCicloModel proc : processosCiclo.findByCicCodOrderByOrdemAscPrccCodAsc(ciclo.getCicCod())) {
             for (PraticaCicloModel pr : praticasCiclo.findByPrccCodOrderByOrdemAscPrtcCodAsc(proc.getPrccCod())) {
@@ -205,8 +180,6 @@ public class IndicadorService {
         }
         return opcoes;
     }
-
-    // ---- apoio ----
 
     private Set<Long> praticasAtivas() {
         List<Long> prcCods = new ArrayList<>();
@@ -227,7 +200,6 @@ public class IndicadorService {
         return prtCods;
     }
 
-    /** Resolve os rótulos do "Vínculo CERNE" (processo/prática do ciclo) e o responsável em lote. */
     private List<IndicadorCicloDTO> comLabels(List<IndicadorModel> lista) {
         Set<Long> prtcCods = new HashSet<>();
         for (IndicadorModel ind : lista) {
@@ -257,7 +229,6 @@ public class IndicadorService {
         return out;
     }
 
-    /** Nome do responsável (PESSOAS → public.CONTAS), memorizado por {@code PES_COD}; {@code null} se não resolvível. */
     private String rotuloResponsavel(Long pesCod, Map<Long, String> cache) {
         if (pesCod == null) {
             return null;
@@ -277,7 +248,6 @@ public class IndicadorService {
         return nome;
     }
 
-    /** Garante que a prática (instância) existe e pertence ao ciclo informado. */
     private void exigirPraticaCicloExiste(Long cicCod, Long prtcCod) {
         PraticaCicloModel pratica = praticasCiclo.findById(prtcCod).orElse(null);
         if (pratica == null || !pratica.getCicCod().equals(cicCod)) {

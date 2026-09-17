@@ -10,10 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Instância de uma prática da metodologia dentro de um ciclo — cópia com chave própria
- * ({@code PRTC_COD}), pendurada num {@link ProcessoCicloModel} do mesmo ciclo ({@code PRCC_COD}). É a
- * chave que os filhos do ciclo referenciam (atividades planejadas, indicadores). {@code PRT_COD_ORIGEM}
- * é proveniência fraca (sem FK), lida só na geração. Schema do tenant.
+ * Instância própria da prática dentro de um ciclo (chave {@code PRTC_COD}, que os filhos do ciclo
+ * referenciam). {@code PRT_COD_ORIGEM} é proveniência fraca (sem FK), lida só na geração.
  */
 @Entity
 @Table(name = "PRATICAS_CICLO")
@@ -32,11 +30,9 @@ public class PraticaCicloModel {
     @Column(name = "PRCC_COD", nullable = false)
     private Long prccCod;
 
-    /** Prática do template de origem — proveniência fraca (sem FK forte). */
     @Column(name = "PRT_COD_ORIGEM")
     private Long prtCodOrigem;
 
-    /** Ordem da prática dentro do processo do ciclo (copiada do template). */
     @Column(name = "ORDEM", nullable = false)
     private Integer ordem;
 

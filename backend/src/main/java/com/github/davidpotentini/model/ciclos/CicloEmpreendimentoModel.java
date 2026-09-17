@@ -8,11 +8,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Empreendimento incubado participante de um ciclo (tabela de junção {@code CICLO_EMPREENDIMENTOS}).
- * Definida ao "Gerar do ciclo": as atividades marcadas "da incubada" são duplicadas por participante.
- * Schema do tenant.
- */
 @Entity
 @Table(name = "CICLO_EMPREENDIMENTOS")
 @IdClass(CicloEmpreendimentoId.class)

@@ -15,11 +15,6 @@ interface EvidenciaDetalheData {
   evdCod: number;
 }
 
-/**
- * Modal ABRIR: mostra o histórico de versões da evidência (versão 1, 2, 3...), cada uma com seu
- * status, arquivo e o motivo de correção (quando houve) em linha do tempo. Abre o arquivo de cada
- * versão em nova aba.
- */
 @Component({
   selector: 'app-evidencia-detalhe',
   imports: [DatePipe, MatDialogModule, MatButtonModule, MatIconModule, MatProgressBarModule],

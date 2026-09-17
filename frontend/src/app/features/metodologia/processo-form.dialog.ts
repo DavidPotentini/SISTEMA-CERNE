@@ -9,11 +9,9 @@ import { MetodologiaService } from '../../core/services/metodologia/metodologia.
 import { Processo } from '../../models/metodologia/metodologia.model';
 
 interface ProcessoFormData {
-  /** Presente no modo edição. */
   processo?: Processo;
 }
 
-/** Modal de processo: cria ou edita ordem/nome/descrição. Ordem é única na metodologia. */
 @Component({
   selector: 'app-processo-form',
   imports: [

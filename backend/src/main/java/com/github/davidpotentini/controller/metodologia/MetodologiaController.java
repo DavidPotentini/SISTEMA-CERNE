@@ -23,10 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Metodologia da própria incubadora (usuário logado, não admin). O tenant vem do JWT — basta estar
- * autenticado. Documento vivo, sem versionamento: as abas editam a metodologia direto.
- */
 @RestController
 @RequestMapping("/incubadora/metodologia")
 public class MetodologiaController {
@@ -53,13 +49,11 @@ public class MetodologiaController {
         return service.editarProcesso(prcCod, dto);
     }
 
-    /** Reordena os processos (arrastar-e-soltar): o corpo é a sequência de {@code prcCod}. */
     @PutMapping("/processos/ordem")
     public List<ProcessoDTO> reordenarProcessos(@RequestBody List<Long> prcCods) {
         return service.reordenarProcessos(prcCods);
     }
 
-    /** Ativa/inativa o processo (inativo continua visível, mas fora da geração do planejamento). */
     @PatchMapping("/processos/{prcCod}/situacao")
     public ProcessoDTO alterarSituacaoProcesso(@PathVariable Long prcCod,
                                                @RequestParam EAtivoInativo situacao) {
@@ -84,13 +78,11 @@ public class MetodologiaController {
         return service.alterarSituacaoPratica(prcCod, prtCod, situacao);
     }
 
-    /** Reordena as práticas de um processo (arrastar-e-soltar): o corpo é a sequência de {@code prtCod}. */
     @PutMapping("/processos/{prcCod}/praticas/ordem")
     public List<ProcessoDTO> reordenarPraticas(@PathVariable Long prcCod, @RequestBody List<Long> prtCods) {
         return service.reordenarPraticas(prcCod, prtCods);
     }
 
-    // ---- indicadores ----
 
     @GetMapping("/indicadores")
     public List<IndicadorDTO> listarIndicadores() {
@@ -108,14 +100,12 @@ public class MetodologiaController {
         return service.editarIndicador(inmCod, dto);
     }
 
-    /** Ativa/inativa o indicador. */
     @PatchMapping("/indicadores/{inmCod}/situacao")
     public IndicadorDTO alterarSituacaoIndicador(@PathVariable Long inmCod,
                                                  @RequestParam EAtivoInativo situacao) {
         return service.alterarSituacaoIndicador(inmCod, situacao);
     }
 
-    // ---- agrupamentos ----
 
     @GetMapping("/agrupamentos")
     public List<AgrupamentoDTO> listarAgrupamentos() {
@@ -135,28 +125,24 @@ public class MetodologiaController {
         return service.editarAgrupamento(agrCod, dto);
     }
 
-    /** Reordena os agrupamentos de uma prática (arrastar-e-soltar): o corpo é a sequência de {@code agrCod}. */
     @PutMapping("/praticas/{prtCod}/agrupamentos/ordem")
     public List<AgrupamentoDTO> reordenarAgrupamentos(@PathVariable Long prtCod,
                                                       @RequestBody List<Long> agrCods) {
         return service.reordenarAgrupamentos(prtCod, agrCods);
     }
 
-    /** Ativa/inativa o agrupamento. */
     @PatchMapping("/agrupamentos/{agrCod}/situacao")
     public AgrupamentoDTO alterarSituacaoAgrupamento(@PathVariable Long agrCod,
                                                      @RequestParam EAtivoInativo situacao) {
         return service.alterarSituacaoAgrupamento(agrCod, situacao);
     }
 
-    /** Exclui o agrupamento (bloqueado se ainda tiver atividades). */
     @DeleteMapping("/agrupamentos/{agrCod}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluirAgrupamento(@PathVariable Long agrCod) {
         service.excluirAgrupamento(agrCod);
     }
 
-    // ---- atividades ----
 
     @GetMapping("/atividades")
     public List<AtividadeMetodologiaDTO> listarAtividades() {
@@ -175,28 +161,24 @@ public class MetodologiaController {
         return service.editarAtividade(ameCod, dto);
     }
 
-    /** Reordena as atividades de uma prática (arrastar-e-soltar): o corpo é a sequência de {@code ameCod}. */
     @PutMapping("/praticas/{prtCod}/atividades/ordem")
     public List<AtividadeMetodologiaDTO> reordenarAtividades(@PathVariable Long prtCod,
                                                              @RequestBody List<Long> ameCods) {
         return service.reordenarAtividades(prtCod, ameCods);
     }
 
-    /** Ativa/inativa a atividade. */
     @PatchMapping("/atividades/{ameCod}/situacao")
     public AtividadeMetodologiaDTO alterarSituacaoAtividade(@PathVariable Long ameCod,
                                                             @RequestParam EAtivoInativo situacao) {
         return service.alterarSituacaoAtividade(ameCod, situacao);
     }
 
-    /** Marca/desmarca a atividade como "da incubada". */
     @PatchMapping("/atividades/{ameCod}/por-empreendimento")
     public AtividadeMetodologiaDTO alterarPorEmpreendimentoAtividade(@PathVariable Long ameCod,
                                                                      @RequestParam boolean valor) {
         return service.alterarPorEmpreendimentoAtividade(ameCod, valor);
     }
 
-    /** Exclui a atividade-padrão (só a metodologia; o que já foi materializado no ciclo permanece). */
     @DeleteMapping("/atividades/{ameCod}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluirAtividade(@PathVariable Long ameCod) {

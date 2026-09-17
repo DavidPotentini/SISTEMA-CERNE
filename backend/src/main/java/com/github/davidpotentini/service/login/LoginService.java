@@ -25,9 +25,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Map;
 
 /**
- * Autentica pela identidade global ({@code public.CONTAS}) — sem seleção de empresa.
- * A incubadora vem de {@code CONTAS.INC_COD} (1:1). O administrador da plataforma
- * ({@code ADMIN_PLATAFORMA = true}) recebe um token sem tenant (opera no {@code public}).
+ * Autentica pela identidade global ({@code public.CONTAS}); a incubadora vem de {@code CONTAS.INC_COD}.
+ * O administrador da plataforma recebe um token sem tenant (opera no {@code public}).
  */
 @Service
 public class LoginService {
@@ -85,10 +84,7 @@ public class LoginService {
                 nomeSchema, false, papel.papCod(), papel.papelNome(), papel.permissoes());
     }
 
-    /**
-     * Ativa uma conta convidada: valida que está {@code CONVIDADO}, grava a senha escolhida
-     * (hash BCrypt) e passa a {@code ATIVO}. Mensagem única (não revela se o e-mail existe).
-     */
+    /** Mensagem única de erro para não revelar se o e-mail existe. */
     @Transactional
     public void ativar(AtivacaoContaDTO dto) {
         ContasModel conta = contasRepository.findByEmail(dto.email())

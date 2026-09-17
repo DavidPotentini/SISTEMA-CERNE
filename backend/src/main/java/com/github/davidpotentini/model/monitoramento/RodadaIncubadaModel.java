@@ -8,11 +8,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Participação de um empreendimento numa rodada de monitoramento (tabela de junção
- * {@code RODADA_INCUBADAS}). É a fonte de quem está na rodada; a avaliação de cada um é criada
- * depois, ao revisar ({@link AvaliacaoModel}).
- */
 @Entity
 @Table(name = "RODADA_INCUBADAS")
 @IdClass(RodadaIncubadaId.class)

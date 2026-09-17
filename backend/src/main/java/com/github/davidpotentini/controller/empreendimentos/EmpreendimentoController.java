@@ -1,5 +1,6 @@
 package com.github.davidpotentini.controller.empreendimentos;
 
+import com.github.davidpotentini.dto.ciclos.CicloDTO;
 import com.github.davidpotentini.dto.empreendimentos.EmpreendimentoDTO;
 import com.github.davidpotentini.dto.empreendimentos.PessoaEmpreendimentoDTO;
 import com.github.davidpotentini.service.empreendimentos.EmpreendimentoService;
@@ -17,10 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Empreendimentos da própria incubadora (usuário logado, não admin). O tenant vem do JWT — basta
- * estar autenticado. Cada empreendimento tem suas pessoas (membros da startup) geridas no modal.
- */
 @RestController
 @RequestMapping("/incubadora/empreendimentos")
 public class EmpreendimentoController {
@@ -36,6 +33,11 @@ public class EmpreendimentoController {
         return service.listar();
     }
 
+    @GetMapping("/ciclo")
+    public List<EmpreendimentoDTO> listarDoCiclo() {
+        return service.listarDoCiclo();
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EmpreendimentoDTO criar(@Valid @RequestBody EmpreendimentoDTO dto) {
@@ -46,6 +48,11 @@ public class EmpreendimentoController {
     public EmpreendimentoDTO editar(@PathVariable Long empCod,
                                     @Valid @RequestBody EmpreendimentoDTO dto) {
         return service.editar(empCod, dto);
+    }
+
+    @GetMapping("/{empCod}/ciclos")
+    public List<CicloDTO> listarCiclos(@PathVariable Long empCod) {
+        return service.listarCiclos(empCod);
     }
 
     @GetMapping("/{empCod}/pessoas")
@@ -60,7 +67,6 @@ public class EmpreendimentoController {
         return service.adicionarPessoa(empCod, dto);
     }
 
-    /** Marca uma pessoa do empreendimento como representante legal. */
     @PatchMapping("/{empCod}/pessoas/{pseCod}/representante-legal")
     public PessoaEmpreendimentoDTO definirRepresentanteLegal(@PathVariable Long empCod,
                                                              @PathVariable Long pseCod) {

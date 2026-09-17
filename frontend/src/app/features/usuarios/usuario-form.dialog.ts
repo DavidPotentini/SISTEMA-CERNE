@@ -11,10 +11,6 @@ import { IncubadoraService } from '../../core/services/incubadora/incubadora.ser
 import { UsuarioService } from '../../core/services/usuario/usuario.service';
 import { UsuarioResumo } from '../../models/usuario/usuario.model';
 
-/**
- * Modal de usuário. Sem {@code usuario} = "Adicionar" (convite: nome, e-mail, incubadora,
- * papel). Com {@code usuario} = "Editar" (nome, incubadora e papel; o e-mail não muda).
- */
 @Component({
   selector: 'app-usuario-form',
   imports: [
@@ -32,7 +28,6 @@ export class UsuarioFormDialog {
   private readonly service = inject(UsuarioService);
   private readonly incubadoraService = inject(IncubadoraService);
   private readonly ref = inject(MatDialogRef<UsuarioFormDialog>);
-  /** Usuário a editar o vínculo, ou {@code null} para um novo (convite). */
   readonly usuario = inject<UsuarioResumo | null>(MAT_DIALOG_DATA);
   readonly novo = this.usuario === null;
 
@@ -44,12 +39,10 @@ export class UsuarioFormDialog {
   readonly incCod = signal<number | null>(this.usuario?.incCod ?? null);
   readonly papCod = signal<number | null>(this.usuario?.papCod ?? null);
 
-  /** Incubadoras para o seletor (todas). */
   readonly incubadoras = rxResource({
     stream: () => this.incubadoraService.listar(),
   });
 
-  /** Papéis da incubadora escolhida — recarrega ao trocar de incubadora. */
   readonly papeis = rxResource({
     params: () => ({ incCod: this.incCod() }),
     stream: ({ params }) =>

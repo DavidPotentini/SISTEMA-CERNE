@@ -3,7 +3,6 @@ package com.github.davidpotentini.model.monitoramento;
 import java.io.Serializable;
 import java.util.Objects;
 
-/** Chave composta de {@link RodadaIncubadaModel} ({@code ROD_COD}, {@code EMP_COD}). */
 public class RodadaIncubadaId implements Serializable {
 
     private Long rodCod;

@@ -12,11 +12,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Identidade de login única (schema {@code public}). Vale para todos: administrador da
- * plataforma e pessoas de incubadora. A senha é hash BCrypt. O vínculo com a incubadora
- * é 1:1 via {@code incCod} (nulo quando {@code adminPlataforma}).
- */
+/** Identidade de login única (schema {@code public}); a senha é hash BCrypt. */
 @Entity
 @Table(name = "CONTAS")
 @Getter
@@ -37,7 +33,6 @@ public class ContasModel {
     @Column(name = "SENHA", nullable = false)
     private String senha;
 
-    /** Situação da conta (VLD_STATUS_CONTA). Nasce CONVIDADO no convite. */
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS", nullable = false)
     private EStatusConta status = EStatusConta.CONVIDADO;
@@ -45,7 +40,7 @@ public class ContasModel {
     @Column(name = "ADMIN_PLATAFORMA", nullable = false)
     private boolean adminPlataforma;
 
-    /** Incubadora da conta (1:1). Nulo para o administrador da plataforma. */
+    /** Nulo para o administrador da plataforma. */
     @Column(name = "INC_COD")
     private Long incCod;
 }

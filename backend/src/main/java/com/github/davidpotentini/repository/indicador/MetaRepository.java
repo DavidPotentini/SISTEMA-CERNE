@@ -10,13 +10,10 @@ import java.util.List;
 
 public interface MetaRepository extends JpaRepository<MetaModel, Long> {
 
-    /** Períodos (metas) de um indicador, em ordem do início de apuração. */
     List<MetaModel> findByIndCodOrderByDataInicioApuracaoAscMetCodAsc(Long indCod);
 
-    /** Períodos dos indicadores informados — para contar totais na apuração (em lote). */
     List<MetaModel> findByIndCodIn(Collection<Long> indCods);
 
-    /** Há alguma meta em qualquer indicador do ciclo? (trava para regerar o ciclo). */
     @Query(value = "SELECT COUNT(*) > 0 FROM INDICADOR_METAS WHERE IND_COD IN "
             + "(SELECT IND_COD FROM INDICADORES WHERE CIC_COD = :cicCod)", nativeQuery = true)
     boolean existsByCiclo(@Param("cicCod") Long cicCod);

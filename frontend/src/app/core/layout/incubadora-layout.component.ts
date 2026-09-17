@@ -1,17 +1,17 @@
-import { Component, inject, signal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter, map } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenavContainer, MatSidenavModule } from '@angular/material/sidenav';
 import { AuthService } from '../services/auth/auth.service';
 import { MinhaIncubadoraService } from '../services/minha-incubadora/minha-incubadora.service';
 import { ENivelIncubadora, NIVEL_LABEL } from '../../models/incubadora/incubadora.model';
 import { IncubadoraSobreDialog } from './incubadora-sobre.dialog';
 
-/** Casca da incubadora: mesmo estilo do admin, mas o rodapé traz o nome da incubadora e o nível CERNE. */
 @Component({
   selector: 'app-incubadora-layout',
   imports: [
@@ -33,20 +33,35 @@ export class IncubadoraLayoutComponent {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
 
-  /** Alimenta o rodapé (nome + nível). */
   readonly incubadora = rxResource({ stream: () => this.service.buscar() });
 
-  /** Menu lateral atual: navegação principal ou o submenu de Configuração (engrenagem do rodapé). */
-  readonly modo = signal<'principal' | 'config'>('principal');
+  private readonly rotasConfig = new Set(['metodologia', 'minha-incubadora', 'empreendimentos']);
 
-  /** Trilho recolhido (só ícones) quando true; o botão do topo alterna. */
+  private readonly urlAtual = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map(e => e.urlAfterRedirects),
+    ),
+    { initialValue: this.router.url },
+  );
+
+  readonly modo = computed<'principal' | 'config'>(() => {
+    const seg = this.urlAtual().split('?')[0].split('/incubadora/')[1]?.split('/')[0] ?? '';
+    return this.rotasConfig.has(seg) ? 'config' : 'principal';
+  });
+
   readonly recolhido = signal(false);
+
+  private readonly container = viewChild.required(MatSidenavContainer);
+
+  ajustarMargens(): void {
+    this.container().updateContentMargins();
+  }
 
   nivelLabel(n: ENivelIncubadora): string {
     return NIVEL_LABEL[n];
   }
 
-  /** Abre a ficha institucional (editável) num modal; ao salvar, recarrega o rodapé. */
   sobre(): void {
     const inc = this.incubadora.value();
     if (!inc) {

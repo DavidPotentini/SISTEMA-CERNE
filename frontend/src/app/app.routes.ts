@@ -57,6 +57,13 @@ export const routes: Routes = [
           import('./features/visao-geral/visao-geral.component').then(m => m.VisaoGeralComponent),
       },
       {
+        path: 'primeiros-passos',
+        loadComponent: () =>
+          import('./features/visao-geral/primeiros-passos.component').then(
+            m => m.PrimeirosPassosComponent,
+          ),
+      },
+      {
         path: 'pendencias',
         loadComponent: () =>
           import('./features/pendencias/pendencias.component').then(
@@ -91,6 +98,20 @@ export const routes: Routes = [
         path: 'apuracao',
         loadComponent: () =>
           import('./features/apuracao/apuracao.component').then(m => m.ApuracaoComponent),
+      },
+      {
+        path: 'empreendimentos',
+        loadComponent: () =>
+          import('./features/empreendimentos/empreendimentos-list.component').then(
+            m => m.EmpreendimentosListComponent,
+          ),
+      },
+      {
+        path: 'empreendimentos-apoiados',
+        loadComponent: () =>
+          import('./features/empreendimentos-apoiados/empreendimentos-apoiados.component').then(
+            m => m.EmpreendimentosApoiadosComponent,
+          ),
       },
       {
         path: 'monitoramento',

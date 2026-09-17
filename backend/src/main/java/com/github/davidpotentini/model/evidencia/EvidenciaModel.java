@@ -18,12 +18,7 @@ import org.springframework.data.domain.Persistable;
 import java.time.LocalDateTime;
 
 /**
- * Uma <b>versão</b> da evidência (tabela {@code EVIDENCIAS}). O par ({@code evdCod}, {@code evdCodSeq})
- * é a chave: {@code evdCod} é o id lógico (igual em todas as versões da mesma evidência) e
- * {@code evdCodSeq} é o número da versão. Título, arquivo, atividade, responsável e status variam por
- * versão; a "evidência atual" é a de maior {@code evdCodSeq}.
- *
- * <p>Como a chave é <b>atribuída</b> pela aplicação (não {@code IDENTITY}), implementamos
+ * Como a chave é <b>atribuída</b> pela aplicação (não {@code IDENTITY}), implementamos
  * {@link Persistable} devolvendo {@code isNew() == true} até o primeiro load/persist — assim o
  * {@code save()} faz {@code INSERT} direto, sem o {@code SELECT} que o Spring Data faria ao ver a
  * chave já preenchida.
@@ -56,7 +51,6 @@ public class EvidenciaModel implements Persistable<EvidenciaId> {
     @Column(name = "STATUS", nullable = false)
     private EStatusEvidencia status = EStatusEvidencia.PENDENTE_VALIDACAO;
 
-    /** Motivo da rejeição, gravado ao solicitar correção; {@code null} nos demais estados. */
     @Column(name = "MOTIVO_CORRECAO")
     private String motivoCorrecao;
 

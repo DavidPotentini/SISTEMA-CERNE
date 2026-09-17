@@ -7,6 +7,5 @@ import java.util.List;
 
 public interface RodadaRepository extends JpaRepository<RodadaModel, Long> {
 
-    /** Rodadas mais recentes primeiro. */
     List<RodadaModel> findAllByOrderByRodCodDesc();
 }

@@ -8,9 +8,7 @@ import java.util.Optional;
 
 public interface ProcessoRepository extends JpaRepository<ProcessoModel, Long> {
 
-    /** Processos da metodologia, na ordem dos accordions. */
     List<ProcessoModel> findAllByOrderByOrdemAscPrcCodAsc();
 
-    /** Processo de maior {@code ordem} — para anexar um novo no fim. */
     Optional<ProcessoModel> findFirstByOrderByOrdemDesc();
 }

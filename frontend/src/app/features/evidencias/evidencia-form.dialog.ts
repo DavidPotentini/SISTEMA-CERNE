@@ -13,22 +13,14 @@ import { AtividadeOpcao, Evidencia } from '../../models/evidencia/evidencia.mode
 
 interface EvidenciaFormData {
   modo: 'registrar' | 'corrigir';
-  /** Presente no modo corrigir: versão corrente (para pré-preencher e enviar a correção). */
   evidencia?: Evidencia;
 }
 
-/** Item {cod, nome} distinto usado nos dropdowns de processo e prática. */
 interface Opcao {
   cod: number;
   nome: string | null;
 }
 
-/**
- * Modal de evidência: registra uma nova ou corrige uma existente (gera a próxima versão). A atividade
- * é escolhida em cascata processo → prática → atividade, filtrando a lista plana de atividades do
- * plano vigente. O arquivo sobe à parte (guarda o `arqCod`). Ao corrigir, exibe o motivo da correção
- * pedida (só leitura) para orientar o ajuste.
- */
 @Component({
   selector: 'app-evidencia-form',
   imports: [
@@ -52,14 +44,12 @@ export class EvidenciaFormDialog {
 
   readonly corrigindo = this.data.modo === 'corrigir';
 
-  // lista plana + seleção da cascata
   readonly carregando = signal(true);
   readonly opcoes = signal<AtividadeOpcao[]>([]);
   readonly prcCod = signal<number | null>(null);
   readonly prtCod = signal<number | null>(null);
   readonly atpCod = signal<number | null>(this.data.evidencia?.atpCod ?? null);
 
-  /** Processos distintos da lista. */
   readonly processos = computed<Opcao[]>(() => {
     const mapa = new Map<number, Opcao>();
     for (const o of this.opcoes()) {
@@ -68,7 +58,6 @@ export class EvidenciaFormDialog {
     return [...mapa.values()];
   });
 
-  /** Práticas distintas dentro do processo selecionado. */
   readonly praticas = computed<Opcao[]>(() => {
     const mapa = new Map<number, Opcao>();
     for (const o of this.opcoes()) {
@@ -78,14 +67,11 @@ export class EvidenciaFormDialog {
     return [...mapa.values()];
   });
 
-  /** Atividades dentro da prática selecionada. */
   readonly atividades = computed<AtividadeOpcao[]>(() =>
     this.opcoes().filter(o => o.prtcCod === this.prtCod()),
   );
 
-  // campos
   readonly titulo = signal(this.data.evidencia?.titulo ?? '');
-  /** Motivo da correção pedida (da versão corrente) — só leitura, para orientar a correção. */
   readonly motivoCorrecao = this.data.evidencia?.motivoCorrecao ?? null;
   readonly arqCod = signal<number | null>(this.data.evidencia?.arqCod ?? null);
   readonly arquivoNome = signal<string | null>(this.data.evidencia?.arquivoNome ?? null);
@@ -108,7 +94,6 @@ export class EvidenciaFormDialog {
     });
   }
 
-  /** No modo corrigir, abre a cascata já no processo/prática que contêm a atividade atual. */
   private preselecionar(lista: AtividadeOpcao[]): void {
     const atp = this.atpCod();
     const atual = atp == null ? undefined : lista.find(o => o.atpCod === atp);

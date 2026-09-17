@@ -11,12 +11,6 @@ import { GerarCicloDialog } from './gerar-ciclo.dialog';
 import { IndicadoresTabComponent } from './indicadores-tab.component';
 import { ProcessosTabComponent } from './processos-tab.component';
 
-/**
- * Tela "Metodologia": abas Processos e Práticas (com as atividades-padrão agrupadas sob cada prática) e
- * Indicadores. Documento vivo — as edições valem na hora (sem versionamento/publicação). O botão
- * "Consolidar metodologia no ciclo em foco" materializa a metodologia no ciclo (estrutura + indicadores
- * + atividades); substitui o que já foi gerado.
- */
 @Component({
   selector: 'app-metodologia',
   imports: [
@@ -35,7 +29,6 @@ export class MetodologiaComponent {
   private readonly service = inject(MetodologiaService);
   private readonly dialog = inject(MatDialog);
 
-  /** Ciclo em foco que receberá a materialização (alimenta o rótulo/estado do botão). */
   readonly alvoRes = rxResource({ stream: () => this.service.alvoMaterializacao() });
 
   readonly materializando = signal(false);
@@ -45,7 +38,6 @@ export class MetodologiaComponent {
   materializar(): void {
     const alvo = this.alvoRes.value();
     if (alvo == null) return;
-    // Escolhe as incubadas participantes antes de gerar (duplica as atividades que repetem por empreendimento).
     this.dialog
       .open(GerarCicloDialog, { width: '90vw', maxWidth: '560px', data: { ciclo: alvo.nome } })
       .afterClosed()

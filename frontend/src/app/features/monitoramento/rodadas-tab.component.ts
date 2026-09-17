@@ -17,10 +17,6 @@ import {
 import { PlanejarRodadaDialog } from './planejar-rodada.dialog';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/**
- * Aba "Rodadas": botão "Planejar Rodada" (abre o modal) e a listagem de todas as rodadas
- * (nome, tipo, responsável, prazo e situação).
- */
 @Component({
   selector: 'app-rodadas-tab',
   imports: [

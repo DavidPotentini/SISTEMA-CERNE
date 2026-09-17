@@ -2,14 +2,19 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
 import { of } from 'rxjs';
+import { CicloService } from '../../core/services/ciclo/ciclo.service';
+import { Ciclo, STATUS_CICLO_LABEL } from '../../models/ciclo/ciclo.model';
 import { EmpreendimentoService } from '../../core/services/empreendimento/empreendimento.service';
+import { dataParaIso, isoParaData } from '../../shared/util/data';
 import {
   EEstagioIncubacao,
   ENivelMaturidade,
@@ -24,11 +29,6 @@ import {
   STATUS_EMP_LABEL,
 } from '../../models/empreendimento/empreendimento.model';
 
-/**
- * Modal de empreendimento. Sem {@code empreendimento} = "Adicionar", com = "Editar". Em ambos os modos
- * as pessoas da startup podem ser cadastradas no mesmo fluxo: na criação ficam num rascunho local e são
- * gravadas junto ao salvar (após o empreendimento existir); na edição são gravadas na hora.
- */
 @Component({
   selector: 'app-empreendimento-gerenciar',
   imports: [
@@ -40,16 +40,28 @@ import {
     MatSelectModule,
     MatTableModule,
     MatIconModule,
+    MatDatepickerModule,
+    MatTabsModule,
   ],
   templateUrl: './empreendimento-gerenciar.dialog.html',
   styleUrl: './empreendimento-gerenciar.dialog.css',
 })
 export class EmpreendimentoGerenciarDialog {
   private readonly service = inject(EmpreendimentoService);
+  private readonly cicloService = inject(CicloService);
   private readonly ref = inject(MatDialogRef<EmpreendimentoGerenciarDialog>);
-  /** Empreendimento a editar, ou {@code null} para um novo. */
   readonly empreendimento = inject<Empreendimento | null>(MAT_DIALOG_DATA);
   readonly novo = this.empreendimento === null;
+
+  private readonly ciclosRes = rxResource({
+    params: () => ({}),
+    stream: () => this.cicloService.listar(),
+  });
+  readonly cicloAtivo = computed<Ciclo | null>(() => {
+    const ciclos = this.ciclosRes.value() ?? [];
+    return ciclos.find(c => c.emFoco) ?? ciclos.find(c => c.status === 'ATIVO') ?? null;
+  });
+  readonly cicCod = signal<number | null>(this.empreendimento?.cicCod ?? null);
 
   readonly estagios = Object.keys(ESTAGIO_LABEL) as EEstagioIncubacao[];
   readonly statusOpcoes = Object.keys(STATUS_EMP_LABEL) as EStatusEmpreendimento[];
@@ -60,13 +72,15 @@ export class EmpreendimentoGerenciarDialog {
   readonly situacaoContratoLabel = SITUACAO_CONTRATO_LABEL;
   readonly nivelMaturidadeLabel = NIVEL_MATURIDADE_LABEL;
 
-  /** Coluna de remover só existe no rascunho (criação). */
   readonly colunas = computed(() =>
     this.novo ? ['nome', 'email', 'telefone', 'acoes'] : ['nome', 'email', 'telefone'],
   );
 
   readonly salvando = signal(false);
   readonly erro = signal<string | null>(null);
+
+  protected readonly isoParaData = isoParaData;
+  protected readonly dataParaIso = dataParaIso;
 
   readonly nome = signal(this.empreendimento?.nome ?? '');
   readonly cnpj = signal(this.empreendimento?.cnpj ?? '');
@@ -86,21 +100,28 @@ export class EmpreendimentoGerenciarDialog {
   readonly entrada = signal(this.empreendimento?.entrada ?? '');
   readonly saida = signal(this.empreendimento?.saida ?? '');
 
-  // ---- pessoas do empreendimento ----
   private readonly pessoasVersao = signal(0);
-  /** Pessoas já gravadas (modo edição). */
   readonly pessoas = rxResource({
     params: () => ({ empCod: this.empreendimento?.empCod, versao: this.pessoasVersao() }),
     stream: ({ params }) =>
       params.empCod == null ? of([]) : this.service.listarPessoas(params.empCod),
   });
-  /** Rascunho local das pessoas ao criar (gravadas no salvar). */
   readonly pessoasLocais = signal<PessoaRascunho[]>([]);
 
-  /** O que a tabela mostra: rascunho na criação, servidor na edição. */
   readonly pessoasExibidas = computed<PessoaRascunho[]>(() =>
     this.novo ? this.pessoasLocais() : (this.pessoas.value() ?? []),
   );
+
+  readonly statusCicloLabel = STATUS_CICLO_LABEL;
+  readonly ciclos = rxResource({
+    params: () => ({ empCod: this.empreendimento?.empCod }),
+    stream: ({ params }) =>
+      params.empCod == null ? of<Ciclo[]>([]) : this.service.listarCiclos(params.empCod),
+  });
+
+  fmtCiclo(d: string | null): string {
+    return d ? d.split('-').reverse().join('/') : '—';
+  }
 
   readonly cadastrando = signal(false);
   readonly pessoaNome = signal('');
@@ -125,8 +146,8 @@ export class EmpreendimentoGerenciarDialog {
       nivelMaturidade: this.nivelMaturidade(),
       entrada: this.entrada() || null,
       saida: this.saida() || null,
+      cicCod: this.cicCod(),
     };
-    // Na criação, as pessoas do rascunho vão no mesmo POST (gravadas junto no backend).
     const requisicao = this.novo
       ? this.service.criar({ ...dto, pessoas: this.pessoasLocais() })
       : this.service.editar(this.empreendimento!.empCod, dto);
@@ -149,7 +170,6 @@ export class EmpreendimentoGerenciarDialog {
     this.cadastrando.set(true);
   }
 
-  /** Na criação, empilha no rascunho local; na edição, grava direto no servidor. */
   cadastrarPessoa(): void {
     const nome = this.pessoaNome().trim();
     if (!nome) return;
@@ -170,7 +190,6 @@ export class EmpreendimentoGerenciarDialog {
       });
   }
 
-  /** Remove uma pessoa do rascunho (só na criação). */
   removerLocal(indice: number): void {
     this.pessoasLocais.update(lista => lista.filter((_, i) => i !== indice));
   }

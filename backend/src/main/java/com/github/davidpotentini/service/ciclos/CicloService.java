@@ -16,11 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Ciclos da incubadora do usuário logado. Roda no schema do próprio tenant (o JWT já deixou o
- * {@code TenantContext} ativo), então {@code CICLOS} é lido e gravado direto — sem {@code callWithin}.
- * "Um por vez": ao criar um ciclo, o ativo anterior é encerrado; o foco ({@code EM_FOCO}) é único e
- * alternado pelo botão "Pôr em foco". Cada transição de unicidade dá {@code flush} antes de marcar o
- * novo, para não violar os índices parciais {@code UQ_CICLO_ATIVO}/{@code UQ_CICLO_EM_FOCO}.
+ * Ciclos da incubadora. Cada transição de unicidade (ativo, em foco) dá {@code flush} antes de marcar
+ * o novo, para não violar os índices parciais {@code UQ_CICLO_ATIVO}/{@code UQ_CICLO_EM_FOCO}.
  */
 @Service
 public class CicloService {
@@ -44,10 +41,8 @@ public class CicloService {
     }
 
     /**
-     * Novo ciclo nasce {@code ATIVO} e sem foco; encerra o ativo anterior antes de abrir. Abre
-     * <b>vazio</b>: a estrutura (processos/práticas do ciclo) não é copiada aqui — ela é materializada
-     * sob demanda, a partir da metodologia, na primeira geração (indicadores ou planejamento) via
-     * {@code EstruturaCicloService.garantirPratica}.
+     * Encerra o ativo anterior e abre <b>vazio</b>: a estrutura não é copiada aqui — é materializada
+     * sob demanda, a partir da metodologia, na primeira geração (indicadores ou planejamento).
      */
     @Transactional(rollbackFor = Exception.class)
     public CicloDTO criar(CicloDTO dto) {
@@ -61,7 +56,6 @@ public class CicloService {
         return mapper.toDTO(ciclo);
     }
 
-    /** Põe o ciclo em foco (o refletido nas telas); tira o foco do anterior. */
     @Transactional(rollbackFor = Exception.class)
     public CicloDTO porEmFoco(Long cicCod) {
         CiclosModel ciclo = buscar(cicCod);
@@ -77,10 +71,8 @@ public class CicloService {
     }
 
     /**
-     * Encerra o ciclo (ação irreversível): passa {@code ATIVO → ENCERRADO}. Só o ciclo ativo encerra e
-     * ele precisa estar em foco — assim as pendências lidas pelo painel (que olha o ciclo em foco) são
-     * as do próprio alvo. Bloqueia enquanto houver qualquer pendência em aberto. Depois de encerrado,
-     * a incubadora fica "entre ciclos" (somente leitura via {@code @EscopoCiclo}) até abrir o próximo.
+     * Encerra o ciclo (irreversível). Exige que o alvo esteja em foco — assim as pendências lidas
+     * (que olham o ciclo em foco) são as do próprio alvo — e bloqueia se houver pendência em aberto.
      */
     @Transactional(rollbackFor = Exception.class)
     public CicloDTO encerrar(Long cicCod) {

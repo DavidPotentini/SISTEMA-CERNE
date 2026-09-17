@@ -1,6 +1,7 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withRouterConfig } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -16,5 +17,7 @@ export const appConfig: ApplicationConfig = {
       withRouterConfig({ paramsInheritanceStrategy: 'always' }),
     ),
     provideHttpClient(withInterceptors([jwtInterceptor, tenantInterceptor])),
+    provideNativeDateAdapter(),
+    { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' },
   ]
 };

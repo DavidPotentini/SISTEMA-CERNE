@@ -10,11 +10,9 @@ import { Pratica } from '../../models/metodologia/metodologia.model';
 interface PraticaFormData {
   prcCod: number;
   processo: string;
-  /** Presente no modo edição. */
   pratica?: Pratica;
 }
 
-/** Modal de prática: adiciona ou edita nome/descrição, no processo (accordion) de onde foi aberta. */
 @Component({
   selector: 'app-pratica-form',
   imports: [FormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],

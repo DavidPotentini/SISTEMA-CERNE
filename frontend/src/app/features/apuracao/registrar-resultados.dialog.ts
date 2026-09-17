@@ -20,12 +20,6 @@ interface RegistrarResultadosData {
   indicador: ApuracaoIndicador;
 }
 
-/**
- * Modal "Registrar Resultados": mostra o indicador (só leitura) e a lista de períodos, cada um com a
- * meta e — quando apurado — o resultado (valor, registrado por, data). Registrar/editar define o
- * valor do período no mesmo lugar; quem registrou e a data são carimbados pelo backend. A lista
- * observa o `versao` do service, então um `recarregar()` após salvar atualiza modal e tela de trás.
- */
 @Component({
   selector: 'app-registrar-resultados',
   imports: [
@@ -55,7 +49,6 @@ export class RegistrarResultadosDialog {
 
   readonly erro = signal<string | null>(null);
 
-  // registro inline do período selecionado
   readonly registrandoCod = signal<number | null>(null);
   readonly valor = signal<number | null>(null);
   readonly salvando = signal(false);

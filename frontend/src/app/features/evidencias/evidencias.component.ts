@@ -26,12 +26,6 @@ import { EvidenciaDetalheDialog } from './evidencia-detalhe.dialog';
 import { EvidenciaFormDialog } from './evidencia-form.dialog';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/**
- * Tela "Registros de evidência": lista a versão corrente de cada evidência (título, atividade/contexto,
- * quem registrou, arquivo, status). A barra de filtros padrão (Processo/Prática/Responsável/Status)
- * recorta a listagem; "Registrar evidência" abre o cadastro; ABRIR mostra o histórico; CORRIGIR (só
- * quando correção solicitada) gera a próxima versão.
- */
 @Component({
   selector: 'app-evidencias',
   imports: [
@@ -51,7 +45,6 @@ export class EvidenciasComponent {
   private readonly dialog = inject(MatDialog);
   private readonly route = inject(ActivatedRoute);
 
-  /** Deep-link de Pendências já tratado? (evita reabrir quando a lista recarrega). */
   private correcaoAberta = false;
 
   readonly colunas = ['titulo', 'atividade', 'responsavel', 'arquivo', 'status', 'acoes'];
@@ -63,7 +56,6 @@ export class EvidenciasComponent {
 
   readonly todas = computed<Evidencia[]>(() => this.evidenciasRes.value() ?? []);
 
-  // ---- filtros padrão ----
   readonly filtros = signal<FiltrosState>({ ...FILTROS_VAZIO });
 
   readonly statusOpcoes: OpcaoStatus[] = (
@@ -88,7 +80,6 @@ export class EvidenciasComponent {
     return [...mapa.values()];
   });
 
-  /** Listagem já com os filtros aplicados (responsável = quem registrou, regPesCod). */
   readonly evidencias = computed<Evidencia[]>(() => {
     const f = this.filtros();
     return this.todas().filter(e =>
@@ -102,8 +93,8 @@ export class EvidenciasComponent {
   });
 
   constructor() {
-    // Vindo de Pendências (?corrigir=evdCod): abre "Corrigir" da evidência quando a lista
-    // carregar. Só uma vez, e só se ainda estiver em correção solicitada.
+    // Vindo de Pendências (?corrigir=evdCod): abre "Corrigir" uma única vez quando a lista
+    // carrega, e só se ainda estiver em correção solicitada.
     effect(() => {
       const todas = this.evidenciasRes.value();
       if (!todas || this.correcaoAberta) {

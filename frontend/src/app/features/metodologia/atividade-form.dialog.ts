@@ -10,18 +10,11 @@ import { MetodologiaService } from '../../core/services/metodologia/metodologia.
 import { Agrupamento, AtividadeMetodologia } from '../../models/metodologia/metodologia.model';
 
 interface AtividadeFormData {
-  /** Presente no modo edição. */
   atividade?: AtividadeMetodologia;
-  /** No modo criação a partir de uma prática: pré-seleciona o vínculo. */
   prtCod?: number;
-  /** No modo criação a partir de um grupo: pré-seleciona o agrupamento. */
   agrCod?: number;
 }
 
-/**
- * Modal de atividade-padrão da metodologia: cria ou edita. O "Vínculo metodológico" é a prática,
- * escolhida num seletor agrupado por processo. "Quem"/"quando" não entram aqui (só no planejamento).
- */
 @Component({
   selector: 'app-atividade-form',
   imports: [
@@ -42,10 +35,8 @@ export class AtividadeFormDialog {
 
   readonly edicao = this.data?.atividade != null;
 
-  /** Processos (com práticas) da metodologia, para o seletor de vínculo. */
   readonly processos = rxResource({ stream: () => this.service.listarProcessos() });
 
-  /** Agrupamentos (todos) da metodologia; filtrados pela prática escolhida no seletor de grupo. */
   private readonly agrupamentos = rxResource({ stream: () => this.service.listarAgrupamentos() });
 
   readonly salvando = signal(false);
@@ -56,7 +47,6 @@ export class AtividadeFormDialog {
   readonly nome = signal(this.data?.atividade?.nome ?? '');
   readonly observacoes = signal(this.data?.atividade?.observacoes ?? '');
 
-  /** Grupos ATIVOS da prática escolhida (para o seletor; opcional — sem grupo = "Sem agrupamento"). */
   readonly gruposDisponiveis = computed<Agrupamento[]>(() => {
     const prt = this.prtCod();
     if (prt == null) return [];

@@ -5,7 +5,6 @@ import com.github.davidpotentini.enums.EEixoCerne;
 import java.io.Serializable;
 import java.util.Objects;
 
-/** Chave composta de {@link PontuacaoModel} ({@code AVA_COD}, {@code DIMENSAO}). */
 public class PontuacaoId implements Serializable {
 
     private Long avaCod;

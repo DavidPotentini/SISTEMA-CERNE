@@ -19,11 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Planejamento institucional do ciclo ativo (tenant vem do JWT; basta estar autenticado). No máx. um
- * planejamento vigente por ciclo. O plano é materializado no "Gerar do ciclo" (Metodologia); esta tela
- * mostra a situação do ciclo ativo e permite ajustar/incluir/remover atividades.
- */
 @RestController
 @EscopoCiclo
 @RequestMapping("/incubadora/planejamento")
@@ -35,13 +30,11 @@ public class PlanejamentoController {
         this.service = service;
     }
 
-    /** Situação do ciclo ativo e o planejamento vigente (ou nada, se ainda não gerado). */
     @GetMapping
     public PlanejamentoAtualDTO atual() {
         return service.atual();
     }
 
-    /** Estrutura (processos/práticas do ciclo) com as atividades planejadas. */
     @GetMapping("/estrutura")
     public List<PlanProcessoDTO> estrutura() {
         return service.estrutura();
@@ -54,18 +47,22 @@ public class PlanejamentoController {
         return service.adicionarComplementar(prtcCod, dto);
     }
 
-    /** Reordena as atividades de uma prática (arrastar-e-soltar): o corpo é a sequência de {@code atpCod}. */
     @PutMapping("/praticas/{prtcCod}/atividades/ordem")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void reordenarAtividades(@PathVariable Long prtcCod, @RequestBody List<Long> atpCods) {
         service.reordenarAtividades(prtcCod, atpCods);
     }
 
-    /** Reordena os agrupamentos de uma prática (arrastar-e-soltar): o corpo é a sequência de {@code agrcCod}. */
     @PutMapping("/praticas/{prtcCod}/agrupamentos/ordem")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void reordenarAgrupamentos(@PathVariable Long prtcCod, @RequestBody List<Long> agrcCods) {
         service.reordenarAgrupamentos(prtcCod, agrcCods);
+    }
+
+    @DeleteMapping("/agrupamentos/{agrcCod}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluirAgrupamento(@PathVariable Long agrcCod) {
+        service.excluirAgrupamento(agrcCod);
     }
 
     @PutMapping("/atividades/{atpCod}")
@@ -74,7 +71,6 @@ public class PlanejamentoController {
         return service.ajustarAtividade(atpCod, dto);
     }
 
-    /** Exclui uma atividade do plano (do modelo ou complementar), salvo se tiver evidências. */
     @DeleteMapping("/atividades/{atpCod}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remover(@PathVariable Long atpCod) {

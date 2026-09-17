@@ -14,12 +14,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Indicador de um ciclo (tabela {@code INDICADORES}). Nasce de duas origens: copiado da metodologia
- * vigente ("Gerar indicadores do ciclo") ou definido manualmente ({@code COMPLEMENTAR}). Vincula-se a
- * uma prática do ciclo ({@code PRTC_COD}, o "Vínculo CERNE"; o processo deriva dela) e ao ciclo ({@code CIC_COD}).
- * Schema do tenant.
- */
 @Entity
 @Table(name = "INDICADORES")
 @Getter
@@ -38,14 +32,12 @@ public class IndicadorModel {
     @Column(name = "ORIGEM", nullable = false)
     private EOrigemIndicador origem = EOrigemIndicador.METODOLOGIA_CERNE;
 
-    /** Prática do ciclo (instância) → {@code PRATICAS_CICLO(PRTC_COD)}; o processo deriva dela. */
     @Column(name = "PRTC_COD")
     private Long prtcCod;
 
     @Column(name = "CIC_COD")
     private Long cicCod;
 
-    /** Responsável pela apuração → {@code PESSOAS(PES_COD)}. Opcional; único campo editável nos gerados. */
     @Column(name = "RESP_PES_COD")
     private Long respPesCod;
 

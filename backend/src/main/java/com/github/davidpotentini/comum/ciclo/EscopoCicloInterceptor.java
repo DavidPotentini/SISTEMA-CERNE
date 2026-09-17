@@ -11,14 +11,9 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
- * Corta a requisição antes de um controller marcado com {@link EscopoCiclo}: GET sempre passa
- * (navegar o histórico de qualquer ciclo), mas mutação só passa quando o ciclo em foco está
- * {@code ATIVO}; se o foco é um ciclo {@code ENCERRADO}, lança {@link RegraNegocioException} (→409).
- * Sem ciclo em foco, deixa passar — a escrita cai no ciclo {@code ATIVO} (ver {@code cicloEmFoco()}
- * nos services), que é editável.
- *
- * <p>Registrado em todas as rotas (como o {@code PermissaoInterceptor}); a anotação no controller é
- * que decide onde vale — sem lista de rotas no config, para não quebrar em refactor de URL.
+ * Nos controllers marcados com {@link EscopoCiclo}: GET sempre passa, mas mutação só quando o ciclo
+ * em foco está {@code ATIVO}; foco {@code ENCERRADO} lança {@link RegraNegocioException} (→409). Sem
+ * ciclo em foco, deixa passar — a escrita cai no {@code ATIVO}, editável.
  */
 @Component
 public class EscopoCicloInterceptor implements HandlerInterceptor {

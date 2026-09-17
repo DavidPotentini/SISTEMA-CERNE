@@ -8,7 +8,6 @@ export type ERecomendacaoMonitor =
   | 'DESLIGAMENTO';
 export type EEixoCerne = 'EMPREENDEDOR' | 'TECNOLOGIA' | 'CAPITAL' | 'MERCADO' | 'GESTAO';
 
-/** Rodada de monitoramento. {@code empCods} só é usado na escrita (participantes). */
 export interface Rodada {
   rodCod: number;
   nome: string;
@@ -17,16 +16,15 @@ export interface Rodada {
   respPesCod: number | null;
   responsavelNome: string | null;
   situacao: ESituacaoRodada;
+  /** Só usado na escrita (participantes). */
   empCods?: number[];
 }
 
-/** Nota (0–5) de um eixo CERNE. */
 export interface Pontuacao {
   dimensao: EEixoCerne;
   pontuacao: number | null;
 }
 
-/** Aplicação da rodada a um empreendimento — card da aba "Aplicações e pontuação". */
 export interface Aplicacao {
   avaCod: number | null;
   empCod: number;
@@ -38,7 +36,6 @@ export interface Aplicacao {
   pontuacoes: Pontuacao[];
 }
 
-/** Uma rodada avaliada de um empreendimento — série do radar de evolução (notas por eixo). */
 export interface EvolucaoRodada {
   rodCod: number;
   rodadaNome: string | null;
@@ -76,7 +73,6 @@ export const EIXO_LABEL: Record<EEixoCerne, string> = {
   GESTAO: 'Gestão',
 };
 
-/** Ordem canônica dos eixos CERNE (para exibição e revisão). */
 export const EIXOS: readonly EEixoCerne[] = [
   'EMPREENDEDOR',
   'TECNOLOGIA',

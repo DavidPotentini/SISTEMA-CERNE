@@ -7,7 +7,6 @@ import { PainelIndicador } from '../../models/indicador/indicador.model';
 import { EPeriodicidade, PERIODICIDADE_LABEL } from '../../models/metodologia/metodologia.model';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/** Consolidação de "atingidos / total" por processo CERNE (denominador = todos os indicadores do processo). */
 interface ConsolidacaoProcesso {
   processo: string;
   total: number;
@@ -15,11 +14,6 @@ interface ConsolidacaoProcesso {
   percentual: number;
 }
 
-/**
- * Aba "Painel": cards do ciclo (total, com meta, com resultados pendentes), listagem por indicador
- * (meta e atingido somados de todos os períodos + %) e a consolidação de atingidos por processo CERNE.
- * Tudo derivado da lista do endpoint /apuracao/painel.
- */
 @Component({
   selector: 'app-painel-tab',
   imports: [DecimalPipe, MatProgressBarModule],
@@ -36,12 +30,10 @@ export class PainelTabComponent {
 
   readonly indicadores = computed<PainelIndicador[]>(() => this.painelRes.value() ?? []);
 
-  // cards
   readonly total = computed(() => this.indicadores().length);
   readonly comMeta = computed(() => this.indicadores().filter(i => i.temMeta).length);
   readonly pendentes = computed(() => this.indicadores().filter(i => i.pendente).length);
 
-  // consolidação por processo CERNE
   readonly consolidacao = computed<ConsolidacaoProcesso[]>(() => {
     const mapa = new Map<string, { total: number; atingidos: number }>();
     for (const i of this.indicadores()) {

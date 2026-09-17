@@ -10,12 +10,7 @@ import java.util.List;
 
 public interface IncubadorasRepository extends JpaRepository<IncubadorasModel, Long> {
 
-    /**
-     * Listagem com filtro opcional por nome (contém, sem diferenciar maiúsculas) e status.
-     * SQL nativo do Postgres, sem aliases: o nome do responsável e a contagem de usuários
-     * vêm de subconsultas correlacionadas em CONTAS. Cada linha é mapeada no service.
-     * Colunas na ordem: INC_COD, NOME, MANTENEDORA, responsável, qtd. usuários, STATUS.
-     */
+    /** Colunas (mapeadas posicionalmente no service): INC_COD, NOME, MANTENEDORA, responsável, qtd. usuários, STATUS. */
     @Query(value = """
             SELECT
                 INCUBADORAS.INC_COD,

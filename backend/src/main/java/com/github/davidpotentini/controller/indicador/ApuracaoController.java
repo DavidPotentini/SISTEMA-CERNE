@@ -16,10 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Apuração de indicadores do ciclo ativo (tenant vem do JWT). Listagem com resumo apurados/total;
- * períodos de um indicador com o resultado; registro (upsert) do resultado de um período.
- */
 @RestController
 @EscopoCiclo
 @RequestMapping("/incubadora/apuracao")
@@ -31,25 +27,21 @@ public class ApuracaoController {
         this.service = service;
     }
 
-    /** Indicadores do ciclo ativo com o resumo de apuração (apurados/total). */
     @GetMapping
     public List<ApuracaoIndicadorDTO> listar() {
         return service.listar();
     }
 
-    /** Painel do ciclo: uma linha por indicador com meta/resultado somados e os sinais de atingido/pendente. */
     @GetMapping("/painel")
     public List<PainelIndicadorDTO> painel() {
         return service.painel();
     }
 
-    /** Períodos de um indicador com o resultado apurado (quando houver). */
     @GetMapping("/{indCod}/periodos")
     public List<PeriodoApuracaoDTO> periodos(@PathVariable Long indCod) {
         return service.periodos(indCod);
     }
 
-    /** Registra (ou atualiza) o resultado de um período. */
     @PutMapping("/{indCod}/periodos/{metCod}")
     public PeriodoApuracaoDTO registrar(@PathVariable Long indCod, @PathVariable Long metCod,
                                         @Valid @RequestBody ResultadoEntradaDTO dto) {

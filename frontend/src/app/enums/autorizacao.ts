@@ -1,4 +1,4 @@
-/** Espelha o tipo Postgres VLD_RECURSO (recursos protegidos por papel). */
+/** Espelha o tipo Postgres VLD_RECURSO. */
 export enum ERecurso {
   Metodologia = 'METODOLOGIA',
   Planejamento = 'PLANEJAMENTO',

@@ -21,15 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Instância da estrutura (processos/práticas) por ciclo — o ciclo é dono da sua própria árvore, com
- * chave própria ({@code PRCC_COD}/{@code PRTC_COD}), imune a mudanças posteriores no template.
- *
- * <p>A estrutura é materializada <b>sob demanda</b>, a partir da metodologia, na primeira geração que
- * a referencia ({@link #garantirPratica}, chamado ao gerar indicadores e ao gerar o planejamento) — o
- * ciclo abre vazio, nada é copiado na abertura. É append-only: nunca recriada destrutivamente (senão
- * os códigos mudariam e os filhos — atividades/indicadores — ficariam órfãos); {@code garantirPratica}
- * casa por proveniência ({@code *_ORIGEM}), então cada prática do template entra uma vez só. O
- * {@code *_ORIGEM} é a correspondência template → instância, lida só aqui, nunca em exibição.
+ * Instância da estrutura (processos/práticas) por ciclo, materializada sob demanda a partir da
+ * metodologia. É <b>append-only</b>: nunca recriada destrutivamente (senão os códigos mudariam e os
+ * filhos — atividades/indicadores — ficariam órfãos); casa por proveniência ({@code *_ORIGEM}), então
+ * cada item do template entra uma vez só.
  */
 @Service
 public class EstruturaCicloService {
@@ -54,11 +49,7 @@ public class EstruturaCicloService {
         this.agrupamentosCiclo = agrupamentosCiclo;
     }
 
-    /**
-     * Materializa a árvore ATIVA da metodologia no ciclo (o "Gerar do ciclo"): garante processos e
-     * práticas ATIVOS na instância. Idempotente — casa por proveniência ({@code *_ORIGEM}), então
-     * reexecutar não duplica; append-only. É o único ponto que cria estrutura do ciclo.
-     */
+    /** Materializa a árvore ATIVA da metodologia no ciclo; é o único ponto que cria estrutura do ciclo. */
     @Transactional(rollbackFor = Exception.class)
     public void materializarEstrutura(Long cicCod) {
         List<Long> prcCodsAtivos = new ArrayList<>();
@@ -88,10 +79,7 @@ public class EstruturaCicloService {
         }
     }
 
-    /**
-     * Devolve o {@code PRTC_COD} da instância que corresponde à prática {@code prtCodTemplate} no ciclo,
-     * criando-a (e o processo, se preciso) sob demanda. Idempotente: casa pela proveniência.
-     */
+    /** {@code PRTC_COD} da instância da prática no ciclo, criando-a (e o processo) sob demanda se preciso. */
     @Transactional(rollbackFor = Exception.class)
     public Long garantirPratica(Long cicCod, Long prtCodTemplate) {
         PraticaCicloModel existente = praticasCiclo
@@ -105,10 +93,7 @@ public class EstruturaCicloService {
         return copiarPratica(cicCod, prccCod, pratica).getPrtcCod();
     }
 
-    /**
-     * Devolve o {@code AGRC_COD} da instância que corresponde ao agrupamento {@code agrCodTemplate} no
-     * ciclo, criando-o (e a prática, se preciso) sob demanda. Idempotente: casa pela proveniência.
-     */
+    /** {@code AGRC_COD} da instância do agrupamento no ciclo, criando-o (e a prática) sob demanda se preciso. */
     @Transactional(rollbackFor = Exception.class)
     public Long garantirAgrupamento(Long cicCod, Long agrCodTemplate) {
         AgrupamentoCicloModel existente = agrupamentosCiclo

@@ -30,11 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Apuração de indicadores do ciclo ativo (schema do tenant vem do JWT). A listagem reaproveita os
- * indicadores do ciclo ({@link IndicadorService}) e acrescenta o resumo de apuração
- * (apurados/total de períodos). Registrar um resultado carimba o usuário logado e a data.
- */
 @Service
 public class ApuracaoService {
 
@@ -56,7 +51,6 @@ public class ApuracaoService {
         this.contas = contas;
     }
 
-    /** Indicadores do ciclo ativo com o resumo de apuração (apurados/total de períodos). */
     @Transactional(readOnly = true)
     public List<ApuracaoIndicadorDTO> listar() {
         List<IndicadorCicloDTO> base = indicadorService.listar();
@@ -68,7 +62,6 @@ public class ApuracaoService {
             indCods.add(ind.indCod());
         }
 
-        // períodos (metas) por indicador + conjunto de metCods apurados (em lote)
         Map<Long, List<MetaModel>> metasPorInd = new HashMap<>();
         List<Long> todosMetCods = new ArrayList<>();
         for (MetaModel m : metas.findByIndCodIn(indCods)) {
@@ -103,8 +96,8 @@ public class ApuracaoService {
     }
 
     /**
-     * Painel do ciclo: uma linha por indicador com meta e resultado somados de todos os períodos,
-     * mais os sinais de "atingido" (resultado >= meta) e "pendente" (período encerrado sem resultado).
+     * Painel do ciclo: uma linha por indicador com meta e resultado somados; "atingido" = resultado >=
+     * meta (com meta > 0), "pendente" = há período encerrado sem resultado.
      */
     @Transactional(readOnly = true)
     public List<PainelIndicadorDTO> painel() {
@@ -117,7 +110,6 @@ public class ApuracaoService {
             indCods.add(ind.indCod());
         }
 
-        // períodos (metas) por indicador + resultado por período (em lote)
         Map<Long, List<MetaModel>> metasPorInd = new HashMap<>();
         List<Long> todosMetCods = new ArrayList<>();
         for (MetaModel m : metas.findByIndCodIn(indCods)) {
@@ -159,7 +151,6 @@ public class ApuracaoService {
         return lista;
     }
 
-    /** Períodos de um indicador com o resultado apurado (quando houver). */
     @Transactional(readOnly = true)
     public List<PeriodoApuracaoDTO> periodos(Long indCod) {
         exigirIndicador(indCod);
@@ -180,7 +171,6 @@ public class ApuracaoService {
         return lista;
     }
 
-    /** Registra (ou atualiza) o resultado de um período; carimba usuário logado e data. */
     @Transactional(rollbackFor = Exception.class)
     public PeriodoApuracaoDTO registrar(Long indCod, Long metCod, BigDecimal valor) {
         MetaModel meta = metas.findById(metCod)
@@ -200,9 +190,7 @@ public class ApuracaoService {
         return toDTO(meta, resultado);
     }
 
-    // ---- apoio ----
-
-    /** Situação de apuração a partir dos períodos: sem período ⇒ {@code null} (sem meta). */
+    /** Sem período ⇒ {@code null} (sem meta). */
     private ESituacaoApuracao situacao(int totalPeriodos, int apurados, boolean atrasado) {
         if (totalPeriodos == 0) {
             return null;
@@ -228,7 +216,6 @@ public class ApuracaoService {
         }
     }
 
-    /** Pessoa ({@code PES_COD}) do usuário logado neste tenant, ou {@code null} se não resolvível. */
     private Long pessoaAtual() {
         Long ctaCod = SessaoContext.contaAtual();
         if (ctaCod == null) {
@@ -237,7 +224,6 @@ public class ApuracaoService {
         return pessoas.findByCtaCod(ctaCod).map(PessoasModel::getPesCod).orElse(null);
     }
 
-    /** Nome de quem registrou (PESSOAS → public.CONTAS); {@code null} se não definido ou não resolvível. */
     private String rotuloResponsavel(Long pesCod) {
         if (pesCod == null) {
             return null;

@@ -17,10 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Metas (períodos) de um indicador do ciclo (tenant vem do JWT). Cada período tem a meta estipulada e
- * a janela de apuração; o cadastro é manual.
- */
 @RestController
 @EscopoCiclo
 @RequestMapping("/incubadora/indicadores/{indCod}/metas")
@@ -32,27 +28,23 @@ public class MetaController {
         this.service = service;
     }
 
-    /** Períodos do indicador, em ordem do início de apuração. */
     @GetMapping
     public List<MetaDTO> listar(@PathVariable Long indCod) {
         return service.listar(indCod);
     }
 
-    /** Cadastra um período (meta) do indicador. */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MetaDTO criar(@PathVariable Long indCod, @Valid @RequestBody MetaDTO dto) {
         return service.criar(indCod, dto);
     }
 
-    /** Edita um período do indicador. */
     @PutMapping("/{metCod}")
     public MetaDTO editar(@PathVariable Long indCod, @PathVariable Long metCod,
                           @Valid @RequestBody MetaDTO dto) {
         return service.editar(indCod, metCod, dto);
     }
 
-    /** Remove um período do indicador. */
     @DeleteMapping("/{metCod}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remover(@PathVariable Long indCod, @PathVariable Long metCod) {

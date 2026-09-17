@@ -10,10 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Instância de um agrupamento (sub-plano) da metodologia dentro de um ciclo — cópia com chave própria
- * ({@code AGRC_COD}), pendurada numa {@link PraticaCicloModel} do mesmo ciclo ({@code PRTC_COD}). É a
- * chave que as atividades planejadas referenciam ({@code AGRC_COD}). {@code AGR_COD_ORIGEM} é
- * proveniência fraca (sem FK), lida só na geração. Schema do tenant.
+ * Instância própria do agrupamento dentro de um ciclo (chave {@code AGRC_COD}, que as atividades
+ * planejadas referenciam). {@code AGR_COD_ORIGEM} é proveniência fraca (sem FK), lida só na geração.
  */
 @Entity
 @Table(name = "AGRUPAMENTOS_CICLO")
@@ -32,15 +30,13 @@ public class AgrupamentoCicloModel {
     @Column(name = "PRTC_COD", nullable = false)
     private Long prtcCod;
 
-    /** Agrupamento do template de origem — proveniência fraca (sem FK forte). */
     @Column(name = "AGR_COD_ORIGEM")
     private Long agrCodOrigem;
 
-    /** Empreendimento do grupo dinâmico "por incubada" → {@code EMPREENDIMENTOS(EMP_COD)}. Nulo nos do template. */
+    /** Empreendimento do grupo dinâmico "por incubada"; nulo nos grupos vindos do template. */
     @Column(name = "EMP_COD")
     private Long empCod;
 
-    /** Ordem do agrupamento dentro da prática do ciclo (copiada do template). */
     @Column(name = "ORDEM", nullable = false)
     private Integer ordem;
 

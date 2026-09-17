@@ -1,5 +1,3 @@
-/* You can add global styles to this file, and also import other style files */
-
 /*
  * Tema tonal da aplicação: substitui o branco padrão por uma leve tinta azure
  * (cor primária do tema). Sobrescreve os tokens de superfície do Material 3
@@ -9,13 +7,11 @@
  * ajuste os HEX abaixo para clarear/escurecer a tinta de toda a aplicação.
  */
 :root {
-  /* Fundo geral (body) e área de conteúdo */
   --mat-sys-background: #eef3fb;
   --mat-sys-surface: #eef3fb;
   --mat-sys-surface-dim: #dbe2ee;
   --mat-sys-surface-bright: #f7faff;
 
-  /* Superfícies "elevadas": cards, diálogos, menus, chips */
   --mat-sys-surface-container-lowest: #ffffff;
   --mat-sys-surface-container-low: #f2f6fc;
   --mat-sys-surface-container: #e9eff9;

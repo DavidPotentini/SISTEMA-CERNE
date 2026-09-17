@@ -1,0 +1,100 @@
+:host {
+  display: block;
+  padding-bottom: 32px;
+}
+.topo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 20px;
+}
+.topo h1 {
+  margin: 0;
+}
+.sub {
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.tudo-pronto {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  background: rgba(46, 125, 50, 0.1);
+  border: 1px solid rgba(46, 125, 50, 0.3);
+}
+.tudo-pronto mat-icon {
+  color: #2e7d32;
+}
+.tudo-pronto p {
+  margin: 0;
+  color: #1b5e20;
+}
+
+.passos {
+  padding: 20px 24px;
+}
+.passos-cab {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.passos-cab .titulo {
+  font-weight: 600;
+}
+.contador {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #1565c0;
+  white-space: nowrap;
+}
+.lista {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.passo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+.passo.proximo {
+  background: rgba(21, 101, 192, 0.06);
+  border: 1px solid rgba(21, 101, 192, 0.2);
+}
+.marca {
+  flex: 0 0 auto;
+  color: rgba(0, 0, 0, 0.3);
+}
+.passo.feito .marca {
+  color: #2e7d32;
+}
+.passo.proximo .marca {
+  color: #1565c0;
+}
+.passo-txt {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.passo-titulo {
+  font-weight: 600;
+}
+.passo.feito .passo-titulo {
+  color: rgba(0, 0, 0, 0.55);
+}
+.passo-desc {
+  font-size: 0.82rem;
+  color: rgba(0, 0, 0, 0.6);
+}

@@ -13,7 +13,6 @@
   flex-direction: column;
   transition: width 0.15s ease;
 }
-/* Cabeçalho: marca à esquerda, botão de recolher (chevron) à direita, na borda do menu. */
 .topo-side {
   display: flex;
   align-items: center;

@@ -11,10 +11,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- * Metadados de um arquivo enviado (tabela {@code ARQUIVOS}). O binário fica no object storage (S3/MinIO)
- * sob {@code storageKey}; aqui guardamos só o ponteiro e os metadados para gerar a URL de download.
- */
+/** O binário fica no object storage (S3/MinIO) sob {@code storageKey}; aqui só o ponteiro e os metadados. */
 @Entity
 @Table(name = "ARQUIVOS")
 @Getter

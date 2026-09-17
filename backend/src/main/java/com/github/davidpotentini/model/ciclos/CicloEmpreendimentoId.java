@@ -3,7 +3,6 @@ package com.github.davidpotentini.model.ciclos;
 import java.io.Serializable;
 import java.util.Objects;
 
-/** Chave composta de {@link CicloEmpreendimentoModel} ({@code CIC_COD}, {@code EMP_COD}). */
 public class CicloEmpreendimentoId implements Serializable {
 
     private Long cicCod;

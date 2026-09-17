@@ -10,11 +10,6 @@ interface GerarCicloData {
   ciclo: string;
 }
 
-/**
- * Diálogo do "Gerar do ciclo": escolhe as incubadas participantes (as marcadas ATIVO, pré-selecionadas
- * pela geração anterior do ciclo). As atividades da metodologia marcadas para repetir por empreendimento
- * são duplicadas por incubada escolhida. Retorna a lista de `empCod` selecionados ao confirmar.
- */
 @Component({
   selector: 'app-gerar-ciclo',
   imports: [MatDialogModule, MatButtonModule, MatCheckboxModule, MatProgressBarModule],

@@ -16,11 +16,6 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-/**
- * Conversão da metodologia. Na escrita, os códigos e a {@code situacao} ("nasce ATIVO") ficam por
- * conta do service; no processo, o {@code prcCod} vem do banco e as {@code praticas} são carregadas
- * pelo service e passadas prontas ao montar o DTO.
- */
 @Mapper(componentModel = "spring")
 public interface MetodologiaMapper {
 
@@ -44,21 +39,17 @@ public interface MetodologiaMapper {
 
     List<PraticaModel> toModelList(List<PraticaDTO> dtos);
 
-    /** Edição de processo: aplica nome/descrição; preserva código, nível, ordem (gerida por arrastar) e situação. */
     @Mapping(target = "prcCod", ignore = true)
     @Mapping(target = "nivel", ignore = true)
     @Mapping(target = "ordem", ignore = true)
     @Mapping(target = "situacao", ignore = true)
     void atualizar(ProcessoDTO dto, @MappingTarget ProcessoModel processo);
 
-    /** Edição de prática: aplica nome/descrição; preserva código, vínculo, ordem e situação. */
     @Mapping(target = "prtCod", ignore = true)
     @Mapping(target = "prcCod", ignore = true)
     @Mapping(target = "ordem", ignore = true)
     @Mapping(target = "situacao", ignore = true)
     void atualizar(PraticaDTO dto, @MappingTarget PraticaModel pratica);
-
-    // ---- agrupamento ----
 
     AgrupamentoDTO toDTO(AgrupamentoModel agrupamento, String vinculoMetodologico);
 
@@ -67,14 +58,11 @@ public interface MetodologiaMapper {
     @Mapping(target = "situacao", ignore = true)
     AgrupamentoModel toModel(AgrupamentoDTO dto);
 
-    /** Edição de agrupamento: aplica nome/descrição; preserva código, vínculo, ordem e situação. */
     @Mapping(target = "agrCod", ignore = true)
     @Mapping(target = "prtCod", ignore = true)
     @Mapping(target = "ordem", ignore = true)
     @Mapping(target = "situacao", ignore = true)
     void atualizar(AgrupamentoDTO dto, @MappingTarget AgrupamentoModel agrupamento);
-
-    // ---- indicador ----
 
     IndicadorDTO toDTO(IndicadorMetodologiaModel indicador, String vinculoMetodologico);
 
@@ -83,13 +71,10 @@ public interface MetodologiaMapper {
     @Mapping(target = "periodicidade", source = "periodicidade", defaultValue = "NAO_SE_APLICA")
     IndicadorMetodologiaModel toModel(IndicadorDTO dto);
 
-    /** Edição de indicador: aplica prática (vínculo)/nome/unidade/periodicidade; preserva código e situação. */
     @Mapping(target = "inmCod", ignore = true)
     @Mapping(target = "situacao", ignore = true)
     @Mapping(target = "periodicidade", source = "periodicidade", defaultValue = "NAO_SE_APLICA")
     void atualizar(IndicadorDTO dto, @MappingTarget IndicadorMetodologiaModel indicador);
-
-    // ---- atividade ----
 
     AtividadeMetodologiaDTO toDTO(AtividadeMetodologiaModel atividade, String vinculoMetodologico);
 
@@ -98,7 +83,6 @@ public interface MetodologiaMapper {
     @Mapping(target = "situacao", ignore = true)
     AtividadeMetodologiaModel toModel(AtividadeMetodologiaDTO dto);
 
-    /** Edição de atividade: aplica prática (vínculo)/grupo/nome/observações; preserva código, ordem, flag e situação. */
     @Mapping(target = "ameCod", ignore = true)
     @Mapping(target = "ordem", ignore = true)
     @Mapping(target = "porEmpreendimento", ignore = true)

@@ -1,28 +1,20 @@
-/* ============================================================================
-   Esqueleto compartilhado da árvore Processos → Práticas → Atividades.
-   Usado por Metodologia (aba Processos e Práticas), Planejamento e Acompanhamento
-   de execução — telas separadas, mas com o MESMO layout/estrutura.
+/*
+ * Esqueleto compartilhado da árvore Processos → Práticas → Atividades, usado por Metodologia,
+ * Planejamento e Acompanhamento via `styleUrls` (o Angular reescopa por componente). Os três
+ * templates usam as MESMAS classes definidas aqui; o específico de cada tela fica no CSS do componente.
+ */
 
-   Incluído via `styleUrls` de cada componente; o Angular reescopa as regras por
-   componente (não vaza). Para manter a semelhança, os três templates usam as
-   MESMAS classes definidas aqui; o que é específico de cada tela (cabeçalho do
-   plano, chips de status, drag-and-drop) fica no CSS próprio do componente.
-   ============================================================================ */
-
-/* Barra do botão recolher/expandir tudo, acima da árvore. */
 .acordeao-acoes {
   display: flex;
   justify-content: flex-end;
   margin: 0 0 8px;
 }
 
-/* Painel do processo (accordion externo). */
 mat-expansion-panel {
   background-color: #fafafa;
   margin-bottom: 12px;
 }
 
-/* Número/ordem do processo no cabeçalho. */
 .ordem {
   display: inline-flex;
   align-items: center;
@@ -41,7 +33,6 @@ mat-expansion-panel {
   color: rgba(0, 0, 0, 0.7);
 }
 
-/* Práticas: accordion aninhado, cada prática recolhível individualmente. */
 .praticas {
   display: block;
   margin-top: 8px;
@@ -54,7 +45,6 @@ mat-expansion-panel {
 .pratica-nome {
   font-weight: 500;
 }
-/* Inativos continuam visíveis, mas atenuados. */
 .pratica.inativa {
   border-left-color: rgba(0, 0, 0, 0.2);
 }
@@ -66,7 +56,6 @@ mat-expansion-panel {
   color: rgba(0, 0, 0, 0.7);
 }
 
-/* Agrupamento (sub-plano) dentro da prática: cabeçalho + suas atividades. */
 .grupo {
   margin: 0 0 14px;
 }
@@ -100,7 +89,6 @@ mat-expansion-panel {
   color: rgba(0, 0, 0, 0.45);
 }
 
-/* Atividades sob a prática, uma separada da outra por linha. */
 .atividades {
   display: flex;
   flex-direction: column;
@@ -129,7 +117,7 @@ mat-expansion-panel {
   font-size: 0.84rem;
   margin-top: 2px;
 }
-.atividade-meta {
+.atividade-info2 {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -169,6 +157,24 @@ mat-expansion-panel {
   color: #a16207;
   font-size: 0.8rem;
 }
+.atividade-empreendimento{
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #e8eefc;
+  color: #274690;
+  gap: 3px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+.atividade-empreendimento mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
 .atividade-acoes {
   display: flex;
   flex-shrink: 0;
@@ -203,7 +209,6 @@ mat-expansion-panel {
   font-weight: 600;
   vertical-align: middle;
 }
-/* Nível CERNE do processo (por ora sempre "CERNE 1"): deixa o escopo explícito. */
 .tag-nivel {
   display: inline-block;
   margin-left: 8px;

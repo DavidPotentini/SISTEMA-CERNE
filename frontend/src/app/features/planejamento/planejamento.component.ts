@@ -10,7 +10,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PlanejamentoService } from '../../core/services/planejamento/planejamento.service';
+import { EmpreendimentoService } from '../../core/services/empreendimento/empreendimento.service';
 import { CicloReadonlyBannerComponent } from '../ciclos/ciclo-readonly-banner.component';
+import { ProximoPassoComponent } from '../../shared/ui/proximo-passo/proximo-passo.component';
 import {
   AtividadePlanejada,
   NIVEL_CERNE_LABEL,
@@ -21,6 +23,7 @@ import {
   STATUS_PLANEJAMENTO_LABEL,
 } from '../../models/planejamento/planejamento.model';
 import {
+  EMP_INSTITUCIONAL,
   FILTROS_VAZIO,
   FiltrosState,
   FiltrosBarComponent,
@@ -31,12 +34,6 @@ import { AtividadePlanejadaFormDialog } from './atividade-planejada-form.dialog'
 import { ConsultarPublicacaoDialog } from './consultar-publicacao.dialog';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/**
- * Tela "Planejamento institucional" do ciclo ativo. No máx. um planejamento vigente por ciclo, que é
- * materializado pelo "Gerar do ciclo" (Metodologia). "Consultar publicação" mostra status/período/
- * responsável/progresso. A estrutura de processos/práticas é a do ciclo (só leitura); as atividades
- * podem ser ajustadas e complementares incluídas/removidas enquanto o plano está publicado.
- */
 @Component({
   selector: 'app-planejamento',
   imports: [
@@ -51,16 +48,17 @@ import { reterRecurso } from '../../shared/util/reter-recurso';
     DragDropModule,
     FiltrosBarComponent,
     CicloReadonlyBannerComponent,
+    ProximoPassoComponent,
   ],
   templateUrl: './planejamento.component.html',
   styleUrls: ['./planejamento.component.css', '../shared/arvore-processos.css'],
 })
 export class PlanejamentoComponent {
   private readonly service = inject(PlanejamentoService);
+  private readonly empreendimentoService = inject(EmpreendimentoService);
   private readonly dialog = inject(MatDialog);
 
   readonly statusLabel = STATUS_PLANEJAMENTO_LABEL;
-  /** Rótulo do nível CERNE do processo (por ora só CERNE 1). */
   readonly nivelLabel = NIVEL_CERNE_LABEL;
 
   readonly atualRes = reterRecurso(rxResource({
@@ -72,18 +70,21 @@ export class PlanejamentoComponent {
     stream: () => this.service.estrutura(),
   }));
 
+  readonly empreendimentosRes = rxResource({
+    params: () => ({ v: this.empreendimentoService.versao() }),
+    stream: () => this.empreendimentoService.listarDoCiclo(),
+  });
+  readonly empreendimentos = computed(() => this.empreendimentosRes.value() ?? []);
+
   readonly plano = computed(() => this.atualRes.value()?.planejamento ?? null);
-  /** Publicado = ciclo vigente, atividades editáveis. */
   readonly editavel = computed(() => this.plano()?.status === 'PUBLICADO');
 
-  /** Painéis abertos por padrão; o botão recolhe/expande a árvore toda de uma vez. */
   readonly tudoExpandido = signal(true);
 
   alternarTudo(): void {
     this.tudoExpandido.update(v => !v);
   }
 
-  /** Subgrupos recolhidos (esconde as atividades); chave = `prtcCod:agrcCod` (ou `:sem` no sintético). */
   private readonly gruposRecolhidos = signal<Set<string>>(new Set());
 
   private chaveGrupo(prtcCod: number, g: PlanGrupo): string {
@@ -91,7 +92,10 @@ export class PlanejamentoComponent {
   }
 
   grupoRecolhido(prtcCod: number, g: PlanGrupo): boolean {
-    return this.gruposRecolhidos().has(this.chaveGrupo(prtcCod, g));
+    if (this.filtroAtivoExpandeGp()) {
+      return false;
+    }
+    return !this.gruposRecolhidos().has(this.chaveGrupo(prtcCod, g));
   }
 
   alternarRecolherGrupo(prtcCod: number, g: PlanGrupo): void {
@@ -105,7 +109,6 @@ export class PlanejamentoComponent {
     this.gruposRecolhidos.set(set);
   }
 
-  // ---- filtros padrão (sem status) ----
   readonly filtros = signal<FiltrosState>({ ...FILTROS_VAZIO });
 
   readonly processoOpcoes = computed<OpcaoProcesso[]>(() =>
@@ -122,19 +125,40 @@ export class PlanejamentoComponent {
     return out;
   });
 
-  /**
-   * Árvore com os filtros aplicados. Processo/prática recortam a estrutura (mantendo práticas vazias,
-   * para ainda permitir incluir atividade); o filtro de responsável recorta atividades e esconde
-   * práticas/processos que ficam sem atividade. Sem filtro, devolve a estrutura original.
-   */
+  readonly algumFiltroAtivo = computed<boolean>(() => {
+    const f = this.filtros();
+    return (
+      f.processo != null ||
+      f.pratica != null ||
+      f.respPesCod != null ||
+      f.agrupamento != null ||
+      f.atividade != null ||
+      f.empCod != null
+    );
+  });
+
+  readonly filtroAtivoExpandeGp = computed<boolean>(() => {
+    const f = this.filtros();
+    return (
+      // f.processo != null ||
+      // f.pratica != null ||
+      f.respPesCod != null ||
+      // f.agrupamento != null ||
+      f.atividade != null ||
+      f.empCod != null
+    );
+  });
+
   readonly estruturaFiltrada = computed<PlanProcesso[]>(() => {
     const f = this.filtros();
     const procs = this.estruturaRes.value() ?? [];
-    const algum = f.processo != null || f.pratica != null || f.respPesCod != null;
-    if (!algum) {
+    if (!this.algumFiltroAtivo()) {
       return procs;
     }
-    const filtrarAtividade = f.respPesCod != null;
+    const filtraAtv = f.respPesCod != null || f.atividade != null || f.empCod != null;
+    const alvoEmp = f.empCod === EMP_INSTITUCIONAL ? null : f.empCod;
+    const buscaAtv = f.atividade?.toLowerCase() ?? null;
+    const buscaGrp = f.agrupamento?.toLowerCase() ?? null;
     const out: PlanProcesso[] = [];
     for (const proc of procs) {
       if (f.processo != null && proc.nome !== f.processo) {
@@ -147,15 +171,24 @@ export class PlanejamentoComponent {
         }
         const grupos: PlanGrupo[] = [];
         for (const g of pr.grupos) {
-          const atividades = filtrarAtividade
-            ? g.atividades.filter(a => a.respPesCod === f.respPesCod)
-            : g.atividades;
-          if (filtrarAtividade && atividades.length === 0) {
+          if (buscaGrp != null && !g.nome.toLowerCase().includes(buscaGrp)) {
+            continue;
+          }
+          let atividades = g.atividades;
+          if (filtraAtv) {
+            atividades = atividades.filter(
+              a =>
+                (f.respPesCod == null || a.respPesCod === f.respPesCod) &&
+                (buscaAtv == null || a.nome.toLowerCase().includes(buscaAtv)) &&
+                (f.empCod == null || (a.empCod ?? null) === alvoEmp),
+            );
+          }
+          if ((filtraAtv || buscaGrp != null) && atividades.length === 0) {
             continue;
           }
           grupos.push({ ...g, atividades });
         }
-        if (filtrarAtividade && grupos.length === 0) {
+        if (grupos.length === 0) {
           continue;
         }
         praticas.push({ ...pr, grupos });
@@ -174,7 +207,6 @@ export class PlanejamentoComponent {
     this.dialog.open(ConsultarPublicacaoDialog, { width: '90vw', maxWidth: '1200px', data: plano });
   }
 
-  /** Total de atividades da prática (soma dos grupos). */
   totalPratica(pr: PlanPratica): number {
     return pr.grupos.reduce((n, g) => n + g.atividades.length, 0);
   }
@@ -199,10 +231,18 @@ export class PlanejamentoComponent {
     this.service.removerAtividade(atv.atpCod).subscribe(() => this.service.recarregar());
   }
 
-  /**
-   * Arrastar-e-soltar de atividades DENTRO de um grupo; persiste a nova sequência de `atpCod` da prática
-   * inteira (grupos na ordem + "sem agrupamento"), com o grupo movido reordenado internamente.
-   */
+  removerAgrupamento(g: PlanGrupo): void {
+    if (g.agrcCod == null) return;
+    const ok = window.confirm(`Excluir o agrupamento "${g.nome}" do planejamento?`);
+    if (!ok) return;
+    this.service.excluirAgrupamento(g.agrcCod).subscribe({
+      next: () => this.service.recarregar(),
+      error: e => window.alert(e?.error?.mensagem ?? 'Não foi possível excluir o agrupamento.'),
+    });
+  }
+
+  // Persiste a sequência de `atpCod` da prática inteira (grupos na ordem + "sem agrupamento"),
+  // com o grupo movido reordenado internamente.
   reordenarAtividade(pr: PlanPratica, agrcCod: number | null, event: CdkDragDrop<AtividadePlanejada[]>): void {
     if (event.previousIndex === event.currentIndex) return;
     const atpCods: number[] = [];
@@ -218,11 +258,8 @@ export class PlanejamentoComponent {
     this.service.reordenarAtividades(pr.prtcCod, atpCods).subscribe(() => this.service.recarregar());
   }
 
-  /**
-   * Arrastar-e-soltar de agrupamentos de uma prática; persiste a sequência de `agrcCod`. O grupo
-   * sintético "Sem agrupamento" (sempre o último e não arrastável) fica fora: o destino é limitado aos
-   * grupos reais.
-   */
+  // O grupo sintético "Sem agrupamento" (sempre o último e não arrastável) fica fora: o destino é
+  // limitado aos grupos reais.
   reordenarAgrupamento(pr: PlanPratica, event: CdkDragDrop<PlanGrupo[]>): void {
     const reais = pr.grupos.filter(g => g.agrcCod != null);
     const to = Math.min(event.currentIndex, reais.length - 1);

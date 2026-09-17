@@ -7,11 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Resolve qual ciclo as telas dependentes de ciclo devem refletir. Centraliza a regra que antes se
- * repetia em cada service: o ciclo {@code EM_FOCO}; se nenhum estiver em foco, cai no {@code ATIVO}
- * (editável). A escrita em ciclo encerrado é barrada antes, pelo {@link EscopoCicloInterceptor}.
- */
+/** Ciclo que as telas refletem: o {@code EM_FOCO}; sem foco, cai no {@code ATIVO} (editável). */
 @Component
 public class CicloContexto {
 
@@ -21,7 +17,6 @@ public class CicloContexto {
         this.ciclos = ciclos;
     }
 
-    /** Ciclo refletido nas telas (EM_FOCO, ou o ATIVO como fallback), ou {@code null} se não houver ciclo. */
     public CiclosModel emFoco() {
         return ciclos.findByEmFocoTrue().orElseGet(() -> {
             List<CiclosModel> ativos = ciclos.findByStatus(EStatusCiclo.ATIVO);

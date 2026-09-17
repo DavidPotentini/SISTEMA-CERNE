@@ -9,10 +9,6 @@ import { AuthService } from '../../core/services/auth/auth.service';
 
 type Modo = 'entrar' | 'ativar';
 
-/**
- * Login da plataforma: apenas e-mail + senha (a incubadora vem da própria conta). Também
- * ativa contas convidadas — o usuário informa o e-mail cadastrado pelo admin e escolhe a senha.
- */
 @Component({
   selector: 'app-login',
   imports: [

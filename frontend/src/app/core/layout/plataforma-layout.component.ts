@@ -9,7 +9,6 @@ import { environment } from '../../../environments/environment';
 import { AuthService } from '../services/auth/auth.service';
 import { IncubadoraService } from '../services/incubadora/incubadora.service';
 
-/** Casca do administrador: menu lateral "Plataforma" + rodapé com incubadoras ativas. */
 @Component({
   selector: 'app-plataforma-layout',
   imports: [
@@ -29,7 +28,7 @@ export class PlataformaLayoutComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  /** Reconsulta sempre que houver mutação (ativar/suspender). */
+  /** `versao()` reconsulta a contagem a cada mutação (ativar/suspender). */
   readonly ativas = httpResource<number>(() => {
     this.service.versao();
     return `${environment.apiUrl}/admin/incubadoras/contagem-ativas`;

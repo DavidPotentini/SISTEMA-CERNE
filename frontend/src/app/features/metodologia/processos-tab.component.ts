@@ -27,21 +27,13 @@ import { PraticaFormDialog } from './pratica-form.dialog';
 import { AgrupamentoFormDialog } from './agrupamento-form.dialog';
 import { AtividadeFormDialog } from './atividade-form.dialog';
 
-/** Grupo (sub-plano) montado para exibição: um agrupamento real (`fonte`), ou o sintético "Sem agrupamento". */
 export interface GrupoView {
   agrCod: number | null;
   nome: string;
-  /** Agrupamento de origem; `null` no grupo sintético "Sem agrupamento". */
   fonte: Agrupamento | null;
   atividades: AtividadeMetodologia[];
 }
 
-/**
- * Aba "Processos e Práticas": accordions cuja ordem é definida arrastando (a ordem não aparece). Ao
- * expandir, veem-se as práticas — cada uma com suas atividades-padrão agrupadas embaixo — e os botões
- * de adicionar prática e atividade. No topo, adicionar novo processo. Edita a metodologia direto (sem
- * versionamento).
- */
 @Component({
   selector: 'app-processos-tab',
   imports: [
@@ -60,28 +52,23 @@ export class ProcessosTabComponent {
   private readonly service = inject(MetodologiaService);
   private readonly dialog = inject(MatDialog);
 
-  /** Rótulo do nível CERNE do processo (por ora só CERNE 1). */
   readonly nivelLabel = NIVEL_CERNE_LABEL;
 
-  /** Processos da metodologia; refaz a busca a cada mutação. */
   readonly processos = reterRecurso(rxResource({
     params: () => ({ v: this.service.versao() }),
     stream: () => this.service.listarProcessos(),
   }));
 
-  /** Atividades-padrão da metodologia; agrupadas por prática no template. */
   readonly atividades = reterRecurso(rxResource({
     params: () => ({ v: this.service.versao() }),
     stream: () => this.service.listarAtividades(),
   }));
 
-  /** Agrupamentos (sub-planos) da metodologia; ordenados por `ordem` dentro da prática. */
   readonly agrupamentos = reterRecurso(rxResource({
     params: () => ({ v: this.service.versao() }),
     stream: () => this.service.listarAgrupamentos(),
   }));
 
-  /** Atividades indexadas por `prtCod`, para renderizar sob cada prática. */
   readonly atividadesPorPratica = computed<Map<number, AtividadeMetodologia[]>>(() => {
     const mapa = new Map<number, AtividadeMetodologia[]>();
     for (const a of this.atividades.value() ?? []) {
@@ -95,7 +82,6 @@ export class ProcessosTabComponent {
     return mapa;
   });
 
-  /** Agrupamentos indexados por `prtCod` (mantêm a ordem vinda do backend). */
   readonly agrupamentosPorPratica = computed<Map<number, Agrupamento[]>>(() => {
     const mapa = new Map<number, Agrupamento[]>();
     for (const g of this.agrupamentos.value() ?? []) {
@@ -113,15 +99,10 @@ export class ProcessosTabComponent {
     return this.atividadesPorPratica().get(prtCod) ?? [];
   }
 
-  /** Agrupamentos reais (ATIVO/INATIVO) de uma prática, na ordem. */
   agrupamentosDa(prtCod: number): Agrupamento[] {
     return this.agrupamentosPorPratica().get(prtCod) ?? [];
   }
 
-  /**
-   * Grupos de uma prática para exibição: cada agrupamento real com suas atividades, seguido do grupo
-   * sintético "Sem agrupamento" (atividades com `agrCod` nulo) quando houver.
-   */
   gruposDaPratica(prtCod: number): GrupoView[] {
     const atividades = this.atividadesDa(prtCod);
     const grupos: GrupoView[] = this.agrupamentosDa(prtCod).map(g => ({
@@ -137,14 +118,36 @@ export class ProcessosTabComponent {
     return grupos;
   }
 
-  /** Painéis abertos por padrão; o botão recolhe/expande a árvore toda de uma vez. */
+  gruposDaPraticaFiltrados(prtCod: number): GrupoView[] {
+    const f = this.filtros();
+    const grupos = this.gruposDaPratica(prtCod);
+    if (f.agrupamento == null && f.atividade == null) {
+      return grupos;
+    }
+    const out: GrupoView[] = [];
+    for (const g of grupos) {
+      if (f.agrupamento != null && !g.nome.toLowerCase().includes(f.agrupamento.toLowerCase())) {
+        continue;
+      }
+      let atividades = g.atividades;
+      if (f.atividade != null) {
+        const busca = f.atividade.toLowerCase();
+        atividades = atividades.filter(a => a.nome.toLowerCase().includes(busca));
+        if (atividades.length === 0) {
+          continue;
+        }
+      }
+      out.push({ ...g, atividades });
+    }
+    return out;
+  }
+
   readonly tudoExpandido = signal(true);
 
   alternarTudo(): void {
     this.tudoExpandido.update(v => !v);
   }
 
-  /** Subgrupos recolhidos (esconde as atividades); chave = `prtCod:agrCod` (ou `:sem` no sintético). */
   private readonly gruposRecolhidos = signal<Set<string>>(new Set());
 
   private chaveGrupo(prtCod: number, g: GrupoView): string {
@@ -152,7 +155,10 @@ export class ProcessosTabComponent {
   }
 
   grupoRecolhido(prtCod: number, g: GrupoView): boolean {
-    return this.gruposRecolhidos().has(this.chaveGrupo(prtCod, g));
+    if (this.filtroAtivoExpandeGp()) {
+      return false;
+    }
+    return !this.gruposRecolhidos().has(this.chaveGrupo(prtCod, g));
   }
 
   alternarRecolherGrupo(prtCod: number, g: GrupoView): void {
@@ -166,12 +172,16 @@ export class ProcessosTabComponent {
     this.gruposRecolhidos.set(set);
   }
 
-  // ---- filtros padrão (só processo/prática) ----
   readonly filtros = signal<FiltrosState>({ ...FILTROS_VAZIO });
 
-  readonly algumFiltro = computed<boolean>(() => {
+  readonly algumFiltroAtivo = computed<boolean>(() => {
     const f = this.filtros();
-    return f.processo != null || f.pratica != null;
+    return f.processo != null || f.pratica != null || f.agrupamento != null || f.atividade != null;
+  });
+
+  readonly filtroAtivoExpandeGp = computed<boolean>(() => {
+    const f = this.filtros();
+    return f.atividade != null;
   });
 
   readonly processoOpcoes = computed<OpcaoProcesso[]>(() =>
@@ -188,13 +198,13 @@ export class ProcessosTabComponent {
     return out;
   });
 
-  /** Processos com os filtros aplicados; sem filtro, devolve a lista original (drag habilitado). */
   readonly processosFiltrados = computed<Processo[]>(() => {
     const f = this.filtros();
     const lista = this.processos.value() ?? [];
-    if (!this.algumFiltro()) {
+    if (!this.algumFiltroAtivo()) {
       return lista;
     }
+    const textoAtivo = f.agrupamento != null || f.atividade != null;
     const out: Processo[] = [];
     for (const p of lista) {
       if (f.processo != null && p.nome !== f.processo) {
@@ -203,16 +213,18 @@ export class ProcessosTabComponent {
       let praticas = p.praticas;
       if (f.pratica != null) {
         praticas = praticas.filter(pr => pr.nome === f.pratica);
-        if (praticas.length === 0) {
-          continue;
-        }
+      }
+      if (textoAtivo) {
+        praticas = praticas.filter(pr => this.gruposDaPraticaFiltrados(pr.prtCod).length > 0);
+      }
+      if (praticas.length === 0) {
+        continue;
       }
       out.push({ ...p, praticas });
     }
     return out;
   });
 
-  /** Arrastar-e-soltar: reordena localmente e persiste a nova sequência de `prcCod`. */
   reordenar(event: CdkDragDrop<Processo[]>): void {
     const lista = this.processos.value();
     if (!lista || event.previousIndex === event.currentIndex) {
@@ -226,7 +238,6 @@ export class ProcessosTabComponent {
     this.service.reordenarProcessos(prcCods).subscribe(() => this.service.recarregar());
   }
 
-  /** Arrastar-e-soltar de práticas dentro de um processo; persiste a nova sequência de `prtCod`. */
   reordenarPratica(p: Processo, event: CdkDragDrop<Pratica[]>): void {
     if (event.previousIndex === event.currentIndex) {
       return;
@@ -236,10 +247,8 @@ export class ProcessosTabComponent {
     this.service.reordenarPraticas(p.prcCod, prtCods).subscribe(() => this.service.recarregar());
   }
 
-  /**
-   * Arrastar-e-soltar de atividades DENTRO de um grupo; persiste a nova sequência de `ameCod` da prática
-   * inteira (grupos na ordem + "sem agrupamento" no fim), com o grupo movido reordenado internamente.
-   */
+  // Persiste a sequência de `ameCod` da prática inteira (grupos na ordem + "sem agrupamento" no fim),
+  // com o grupo movido reordenado internamente.
   reordenarAtividade(pr: Pratica, agrCod: number | null, event: CdkDragDrop<AtividadeMetodologia[]>): void {
     if (event.previousIndex === event.currentIndex) {
       return;
@@ -257,11 +266,8 @@ export class ProcessosTabComponent {
     this.service.reordenarAtividades(pr.prtCod, ameCods).subscribe(() => this.service.recarregar());
   }
 
-  /**
-   * Arrastar-e-soltar de agrupamentos dentro de uma prática; persiste a nova sequência de `agrCod`. O
-   * grupo sintético "Sem agrupamento" (sempre o último e não arrastável) fica fora: o índice de destino
-   * é limitado aos grupos reais.
-   */
+  // O grupo sintético "Sem agrupamento" (sempre o último e não arrastável) fica fora: o índice de
+  // destino é limitado aos grupos reais.
   reordenarAgrupamento(pr: Pratica, event: CdkDragDrop<GrupoView[]>): void {
     const grupos = [...this.agrupamentosDa(pr.prtCod)];
     const to = Math.min(event.currentIndex, grupos.length - 1);
@@ -350,7 +356,6 @@ export class ProcessosTabComponent {
     this.service.alterarSituacaoAtividade(a.ameCod, situacao).subscribe(() => this.service.recarregar());
   }
 
-  /** Liga/desliga "repetir por empreendimento" na atividade (uma cópia por incubada na geração). */
   alternarPorEmpreendimentoAtividade(a: AtividadeMetodologia): void {
     this.service
       .alterarPorEmpreendimentoAtividade(a.ameCod, !a.porEmpreendimento)

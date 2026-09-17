@@ -12,7 +12,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Matriz papel × recurso → nível (schema do tenant). Uma linha por recurso do papel. */
 @Entity
 @Table(name = "PAPEL_PERMISSOES")
 @IdClass(PapelPermissaoId.class)

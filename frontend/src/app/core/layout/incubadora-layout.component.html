@@ -1,10 +1,8 @@
 <mat-sidenav-container class="shell">
   <mat-sidenav mode="side" opened class="side">
-    <div class="side-content" [class.recolhido]="recolhido()">
+    <div class="side-content" [class.recolhido]="recolhido()" (transitionend)="ajustarMargens()">
       <div class="topo-side">
-        @if (modo() === 'principal') {
-          <span class="brand-txt">Incubadora</span>
-        }
+        <span class="brand-txt">Incubadora</span>
         <button mat-icon-button class="toggle" (click)="recolhido.set(!recolhido())"
                 [title]="recolhido() ? 'Expandir menu' : 'Recolher menu'"
                 [attr.aria-label]="recolhido() ? 'Expandir menu' : 'Recolher menu'">
@@ -16,17 +14,20 @@
         <mat-nav-list class="menu">
           <div class="grupo-menu">Visão Geral</div>
 
+          <a mat-list-item routerLink="/incubadora/primeiros-passos" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>checklist</mat-icon>
+            <span matListItemTitle>Primeiros passos</span>
+          </a>
+
           <a mat-list-item routerLink="/incubadora/visao-geral" routerLinkActive="ativo">
             <mat-icon matListItemIcon>dashboard</mat-icon>
             <span matListItemTitle>Dashboard</span>
           </a>
 
-          <div class="grupo-menu">Empreendimentos Apoiados</div>
-
-          <a mat-list-item routerLink="/incubadora/monitoramento" routerLinkActive="ativo">
+          <!-- <a mat-list-item routerLink="/incubadora/monitoramento" routerLinkActive="ativo">
             <mat-icon matListItemIcon>monitoring</mat-icon>
             <span matListItemTitle>Monitoramento dos empreendimentos</span>
-          </a>
+          </a> -->
 
           <div class="grupo-menu">Planejamento</div>
           <a mat-list-item routerLink="/incubadora/planejamento" routerLinkActive="ativo">
@@ -55,24 +56,32 @@
             <mat-icon matListItemIcon>assessment</mat-icon>
             <span matListItemTitle>Apuração de indicadores</span>
           </a>
+          <a mat-list-item routerLink="/incubadora/empreendimentos-apoiados" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>apartment</mat-icon>
+            <span matListItemTitle>Acompanhamento dos empreendimentos</span>
+          </a>
 
         </mat-nav-list>
       } @else {
-        <button mat-button class="voltar" (click)="modo.set('principal')">
+        <a mat-button class="voltar" routerLink="/incubadora/visao-geral">
           <mat-icon>arrow_back</mat-icon>
           <span class="rotulo">Voltar</span>
-        </button>
+        </a>
 
         <mat-nav-list class="menu">
           <div class="grupo-menu">Configuração</div>
 
-          <a mat-list-item routerLink="/incubadora/metodologia" routerLinkActive="ativo">
-            <mat-icon matListItemIcon>account_tree</mat-icon>
-            <span matListItemTitle>Metodologia</span>
-          </a>
           <a mat-list-item routerLink="/incubadora/minha-incubadora" routerLinkActive="ativo">
             <mat-icon matListItemIcon>domain</mat-icon>
             <span matListItemTitle>Minha Incubadora</span>
+          </a>
+          <a mat-list-item routerLink="/incubadora/empreendimentos" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>apartment</mat-icon>
+            <span matListItemTitle>Empreendimentos</span>
+          </a>
+          <a mat-list-item routerLink="/incubadora/metodologia" routerLinkActive="ativo">
+            <mat-icon matListItemIcon>account_tree</mat-icon>
+            <span matListItemTitle>Metodologia</span>
           </a>
         </mat-nav-list>
       }
@@ -84,10 +93,10 @@
               <span class="nome">{{ inc.nome }}</span>
               <span class="nivel">{{ inc.nivel ? nivelLabel(inc.nivel) : '—' }}</span>
             </div>
-            <button mat-icon-button class="sobre" (click)="modo.set('config')"
-                    title="Configuração" aria-label="Configuração">
+            <a mat-icon-button class="sobre" routerLink="/incubadora/minha-incubadora"
+               title="Configuração" aria-label="Configuração">
               <mat-icon>settings</mat-icon>
-            </button>
+            </a>
             <button mat-icon-button class="sobre" (click)="sobre()"
                     title="Sobre a incubadora" aria-label="Sobre a incubadora">
               <mat-icon>info</mat-icon>

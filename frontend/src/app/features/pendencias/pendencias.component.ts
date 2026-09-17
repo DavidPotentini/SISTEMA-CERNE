@@ -26,7 +26,6 @@ import {
   casaFiltros,
 } from '../../shared/ui/filtros-bar/filtros-bar.component';
 
-/** Uma seção do painel: o tipo, seu rótulo/ícone e as pendências daquele tipo. */
 interface Secao {
   tipo: ETipoPendencia;
   rotulo: string;
@@ -34,12 +33,6 @@ interface Secao {
   itens: Pendencia[];
 }
 
-/**
- * Tela "Pendências": reúne todas as pendências do ciclo ativo. Cards-resumo no topo (contagem
- * por tipo) e, abaixo, uma seção expansível por tipo com seus itens. Cada item é clicável e navega
- * até a tela de origem (acompanhamento, evidências ou apuração). Contadores e agrupamento derivados
- * no front a partir da lista única do endpoint.
- */
 @Component({
   selector: 'app-pendencias',
   imports: [
@@ -63,7 +56,6 @@ export class PendenciasComponent {
 
   private readonly todas = computed<Pendencia[]>(() => this.pendenciasRes.value() ?? []);
 
-  // ---- filtros padrão (status = tipo de pendência) ----
   readonly filtros = signal<FiltrosState>({ ...FILTROS_VAZIO });
 
   readonly statusOpcoes: OpcaoStatus[] = TIPOS_PENDENCIA.map(tipo => ({
@@ -101,7 +93,6 @@ export class PendenciasComponent {
     );
   });
 
-  /** Seções na ordem canônica (mais urgente primeiro), só as com itens (após os filtros). */
   readonly secoes = computed<Secao[]>(() => {
     const itens = this.itensFiltrados();
     return TIPOS_PENDENCIA.map(tipo => ({
@@ -112,7 +103,6 @@ export class PendenciasComponent {
     })).filter(s => s.itens.length > 0);
   });
 
-  /** Cards-resumo: contagem por tipo, na ordem canônica (sempre os 4). */
   readonly resumo = computed(() => {
     const itens = this.pendenciasRes.value() ?? [];
     return TIPOS_PENDENCIA.map(tipo => ({
@@ -125,7 +115,6 @@ export class PendenciasComponent {
 
   readonly total = computed(() => (this.pendenciasRes.value() ?? []).length);
 
-  /** Seções abertas por padrão; o botão recolhe/expande todas de uma vez. */
   readonly tudoExpandido = signal(true);
 
   alternarTudo(): void {

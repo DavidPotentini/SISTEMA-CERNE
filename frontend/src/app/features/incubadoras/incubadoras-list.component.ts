@@ -14,7 +14,6 @@ import { IncubadoraConfigurarDialog } from './incubadora-configurar.dialog';
 import { IncubadoraConsultarDialog } from './incubadora-consultar.dialog';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/** Tela "Incubadoras" do administrador: listagem, filtro e ações. */
 @Component({
   selector: 'app-incubadoras-list',
   imports: [
@@ -38,10 +37,6 @@ export class IncubadorasListComponent {
   readonly status = signal('');
   readonly colunas = ['nome', 'mantenedora', 'responsavel', 'usuarios', 'status', 'acoes'];
 
-  /**
-   * Resource reativo sobre a service comum: refaz a busca sempre que o nome, o status
-   * ou a {@code versao} (mutações: ativar/suspender/salvar) mudam.
-   */
   readonly dados = reterRecurso(rxResource({
     params: () => ({
       versao: this.service.versao(),

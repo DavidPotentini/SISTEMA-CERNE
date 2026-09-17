@@ -1,8 +1,9 @@
 <h2 mat-dialog-title>Gerar do ciclo — {{ data.ciclo }}</h2>
 <mat-dialog-content>
   <p class="intro">
-    Escolha as incubadas participantes. As atividades marcadas para repetir por empreendimento serão
-    duplicadas por incubada selecionada, em um grupo por empreendimento.
+    Escolha para quais empreendimentos do ciclo replicar. As atividades marcadas para repetir por
+    empreendimento serão duplicadas por empreendimento selecionado, em um grupo por empreendimento.
+    O vínculo do empreendimento ao ciclo é definido no cadastro do empreendimento.
   </p>
 
   @if (carregando()) {
@@ -10,7 +11,7 @@
   } @else if (erro()) {
     <p class="erro">{{ erro() }}</p>
   } @else if (incubadas().length === 0) {
-    <p class="vazio">Nenhuma incubada ativa. As atividades que repetem por empreendimento não serão geradas.</p>
+    <p class="vazio">Nenhum empreendimento vinculado a este ciclo. Vincule no cadastro do empreendimento.</p>
   } @else {
     <div class="lista">
       @for (inc of incubadas(); track inc.empCod) {

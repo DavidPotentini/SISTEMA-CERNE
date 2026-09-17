@@ -1,19 +1,17 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CicloService } from '../../core/services/ciclo/ciclo.service';
 import { Ciclo } from '../../models/ciclo/ciclo.model';
+import { dataParaIso, isoParaData } from '../../shared/util/data';
 
-/**
- * Modal "Novo ciclo": nome + período. O ciclo nasce ativo e encerra o ativo anterior (regra no
- * backend). O foco é definido depois, pelo botão "Pôr em foco" na listagem.
- */
 @Component({
   selector: 'app-ciclo-form',
-  imports: [FormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],
+  imports: [FormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatDatepickerModule],
   templateUrl: './ciclo-form.dialog.html',
   styleUrl: './ciclo-form.dialog.css',
 })
@@ -27,6 +25,9 @@ export class CicloFormDialog {
   readonly nome = signal('');
   readonly inicio = signal('');
   readonly fim = signal('');
+
+  protected readonly isoParaData = isoParaData;
+  protected readonly dataParaIso = dataParaIso;
 
   salvar(): void {
     if (!this.nome().trim()) return;

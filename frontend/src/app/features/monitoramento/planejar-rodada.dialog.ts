@@ -2,11 +2,13 @@ import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { EmpreendimentoService } from '../../core/services/empreendimento/empreendimento.service';
+import { dataParaIso, isoParaData } from '../../shared/util/data';
 import { EquipeService } from '../../core/services/equipe/equipe.service';
 import { MonitoramentoService } from '../../core/services/monitoramento/monitoramento.service';
 import {
@@ -15,11 +17,6 @@ import {
   TIPO_RODADA_LABEL,
 } from '../../models/monitoramento/monitoramento.model';
 
-/**
- * Modal "Planejar Rodada": informa os dados da rodada (nome, tipo, responsável, prazo) e escolhe os
- * empreendimentos participantes. O ciclo é o ativo (definido no backend). Empreendimentos e
- * responsáveis (equipe da incubadora) vêm dos endpoints de empreendimentos.
- */
 @Component({
   selector: 'app-planejar-rodada',
   imports: [
@@ -29,6 +26,7 @@ import {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatDatepickerModule,
   ],
   templateUrl: './planejar-rodada.dialog.html',
   styleUrl: './planejar-rodada.dialog.css',
@@ -52,6 +50,9 @@ export class PlanejarRodadaDialog {
   readonly tipo = signal<ETipoRodada>('PERIODICO');
   readonly respPesCod = signal<number | null>(null);
   readonly prazo = signal<string | null>(null);
+
+  protected readonly isoParaData = isoParaData;
+  protected readonly dataParaIso = dataParaIso;
   readonly empCods = signal<number[]>([]);
 
   readonly salvando = signal(false);

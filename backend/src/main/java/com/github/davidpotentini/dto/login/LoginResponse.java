@@ -5,10 +5,6 @@ import com.github.davidpotentini.enums.ERecurso;
 
 import java.util.Map;
 
-/**
- * Contexto devolvido pelo login. Para o administrador da plataforma, {@code nomeSchema},
- * {@code papCod} e {@code papelNome} são nulos e {@code adminPlataforma} é {@code true}.
- */
 public record LoginResponse(
         String token,
         Long ctaCod,

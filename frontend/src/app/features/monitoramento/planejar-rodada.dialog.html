@@ -17,7 +17,9 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Prazo</mat-label>
-      <input matInput type="date" [ngModel]="prazo()" (ngModelChange)="prazo.set($event)" />
+      <input matInput [matDatepicker]="dpPrazo" [ngModel]="isoParaData(prazo())" (ngModelChange)="prazo.set(dataParaIso($event))" />
+      <mat-datepicker-toggle matIconSuffix [for]="dpPrazo"></mat-datepicker-toggle>
+      <mat-datepicker #dpPrazo></mat-datepicker>
     </mat-form-field>
 
     <mat-form-field appearance="outline">

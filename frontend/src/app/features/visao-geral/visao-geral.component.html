@@ -1,8 +1,7 @@
+<app-ciclo-readonly-banner />
+
 <div class="topo">
   <h1>Visão geral</h1>
-  @if (resumoRes.value(); as r) {
-    <span class="ciclo">{{ r.cicloNome || 'Nenhum ciclo em foco' }}</span>
-  }
 </div>
 
 @if (resumoRes.isLoading()) {
@@ -17,7 +16,6 @@
     </mat-card>
   } @else {
     <section class="grade">
-      <!-- Anel de progresso (atividades concluídas) -->
       <a class="cartao anel-cartao" routerLink="/incubadora/planejamento">
         <svg class="anel" viewBox="0 0 120 120" aria-hidden="true">
           <circle class="trilho" cx="60" cy="60" r="52" />
@@ -37,14 +35,12 @@
         </div>
       </a>
 
-      <!-- Empreendimentos ativos -->
       <a class="cartao kpi" routerLink="/incubadora/minha-incubadora">
         <mat-icon class="kpi-icone">apartment</mat-icon>
         <span class="kpi-valor">{{ r.empreendimentosAtivos }}</span>
         <span class="kpi-rotulo">Empreendimentos ativos</span>
       </a>
 
-      <!-- Evidências -->
       <a class="cartao kpi" routerLink="/incubadora/evidencias">
         <mat-icon class="kpi-icone">fact_check</mat-icon>
         <span class="kpi-valor">
@@ -53,7 +49,6 @@
         <span class="kpi-rotulo">Evidências validadas / registradas</span>
       </a>
 
-      <!-- Indicadores com meta atingida -->
       <a class="cartao kpi" routerLink="/incubadora/apuracao">
         <mat-icon class="kpi-icone">insights</mat-icon>
         <span class="kpi-valor">
@@ -63,7 +58,6 @@
       </a>
     </section>
 
-    <!-- Fluxo de processos -->
     <mat-card class="fluxo-cartao">
       <h2>Fluxo de processos</h2>
       @if (r.fluxo.length === 0) {

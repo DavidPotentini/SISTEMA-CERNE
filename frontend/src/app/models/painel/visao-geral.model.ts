@@ -1,6 +1,5 @@
 export type EEstadoProcesso = 'CONCLUIDO' | 'EM_ANDAMENTO' | 'NAO_INICIADO';
 
-/** Um nó do fluxo de processos: estado derivado das atividades e a contagem x/y. */
 export interface ProcessoFluxo {
   prccCod: number;
   nome: string;
@@ -10,7 +9,6 @@ export interface ProcessoFluxo {
   atividadesTotal: number;
 }
 
-/** Resumo de andamento do ciclo em foco (um endpoint, um DTO agregador). */
 export interface ResumoCiclo {
   cicloNome: string | null;
   atividadesConcluidas: number;

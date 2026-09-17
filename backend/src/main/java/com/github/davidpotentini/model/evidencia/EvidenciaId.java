@@ -8,10 +8,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
-/**
- * Chave composta de {@link EvidenciaModel}: {@code EVD_COD} (id lógico da evidência, repetido entre
- * versões) + {@code EVD_COD_SEQ} (número da versão). Juntos identificam uma versão específica.
- */
+/** {@code EVD_COD} = id lógico da evidência (repetido entre versões); {@code EVD_COD_SEQ} = número da versão. */
 @Getter
 @Setter
 @NoArgsConstructor

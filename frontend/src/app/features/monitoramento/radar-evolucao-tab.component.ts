@@ -20,7 +20,6 @@ import {
 } from '../../models/monitoramento/monitoramento.model';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/** Cores por série (rodada), em ordem; ciclam se houver mais rodadas que cores. */
 const CORES = [
   '#1565c0',
   '#2e7d32',
@@ -30,11 +29,6 @@ const CORES = [
   '#00838f',
 ] as const;
 
-/**
- * Aba "Radar de evolução": escolhido um empreendimento, mostra um gráfico de radar com os 5 eixos
- * CERNE e uma série (polígono) por rodada avaliada, de modo a ler a evolução do empreendimento em
- * cada eixo ao longo das rodadas. A lista do filtro traz todos os empreendimentos da incubadora.
- */
 @Component({
   selector: 'app-radar-evolucao-tab',
   imports: [
@@ -51,7 +45,6 @@ export class RadarEvolucaoTabComponent {
   private readonly empreendimentoService = inject(EmpreendimentoService);
   private readonly service = inject(MonitoramentoService);
 
-  /** Empreendimento selecionado no filtro. */
   readonly empCod = signal<number | null>(null);
 
   readonly empreendimentosRes = reterRecurso(rxResource({
@@ -66,10 +59,8 @@ export class RadarEvolucaoTabComponent {
     stream: ({ params }) => this.service.evolucao(params.emp),
   }));
 
-  /** Rótulos dos eixos (ordem canônica CERNE). */
   private readonly rotulosEixos = EIXOS.map(e => EIXO_LABEL[e]);
 
-  /** Dados do radar: labels = eixos; um dataset por rodada. */
   readonly chartData = computed<ChartData<'radar', (number | null)[], string>>(() => {
     const serie = this.evolucaoRes.value() ?? [];
     return {
@@ -105,7 +96,6 @@ export class RadarEvolucaoTabComponent {
     },
   };
 
-  /** true quando há empreendimento escolhido mas nenhuma rodada avaliada. */
   readonly semDados = computed(
     () => this.empCod() != null && !this.evolucaoRes.isLoading() && (this.evolucaoRes.value() ?? []).length === 0,
   );

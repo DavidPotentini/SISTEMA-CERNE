@@ -6,11 +6,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Mapper;
 
-/**
- * Aplica os campos editáveis do DTO sobre a incubadora existente (@MappingTarget) — assim
- * {@code nomeSchema}, {@code status}, {@code criadaEm}/{@code ativadaEm} e {@code incCod} são
- * preservados (não vêm do formulário). Níveis e nome do responsável ficam no service.
- */
 @Mapper(componentModel = "spring")
 public interface IncubadoraMapper {
 

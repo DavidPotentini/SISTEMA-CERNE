@@ -17,12 +17,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-/**
- * Empreendimento (startup) incubado — schema do tenant. O vínculo com o ciclo é feito à parte, por
- * {@code CICLO_EMPREENDIMENTOS} (não há coluna própria aqui). O contato principal entre os membros da
- * startup é a pessoa {@code REPRESENTANTE_LEGAL} de {@code PESSOAS_EMPREENDIMENTO}; os documentos ficam
- * em {@code DOCUMENTOS_EMPREENDIMENTO}.
- */
 @Entity
 @Table(name = "EMPREENDIMENTOS")
 @Getter

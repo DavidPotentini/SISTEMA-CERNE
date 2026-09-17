@@ -59,6 +59,12 @@
   gap: 8px;
   flex-wrap: wrap;
 }
+.cab-sub {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+  max-width: 760px;
+}
 .tag {
   display: inline-block;
   padding: 1px 10px;
@@ -100,7 +106,6 @@
   font-size: 0.9rem;
 }
 
-/* Tag "Complementar" (atividade incluída fora do modelo). */
 .tag-origem {
   display: inline-block;
   margin-left: 8px;
@@ -113,7 +118,6 @@
   vertical-align: middle;
 }
 
-/* Arrastar-e-soltar (atividades e agrupamentos). */
 .arrastar {
   font-size: 20px;
   width: 20px;
@@ -125,7 +129,6 @@
 .arrastar:active {
   cursor: grabbing;
 }
-/* Com a alça na frente, a info cresce e mantém as ações à direita. */
 .atividade .atividade-info {
   flex: 1;
 }
@@ -139,12 +142,15 @@
   transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-/* Recolher subgrupo: clique no cabeçalho inteiro alterna; as atividades somem quando recolhido. */
 .grupo-titulo {
   cursor: pointer;
 }
 .grupo-titulo .recolher {
   color: rgba(0, 0, 0, 0.6);
+}
+.grupo-acoes {
+  display: inline-flex;
+  align-items: center;
 }
 .grupo.recolhido .atividades {
   display: none;

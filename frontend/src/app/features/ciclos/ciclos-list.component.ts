@@ -9,7 +9,6 @@ import { Ciclo, EStatusCiclo, STATUS_CICLO_LABEL } from '../../models/ciclo/cicl
 import { CicloFormDialog } from './ciclo-form.dialog';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/** Card "Ciclos" da incubadora: listagem (nome, período, status), adicionar e pôr em foco. */
 @Component({
   selector: 'app-ciclos-list',
   imports: [MatCardModule, MatTableModule, MatButtonModule, MatDialogModule],
@@ -22,10 +21,8 @@ export class CiclosListComponent {
 
   readonly colunas = ['nome', 'periodo', 'status', 'acoes'];
 
-  /** Mensagem da última ação de encerramento que falhou (ex.: ciclo com pendências). */
   readonly erroEncerrar = signal<string | null>(null);
 
-  /** Refaz a busca sempre que houver mutação (criar / pôr em foco). */
   readonly dados = reterRecurso(rxResource({
     params: () => ({ versao: this.service.versao() }),
     stream: () => this.service.listar(),
@@ -35,7 +32,7 @@ export class CiclosListComponent {
     return STATUS_CICLO_LABEL[s];
   }
 
-  /** Período "dd/MM/yyyy – dd/MM/yyyy" (formata sem Date para não sofrer com timezone). */
+  /** Formata sem Date para não sofrer com timezone. */
   periodo(c: Ciclo): string {
     const f = (d: string | null) => (d ? d.split('-').reverse().join('/') : null);
     const ini = f(c.inicio);
@@ -54,7 +51,6 @@ export class CiclosListComponent {
     this.service.porEmFoco(c.cicCod).subscribe(() => this.service.recarregar());
   }
 
-  /** Encerra o ciclo ativo (irreversível). O backend recusa se houver pendências em aberto. */
   encerrar(c: Ciclo): void {
     const ok = window.confirm(
       `Encerrar o ciclo "${c.nome}"? Esta ação é irreversível: o ciclo passa a somente leitura.`,

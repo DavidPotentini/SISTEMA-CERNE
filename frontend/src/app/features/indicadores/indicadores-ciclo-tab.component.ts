@@ -31,11 +31,6 @@ import {
 import { IndicadorComplementarDialog } from './indicador-complementar.dialog';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/**
- * Aba "Indicadores do ciclo": lista os indicadores do ciclo ativo (nome, origem, vínculo CERNE,
- * unidade, periodicidade, situação). Os indicadores da metodologia entram pelo "Gerar do ciclo"
- * (Metodologia); aqui só "Definir complementar" inclui um indicador manual.
- */
 @Component({
   selector: 'app-indicadores-ciclo-tab',
   imports: [
@@ -68,12 +63,10 @@ export class IndicadoresCicloTabComponent {
 
   readonly todos = computed<IndicadorCiclo[]>(() => this.indicadoresRes.value() ?? []);
 
-  /** Equipe da incubadora — candidatos a responsável pela apuração. */
   readonly responsaveisRes = reterRecurso(rxResource({
     stream: () => this.equipeService.listarResponsaveis(),
   }));
 
-  // ---- filtros padrão ----
   readonly filtros = signal<FiltrosState>({ ...FILTROS_VAZIO });
 
   readonly statusOpcoes: OpcaoStatus[] = [
@@ -99,7 +92,6 @@ export class IndicadoresCicloTabComponent {
     return [...mapa.values()];
   });
 
-  /** Listagem já com os filtros aplicados. */
   readonly indicadores = computed<IndicadorCiclo[]>(() => {
     const f = this.filtros();
     return this.todos().filter(i =>
@@ -120,7 +112,6 @@ export class IndicadoresCicloTabComponent {
     return PERIODICIDADE_LABEL[p];
   }
 
-  /** Define o responsável pela apuração (único campo editável dos indicadores da metodologia). */
   definirResponsavel(indCod: number, respPesCod: number | null): void {
     this.erroAcao.set(null);
     this.service.definirResponsavel(indCod, respPesCod).subscribe({

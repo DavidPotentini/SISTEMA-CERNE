@@ -8,7 +8,6 @@ export class UsuarioService {
   private readonly http = inject(HttpClient);
   readonly base = `${environment.apiUrl}/admin/usuarios`;
 
-  /** Incrementa a cada mutação; a lista observa para recarregar. */
   readonly versao = signal(0);
   recarregar(): void {
     this.versao.update(v => v + 1);
@@ -18,7 +17,6 @@ export class UsuarioService {
     return this.http.get<UsuarioResumo[]>(this.base);
   }
 
-  /** Papéis disponíveis para atribuição na incubadora (vazio se não provisionada). */
   listarPapeis(incCod: number) {
     const params = new HttpParams().set('incCod', incCod);
     return this.http.get<PapelResumo[]>(`${this.base}/papeis`, { params });

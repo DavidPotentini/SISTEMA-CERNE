@@ -12,11 +12,6 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-/**
- * Meta de um indicador para um período (tabela {@code INDICADOR_METAS}). Cada linha é um período com
- * sua {@code valor} (meta estipulada) e a janela de apuração ({@code dataInicioApuracao} …
- * {@code dataFimApuracao}). Schema do tenant.
- */
 @Entity
 @Table(name = "INDICADOR_METAS")
 @Getter

@@ -11,10 +11,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Nota (0–5) de um eixo CERNE numa avaliação ({@code AVALIACAO_PONTUACOES}). Chave composta por
- * {@code AVA_COD} + {@code DIMENSAO} — uma nota por eixo por avaliação.
- */
 @Entity
 @Table(name = "AVALIACAO_PONTUACOES")
 @IdClass(PontuacaoId.class)

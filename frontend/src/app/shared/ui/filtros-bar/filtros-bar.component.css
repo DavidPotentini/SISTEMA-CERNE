@@ -1,12 +1,35 @@
 .filtros {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  align-items: end;
+  gap: 10px 12px;
   margin-bottom: 12px;
 }
-.filtro {
-  width: 200px;
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.rotulo {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.campo mat-form-field {
+  width: 100%;
+}
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: end;
+}
+.pesquisar {
+  flex: none;
 }
 .limpar {
   color: rgba(0, 0, 0, 0.6);

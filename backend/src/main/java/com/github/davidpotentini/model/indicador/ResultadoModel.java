@@ -10,11 +10,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Resultado apurado de uma meta (tabela {@code INDICADOR_RESULTADOS}). É 1:1 com a meta: a chave é o
- * próprio {@code MET_COD}. Guarda o valor apurado, quem registrou ({@code REG_PES_COD}) e quando
- * ({@code DATA_REGISTRO}). Schema do tenant.
- */
+/** Resultado apurado de uma meta — 1:1 com ela: a chave é o próprio {@code MET_COD} (não gerado). */
 @Entity
 @Table(name = "INDICADOR_RESULTADOS")
 @Getter

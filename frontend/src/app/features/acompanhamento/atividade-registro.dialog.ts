@@ -25,7 +25,6 @@ interface AtividadeRegistroData {
   atividade: AtividadePlanejada;
 }
 
-/** Ícone por status da atividade, para o chip de estado atual. */
 const STATUS_ICONE: Record<EStatusAtividade, string> = {
   PLANEJADA: 'schedule',
   EM_ANDAMENTO: 'autorenew',
@@ -33,12 +32,6 @@ const STATUS_ICONE: Record<EStatusAtividade, string> = {
   ATRASADA: 'error',
 };
 
-/**
- * Modal "Registrar" do acompanhamento: mostra a atividade em só leitura. O status intermediário
- * (planejada/em andamento) é derivado das evidências — aqui só há a ação de concluir (habilitada com
- * ≥1 evidência e todas validadas; o backend valida) ou reabrir. Lista as evidências para validar ou
- * solicitar correção (com motivo) em cada uma — só enquanto PENDENTE_VALIDACAO.
- */
 @Component({
   selector: 'app-atividade-registro',
   imports: [
@@ -67,18 +60,15 @@ export class AtividadeRegistroDialog {
 
   readonly concluida = computed(() => this.atividade().status === 'CONCLUIDA');
 
-  // status da atividade
   readonly salvandoStatus = signal(false);
   readonly erroStatus = signal<string | null>(null);
   readonly statusSalvo = signal(false);
 
-  // evidências da atividade
   readonly carregando = signal(true);
   readonly lista = signal<Evidencia[]>([]);
   readonly erro = signal<string | null>(null);
   readonly abrindoArquivo = signal(false);
   readonly avaliandoCod = signal<number | null>(null);
-  /** Motivo de correção digitado por evidência (evdCod → texto), exigido ao solicitar correção. */
   readonly motivos = signal<Record<number, string>>({});
 
   readonly todasValidadas = computed(() => {

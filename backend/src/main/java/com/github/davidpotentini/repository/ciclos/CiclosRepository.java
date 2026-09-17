@@ -9,7 +9,6 @@ import java.util.Optional;
 
 public interface CiclosRepository extends JpaRepository<CiclosModel, Long> {
 
-    /** Mais recentes primeiro. */
     List<CiclosModel> findAllByOrderByCicCodDesc();
 
     List<CiclosModel> findByStatus(EStatusCiclo status);

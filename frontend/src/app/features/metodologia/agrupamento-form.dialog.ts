@@ -10,11 +10,9 @@ import { Agrupamento } from '../../models/metodologia/metodologia.model';
 interface AgrupamentoFormData {
   prtCod: number;
   pratica: string;
-  /** Presente no modo edição. */
   agrupamento?: Agrupamento;
 }
 
-/** Modal de agrupamento (sub-plano): adiciona ou edita nome/descrição, na prática de onde foi aberto. */
 @Component({
   selector: 'app-agrupamento-form',
   imports: [FormsModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],

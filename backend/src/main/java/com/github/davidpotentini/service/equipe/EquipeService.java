@@ -15,12 +15,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Equipe vinculada da incubadora do usuário logado. Roda no schema do próprio tenant
- * (o JWT já deixou o {@code TenantContext} ativo), então {@code PESSOAS}/{@code PAPEIS}
- * são lidos direto — sem {@code callWithin}. Nome/e-mail/situação vêm de {@code public.CONTAS}
- * pelo fallback do {@code search_path}.
- */
 @Service
 public class EquipeService {
 
@@ -54,8 +48,7 @@ public class EquipeService {
         return equipe;
     }
 
-    /** Candidatos a responsável: a equipe (pessoas com conta), só {@code PES_COD} + nome. Usado por
-     * atividades, indicadores e rodadas para escolher o responsável. */
+    /** Candidatos a responsável ({@code PES_COD} + nome) para atividades, indicadores e rodadas. */
     @Transactional(readOnly = true)
     public List<ResponsavelDTO> listarResponsaveis() {
         List<ResponsavelDTO> lista = new ArrayList<>();
@@ -69,7 +62,6 @@ public class EquipeService {
         return lista;
     }
 
-    /** Nome do papel local; {@code null} se a pessoa não tem papel ou ele não existe mais. */
     private String nomePapel(Long papCod) {
         if (papCod == null) {
             return null;

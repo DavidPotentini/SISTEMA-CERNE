@@ -12,7 +12,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Papel local da incubadora (schema do tenant). Só o nome é necessário no login. */
 @Entity
 @Table(name = "PAPEIS")
 @Getter
@@ -27,7 +26,6 @@ public class PapeisModel {
     @Column(name = "NOME", nullable = false)
     private String nome;
 
-    /** Situação do papel (ATIVO/INATIVO). Papéis inativos não são ofertados na atribuição. */
     @Enumerated(EnumType.STRING)
     @Column(name = "SITUACAO", nullable = false)
     private EAtivoInativo situacao = EAtivoInativo.ATIVO;

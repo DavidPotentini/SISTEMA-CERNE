@@ -10,7 +10,6 @@ import {
   STATUS_LABEL,
 } from '../../models/incubadora/incubadora.model';
 
-/** Modal "Consultar": exibe todas as informações da incubadora (somente leitura). */
 @Component({
   selector: 'app-incubadora-consultar',
   imports: [MatDialogModule, MatButtonModule],

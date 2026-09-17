@@ -1,65 +1,143 @@
 <div class="filtros">
-  <mat-form-field appearance="outline" class="filtro" subscriptSizing="dynamic">
-    <mat-label>Processo</mat-label>
-    <mat-select
-      [ngModel]="filtros().processo"
-      (ngModelChange)="mudarProcesso($event)"
-    >
-      <mat-option [value]="null">Todos</mat-option>
-      @for (p of processos(); track p.nome) {
-        <mat-option [value]="p.nome">{{ p.nome }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+  @if (comProcessoPratica()) {
+    <div class="campo">
+      <span class="rotulo">Processo</span>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-select
+          [ngModel]="rascunho().processo"
+          (ngModelChange)="mudarProcesso($event)"
+        >
+          @for (p of processos(); track p.nome) {
+            <mat-option [value]="p.nome">{{ p.nome }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
 
-  <mat-form-field appearance="outline" class="filtro" subscriptSizing="dynamic">
-    <mat-label>Prática</mat-label>
-    <mat-select
-      [ngModel]="filtros().pratica"
-      (ngModelChange)="mudarPratica($event)"
-      [disabled]="filtros().processo == null"
-    >
-      <mat-option [value]="null">Todas</mat-option>
-      @for (p of praticasDoProcesso(); track p.nome) {
-        <mat-option [value]="p.nome">{{ p.nome }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+    <div class="campo">
+      <span class="rotulo">Prática</span>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-select
+          [ngModel]="rascunho().pratica"
+          (ngModelChange)="mudarPratica($event)"
+          [disabled]="rascunho().processo == null"
+        >
+          @for (p of praticasDoProcesso(); track p.nome) {
+            <mat-option [value]="p.nome">{{ p.nome }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  }
+
+  @if (comAgrupamento()) {
+    <div class="campo">
+      <span class="rotulo">Agrupamento</span>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <input
+          matInput
+          [ngModel]="rascunho().agrupamento"
+          (ngModelChange)="mudarAgrupamento($event)"
+          (keyup.enter)="pesquisar()"
+          placeholder="Buscar por nome"
+        />
+      </mat-form-field>
+    </div>
+  }
+
+  @if (comAtividade()) {
+    <div class="campo">
+      <span class="rotulo">Atividade</span>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <input
+          matInput
+          [ngModel]="rascunho().atividade"
+          (ngModelChange)="mudarAtividade($event)"
+          (keyup.enter)="pesquisar()"
+          placeholder="Buscar por nome"
+        />
+      </mat-form-field>
+    </div>
+  }
+
+  @if (comEmpreendimento()) {
+    <div class="campo">
+      <span class="rotulo">Empreendimento</span>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-select
+          [ngModel]="rascunho().empCod"
+          (ngModelChange)="mudarEmpreendimento($event)"
+        >
+          @if (comEmpreendimentoInstitucional()) {
+            <mat-option [value]="EMP_INSTITUCIONAL">Institucional</mat-option>
+          }
+          @for (e of empreendimentos(); track e.empCod) {
+            <mat-option [value]="e.empCod">{{ e.nome }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  }
 
   @if (comResponsavel()) {
-    <mat-form-field appearance="outline" class="filtro" subscriptSizing="dynamic">
-      <mat-label>Responsável</mat-label>
-      <mat-select
-        [ngModel]="filtros().respPesCod"
-        (ngModelChange)="mudarResponsavel($event)"
-      >
-        <mat-option [value]="null">Todos</mat-option>
-        @for (r of responsaveisRes.value() ?? []; track r.pesCod) {
-          <mat-option [value]="r.pesCod">{{ r.nome }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+    <div class="campo">
+      <span class="rotulo">Responsável</span>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-select
+          [ngModel]="rascunho().respPesCod"
+          (ngModelChange)="mudarResponsavel($event)"
+        >
+          @for (r of responsaveisRes.value() ?? []; track r.pesCod) {
+            <mat-option [value]="r.pesCod">{{ r.nome }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
   }
 
   @if (comStatus()) {
-    <mat-form-field appearance="outline" class="filtro" subscriptSizing="dynamic">
-      <mat-label>{{ statusLabel() }}</mat-label>
-      <mat-select
-        [ngModel]="filtros().status"
-        (ngModelChange)="mudarStatus($event)"
-      >
-        <mat-option [value]="null">Todos</mat-option>
-        @for (s of statusOpcoes(); track s.value) {
-          <mat-option [value]="s.value">{{ s.label }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+    <div class="campo">
+      <span class="rotulo">{{ statusLabel() }}</span>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-select
+          [ngModel]="rascunho().status"
+          (ngModelChange)="mudarStatus($event)"
+        >
+          @for (s of statusOpcoes(); track s.value) {
+            <mat-option [value]="s.value">{{ s.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
   }
 
-  @if (algumAtivo()) {
-    <button mat-button class="limpar" (click)="limpar()">
-      <mat-icon>close</mat-icon>
-      Limpar
-    </button>
+  @if (comEvidencia()) {
+    <div class="campo">
+      <span class="rotulo">{{ evidenciaLabel() }}</span>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-select
+          [ngModel]="rascunho().evidencia"
+          (ngModelChange)="mudarEvidencia($event)"
+        >
+          @for (e of evidenciaOpcoes(); track e.value) {
+            <mat-option [value]="e.value">{{ e.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
   }
+
+  <div class="acoes">
+    <button mat-flat-button color="primary" class="pesquisar" (click)="pesquisar()">
+      <mat-icon>search</mat-icon>
+      Pesquisar
+    </button>
+
+    @if (algumAtivo()) {
+      <button mat-button class="limpar" (click)="limpar()">
+        <mat-icon>close</mat-icon>
+        Limpar
+      </button>
+    }
+  </div>
 </div>

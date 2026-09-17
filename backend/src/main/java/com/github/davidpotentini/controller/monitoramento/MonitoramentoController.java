@@ -19,10 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Monitoramento das incubadas da própria incubadora (usuário logado). O tenant vem do JWT. Aba
- * "Rodadas" (planejar/listar rodadas) e aba "Aplicações e pontuação" (cards por rodada e revisão).
- */
 @RestController
 @EscopoCiclo
 @RequestMapping("/incubadora/monitoramento")

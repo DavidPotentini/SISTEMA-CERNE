@@ -9,7 +9,6 @@ import { UsuarioFormDialog } from './usuario-form.dialog';
 import { NgClass } from '@angular/common';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/** Tela "Usuários da plataforma" do administrador: listagem, convidar e suspender/reativar. */
 @Component({
   selector: 'app-usuarios-list',
   imports: [MatTableModule, MatButtonModule, MatDialogModule, NgClass],
@@ -22,7 +21,6 @@ export class UsuariosListComponent {
 
   readonly colunas = ['nome', 'email', 'incubadora', 'papel', 'status', 'acoes'];
 
-  /** Refaz a busca sempre que houver mutação (convidar / suspender / reativar). */
   readonly dados = reterRecurso(rxResource({
     params: () => ({ versao: this.service.versao() }),
     stream: () => this.service.listar(),

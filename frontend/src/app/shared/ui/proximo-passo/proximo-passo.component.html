@@ -1,0 +1,8 @@
+<mat-card class="proximo-passo">
+  <mat-icon class="icone">{{ icone() }}</mat-icon>
+  <div class="msg"><ng-content /></div>
+  <a mat-flat-button color="primary" [routerLink]="rota()">
+    <mat-icon>arrow_forward</mat-icon>
+    {{ rotulo() }}
+  </a>
+</mat-card>

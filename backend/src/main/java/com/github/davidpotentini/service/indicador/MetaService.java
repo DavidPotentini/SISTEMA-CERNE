@@ -13,10 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Metas (períodos) de um indicador do ciclo. Cada período tem a meta estipulada e a janela de
- * apuração; o cadastro é manual (não derivado da periodicidade). Schema do tenant vem do JWT.
- */
 @Service
 public class MetaService {
 
@@ -30,7 +26,6 @@ public class MetaService {
         this.mapper = mapper;
     }
 
-    /** Períodos do indicador, em ordem do início de apuração. */
     @Transactional(readOnly = true)
     public List<MetaDTO> listar(Long indCod) {
         exigirIndicador(indCod);
@@ -41,7 +36,6 @@ public class MetaService {
         return lista;
     }
 
-    /** Cadastra um período (meta) do indicador. */
     @Transactional(rollbackFor = Exception.class)
     public MetaDTO criar(Long indCod, MetaDTO dto) {
         exigirIndicador(indCod);
@@ -52,7 +46,6 @@ public class MetaService {
         return mapper.toDTO(meta);
     }
 
-    /** Edita um período do indicador. */
     @Transactional(rollbackFor = Exception.class)
     public MetaDTO editar(Long indCod, Long metCod, MetaDTO dto) {
         validarJanela(dto);
@@ -62,14 +55,12 @@ public class MetaService {
         return mapper.toDTO(meta);
     }
 
-    /** Remove um período do indicador. */
     @Transactional(rollbackFor = Exception.class)
     public void remover(Long indCod, Long metCod) {
         MetaModel meta = buscarDoIndicador(indCod, metCod);
         metas.delete(meta);
     }
 
-    // ---- apoio ----
 
     private void validarJanela(MetaDTO dto) {
         if (dto.dataFimApuracao().isBefore(dto.dataInicioApuracao())) {

@@ -21,10 +21,6 @@ export const STATUS_ATIVIDADE_LABEL: Record<EStatusAtividade, string> = {
   ATRASADA: 'Atrasada',
 };
 
-/**
- * Planejamento institucional do ciclo ativo. Gerado da metodologia vigente; `inicio`/`fim` vêm do
- * ciclo. `totalAtividades`/`concluidas`/`progresso` (%) alimentam o "Consultar publicação".
- */
 export interface Planejamento {
   plnCod: number;
   nome: string;
@@ -40,7 +36,6 @@ export interface Planejamento {
   progresso: number;
 }
 
-/** Situação do ciclo ativo: se há ciclo e o planejamento vigente (ou `null` se ainda não gerado). */
 export interface PlanejamentoAtual {
   cicloAtivo: boolean;
   cicCod: number | null;
@@ -48,7 +43,6 @@ export interface PlanejamentoAtual {
   planejamento: Planejamento | null;
 }
 
-/** Atividade planejada de uma prática (ajustável; complementares podem ser incluídas/removidas). */
 export interface AtividadePlanejada {
   atpCod: number;
   plnCod: number;
@@ -61,13 +55,10 @@ export interface AtividadePlanejada {
   prazo: string | null;
   status: EStatusAtividade;
   empCod: number | null;
+  empreendimentoNome: string | null;
   responsavelNome: string | null;
 }
 
-/**
- * Agrupamento (sub-plano) dentro da estrutura do planejamento — nível entre prática e atividades.
- * `agrcCod` é `null` no grupo sintético "Sem agrupamento" (atividades sem grupo, inclui complementares).
- */
 export interface PlanGrupo {
   agrcCod: number | null;
   nome: string;
@@ -77,7 +68,6 @@ export interface PlanGrupo {
   atividades: AtividadePlanejada[];
 }
 
-/** Prática dentro da estrutura do planejamento — só leitura (da metodologia) + grupos de atividades. */
 export interface PlanPratica {
   prtcCod: number;
   nome: string;
@@ -85,14 +75,12 @@ export interface PlanPratica {
   grupos: PlanGrupo[];
 }
 
-/** Nível CERNE do processo do ciclo. Por ora o sistema trata só o Nível I. */
 export type ENivelCerne = 'CERNE_1';
 
 export const NIVEL_CERNE_LABEL: Record<ENivelCerne, string> = {
   CERNE_1: 'CERNE 1',
 };
 
-/** Processo dentro da estrutura do planejamento — só leitura, ordenado por `ordem`. */
 export interface PlanProcesso {
   prccCod: number;
   nivel: ENivelCerne;

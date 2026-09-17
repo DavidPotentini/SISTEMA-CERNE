@@ -7,11 +7,6 @@ import {
   Rodada,
 } from '../../../models/monitoramento/monitoramento.model';
 
-/**
- * Monitoramento das incubadas (tenant vem do JWT). Rodadas (planejar/listar/concluir) e aplicações
- * por rodada (cards + revisão). O `versao` é o gatilho: um `recarregar()` após qualquer mutação
- * refaz a listagem de rodadas e as aplicações abertas que observem o mesmo sinal.
- */
 @Injectable({ providedIn: 'root' })
 export class MonitoramentoService {
   private readonly http = inject(HttpClient);
@@ -45,7 +40,6 @@ export class MonitoramentoService {
     );
   }
 
-  /** Série do radar de evolução: rodadas avaliadas do empreendimento, com notas por eixo. */
   evolucao(empCod: number) {
     return this.http.get<EvolucaoRodada[]>(`${this.base}/empreendimentos/${empCod}/evolucao`);
   }

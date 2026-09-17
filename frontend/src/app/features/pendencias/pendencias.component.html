@@ -13,7 +13,6 @@
 } @else if (pendenciasRes.error()) {
   <p class="estado erro">Não foi possível carregar as pendências.</p>
 } @else {
-  <!-- Cards-resumo -->
   <div class="cards">
     @for (c of resumo(); track c.tipo) {
       <div class="card" [class.tipo-atrasada]="c.tipo === 'ATIVIDADE_ATRASADA'"
@@ -44,7 +43,6 @@
     @if (secoes().length === 0) {
       <p class="estado">Nenhuma pendência com esses filtros.</p>
     } @else {
-    <!-- Seções por tipo -->
     <div class="acordeao-acoes">
       <button mat-stroked-button (click)="alternarTudo()">
         <mat-icon>{{ tudoExpandido() ? 'unfold_less' : 'unfold_more' }}</mat-icon>

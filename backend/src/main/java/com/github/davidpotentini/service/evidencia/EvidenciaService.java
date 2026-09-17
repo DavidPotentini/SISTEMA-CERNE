@@ -36,14 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Registros de evidência (schema do tenant vem do JWT). Cada evidência é versionada por linha em
- * {@code EVIDENCIAS} — o par ({@code evdCod}, {@code evdCodSeq}) identifica a versão; a "atual" é a de
- * maior SEQ. Registrar cria a versão 1 (id lógico novo, via sequence); corrigir (só quando a atual
- * está em {@code CORRECAO_SOLICITADA}) cria a próxima versão reusando o mesmo id lógico. A evidência
- * referencia sempre uma atividade planejada ({@code ATP_COD}); no cadastro, a UI filtra a atividade
- * por processo → prática.
- */
 @Service
 public class EvidenciaService {
 
@@ -75,7 +67,6 @@ public class EvidenciaService {
         this.mapper = mapper;
     }
 
-    /** Listagem: a versão corrente (maior SEQ) de cada evidência. */
     @Transactional(readOnly = true)
     public List<EvidenciaDTO> listar() {
         List<EvidenciaDTO> lista = new ArrayList<>();
@@ -85,7 +76,6 @@ public class EvidenciaService {
         return lista;
     }
 
-    /** Histórico (ABRIR): todas as versões em ordem; cada uma carrega seu próprio motivo de correção. */
     @Transactional(readOnly = true)
     public List<EvidenciaDTO> historico(Long evdCod) {
         List<EvidenciaModel> versoes = evidencias.historico(evdCod);
@@ -99,7 +89,6 @@ public class EvidenciaService {
         return historico;
     }
 
-    /** Registra uma nova evidência (versão 1); autor = usuário logado. */
     @Transactional(rollbackFor = Exception.class)
     public EvidenciaDTO registrar(EvidenciaDTO dto) {
         exigirAtividade(dto.atpCod());
@@ -114,11 +103,6 @@ public class EvidenciaService {
         return toDTO(evidencia);
     }
 
-    /**
-     * Corrige a evidência gerando a próxima versão (mesmo id lógico), que nasce {@code PENDENTE_VALIDACAO}
-     * sem motivo. Só é permitido quando a versão corrente está em {@code CORRECAO_SOLICITADA} — a
-     * própria nova versão (arquivo/título) é a correção.
-     */
     @Transactional(rollbackFor = Exception.class)
     public EvidenciaDTO corrigir(Long evdCod, EvidenciaDTO dto) {
         EvidenciaModel corrente = evidencias.versaoCorrente(evdCod)
@@ -139,11 +123,6 @@ public class EvidenciaService {
         return toDTO(nova);
     }
 
-    /**
-     * Avalia a versão corrente (acompanhamento de execução) — decisão única: só quem está
-     * {@code PENDENTE_VALIDACAO} pode ser avaliado. Validar é final; solicitar correção exige um
-     * {@code motivo}, que fica gravado na própria versão para orientar a correção.
-     */
     @Transactional(rollbackFor = Exception.class)
     public EvidenciaDTO avaliar(Long evdCod, EStatusEvidencia status, String motivo) {
         if (status != EStatusEvidencia.VALIDADA && status != EStatusEvidencia.CORRECAO_SOLICITADA) {
@@ -164,11 +143,6 @@ public class EvidenciaService {
         return toDTO(corrente);
     }
 
-    /**
-     * Atividades disponíveis para vincular uma evidência: as atividades planejadas do plano vigente do
-     * ciclo ativo, cada uma já com sua prática e processo (lista plana). A UI agrupa para os dropdowns
-     * em cascata (processo → prática → atividade). Sem plano vigente, devolve vazio.
-     */
     @Transactional(readOnly = true)
     public List<AtividadeOpcaoDTO> atividadesDisponiveis() {
         PlanejamentoModel plano = vigenteDoCicloEmFoco();
@@ -196,9 +170,7 @@ public class EvidenciaService {
         return opcoes;
     }
 
-    // ---- apoio ----
 
-    /** Planejamento vigente ({@code PUBLICADO}) do ciclo em foco (fallback ATIVO), ou {@code null}. */
     private PlanejamentoModel vigenteDoCicloEmFoco() {
         CiclosModel ciclo = cicloContexto.emFoco();
         if (ciclo == null) {
@@ -215,10 +187,7 @@ public class EvidenciaService {
         }
     }
 
-    /**
-     * Ao registrar uma evidência (que nasce pendente), a atividade volta a EM_ANDAMENTO se estava
-     * PLANEJADA (1ª evidência) ou CONCLUIDA (nova evidência reabre a execução). Intermediário derivado.
-     */
+    /** Registrar uma evidência reabre a atividade: PLANEJADA ou CONCLUIDA → EM_ANDAMENTO. */
     private void marcarEmAndamentoPorEvidencia(Long atpCod) {
         AtividadePlanejadaModel atv = atividades.findById(atpCod).orElse(null);
         if (atv == null) {
@@ -231,7 +200,6 @@ public class EvidenciaService {
         }
     }
 
-    /** Rótulos da evidência, incluindo a cadeia atividade → prática → processo. */
     private EvidenciaDTO toDTO(EvidenciaModel e) {
         String atividadeNome = null;
         String praticaNome = null;
@@ -259,7 +227,6 @@ public class EvidenciaService {
                 : arquivos.findById(arqCod).map(ArquivoModel::getNomeOriginal).orElse(null);
     }
 
-    /** Pessoa ({@code PES_COD}) do usuário logado neste tenant, ou {@code null} se não resolvível. */
     private Long pessoaAtual() {
         Long ctaCod = SessaoContext.contaAtual();
         if (ctaCod == null) {
@@ -268,7 +235,6 @@ public class EvidenciaService {
         return pessoas.findByCtaCod(ctaCod).map(PessoasModel::getPesCod).orElse(null);
     }
 
-    /** Nome do responsável (PESSOAS → public.CONTAS); {@code null} se não definido ou não resolvível. */
     private String rotuloResponsavel(Long pesCod) {
         if (pesCod == null) {
             return null;

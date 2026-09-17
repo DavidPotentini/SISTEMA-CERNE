@@ -10,8 +10,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
 import { PlanejamentoService } from '../../core/services/planejamento/planejamento.service';
+import { EmpreendimentoService } from '../../core/services/empreendimento/empreendimento.service';
 import { EvidenciaService } from '../../core/services/evidencia/evidencia.service';
 import { CicloReadonlyBannerComponent } from '../ciclos/ciclo-readonly-banner.component';
+import { ProximoPassoComponent } from '../../shared/ui/proximo-passo/proximo-passo.component';
 import {
   AtividadePlanejada,
   EStatusAtividade,
@@ -22,6 +24,7 @@ import {
   STATUS_PLANEJAMENTO_LABEL,
 } from '../../models/planejamento/planejamento.model';
 import {
+  EMP_INSTITUCIONAL,
   FILTROS_VAZIO,
   FiltrosState,
   FiltrosBarComponent,
@@ -32,10 +35,8 @@ import {
 import { AtividadeRegistroDialog } from './atividade-registro.dialog';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/** Estados que podem ser filtrados (ATRASADA é derivado do prazo). */
 const STATUS_FILTRAVEIS: EStatusAtividade[] = ['PLANEJADA', 'EM_ANDAMENTO', 'CONCLUIDA', 'ATRASADA'];
 
-/** Contagem de evidências de uma atividade por status (derivada no front). */
 interface ContagemEvid {
   validadas: number;
   pendentes: number;
@@ -44,7 +45,6 @@ interface ContagemEvid {
 }
 const CONTAGEM_VAZIA: ContagemEvid = { validadas: 0, pendentes: 0, correcao: 0, total: 0 };
 
-/** Ícone por status da atividade, para o chip. */
 const STATUS_ICONE: Record<EStatusAtividade, string> = {
   PLANEJADA: 'schedule',
   EM_ANDAMENTO: 'autorenew',
@@ -52,13 +52,6 @@ const STATUS_ICONE: Record<EStatusAtividade, string> = {
   ATRASADA: 'error',
 };
 
-/**
- * Tela "Acompanhamento de execução": mesma estrutura do planejamento (cabeçalho + accordion de
- * processos/práticas/atividades), porém só leitura da estrutura. Cada processo mostra o total de
- * atividades e quantas estão concluídas; a barra de filtros padrão (Processo/Prática/Responsável/
- * Status) recorta a árvore exibida; o botão "Registrar" de cada atividade abre o modal para mudar o
- * status e avaliar as evidências.
- */
 @Component({
   selector: 'app-acompanhamento',
   imports: [
@@ -71,19 +64,20 @@ const STATUS_ICONE: Record<EStatusAtividade, string> = {
     MatDialogModule,
     FiltrosBarComponent,
     CicloReadonlyBannerComponent,
+    ProximoPassoComponent,
   ],
   templateUrl: './acompanhamento.component.html',
   styleUrls: ['./acompanhamento.component.css', '../shared/arvore-processos.css'],
 })
 export class AcompanhamentoComponent {
   private readonly service = inject(PlanejamentoService);
+  private readonly empreendimentoService = inject(EmpreendimentoService);
   private readonly evidenciaService = inject(EvidenciaService);
   private readonly dialog = inject(MatDialog);
 
   readonly statusIcone = STATUS_ICONE;
   private readonly route = inject(ActivatedRoute);
 
-  /** Deep-link de Pendências já tratado? (evita reabrir quando a estrutura recarrega). */
   private registroAberto = false;
 
   readonly statusPlanoLabel = STATUS_PLANEJAMENTO_LABEL;
@@ -100,13 +94,17 @@ export class AcompanhamentoComponent {
 
   readonly plano = computed(() => this.atualRes.value()?.planejamento ?? null);
 
-  /** Evidências (versão corrente) do ciclo; recarrega quando o plano ou uma avaliação muda. */
+  readonly empreendimentosRes = rxResource({
+    params: () => ({ v: this.empreendimentoService.versao() }),
+    stream: () => this.empreendimentoService.listarDoCiclo(),
+  });
+  readonly empreendimentos = computed(() => this.empreendimentosRes.value() ?? []);
+
   readonly evidenciasRes = reterRecurso(rxResource({
     params: () => ({ p: this.service.versao(), e: this.evidenciaService.versao() }),
     stream: () => this.evidenciaService.listar(),
   }));
 
-  /** Contagem de evidências por atividade (atpCod → validadas/pendentes/correção). */
   readonly contagensPorAtp = computed<Map<number, ContagemEvid>>(() => {
     const mapa = new Map<number, ContagemEvid>();
     for (const ev of this.evidenciasRes.value() ?? []) {
@@ -124,14 +122,12 @@ export class AcompanhamentoComponent {
     return this.contagensPorAtp().get(atpCod) ?? CONTAGEM_VAZIA;
   }
 
-  /** Painéis abertos por padrão; o botão recolhe/expande a árvore toda de uma vez. */
   readonly tudoExpandido = signal(true);
 
   alternarTudo(): void {
     this.tudoExpandido.update(v => !v);
   }
 
-  /** Subgrupos recolhidos (esconde as atividades); chave = `prtcCod:agrcCod` (ou `:sem` no sintético). */
   private readonly gruposRecolhidos = signal<Set<string>>(new Set());
 
   private chaveGrupo(prtcCod: number, g: PlanGrupo): string {
@@ -139,7 +135,10 @@ export class AcompanhamentoComponent {
   }
 
   grupoRecolhido(prtcCod: number, g: PlanGrupo): boolean {
-    return this.gruposRecolhidos().has(this.chaveGrupo(prtcCod, g));
+    if (this.filtroAtivoExpandeGp()) {
+      return false;
+    }
+    return !this.gruposRecolhidos().has(this.chaveGrupo(prtcCod, g));
   }
 
   alternarRecolherGrupo(prtcCod: number, g: PlanGrupo): void {
@@ -153,13 +152,30 @@ export class AcompanhamentoComponent {
     this.gruposRecolhidos.set(set);
   }
 
-  // ---- filtros padrão ----
   readonly filtros = signal<FiltrosState>({ ...FILTROS_VAZIO });
 
   readonly statusOpcoes: OpcaoStatus[] = STATUS_FILTRAVEIS.map(s => ({
     value: s,
     label: STATUS_ATIVIDADE_LABEL[s],
   }));
+
+  readonly evidenciaOpcoes: OpcaoStatus[] = [
+    { value: 'VALIDADA', label: 'Com evidência validada' },
+    { value: 'PENDENTE', label: 'Com evidência pendente' },
+    { value: 'CORRECAO', label: 'Com evidência em correção' },
+    { value: 'SEM', label: 'Sem evidências' },
+  ];
+
+  private casaEvidencia(atpCod: number, filtro: string | null): boolean {
+    if (filtro == null) {
+      return true;
+    }
+    const c = this.contagemEvid(atpCod);
+    if (filtro === 'VALIDADA') return c.validadas > 0;
+    if (filtro === 'PENDENTE') return c.pendentes > 0;
+    if (filtro === 'CORRECAO') return c.correcao > 0;
+    return c.total === 0;
+  }
 
   readonly processoOpcoes = computed<OpcaoProcesso[]>(() =>
     (this.estruturaRes.value() ?? []).map(p => ({ nome: p.nome })),
@@ -175,15 +191,43 @@ export class AcompanhamentoComponent {
     return out;
   });
 
-  /** Árvore com os filtros aplicados; sem filtro, devolve a estrutura original (mantém práticas vazias). */
+  readonly algumFiltroAtivo = computed<boolean>(() => {
+    const f = this.filtros();
+    return (
+      f.processo != null ||
+      f.pratica != null ||
+      f.respPesCod != null ||
+      f.status != null ||
+      f.agrupamento != null ||
+      f.atividade != null ||
+      f.empCod != null ||
+      f.evidencia != null
+    );
+  });
+
+  readonly filtroAtivoExpandeGp = computed<boolean>(() => {
+    const f = this.filtros();
+    return (
+      // f.processo != null ||
+      // f.pratica != null ||
+      f.respPesCod != null ||
+      f.status != null ||
+      // f.agrupamento != null ||
+      f.atividade != null ||
+      f.empCod != null ||
+      f.evidencia != null
+    );
+  });
+
   readonly estruturaFiltrada = computed<PlanProcesso[]>(() => {
     const f = this.filtros();
     const procs = this.estruturaRes.value() ?? [];
-    const algum =
-      f.processo != null || f.pratica != null || f.respPesCod != null || f.status != null;
-    if (!algum) {
+    if (!this.algumFiltroAtivo()) {
       return procs;
     }
+    const alvoEmp = f.empCod === EMP_INSTITUCIONAL ? null : f.empCod;
+    const buscaAtv = f.atividade?.toLowerCase() ?? null;
+    const buscaGrp = f.agrupamento?.toLowerCase() ?? null;
     const out: PlanProcesso[] = [];
     for (const proc of procs) {
       if (f.processo != null && proc.nome !== f.processo) {
@@ -196,10 +240,16 @@ export class AcompanhamentoComponent {
         }
         const grupos: PlanGrupo[] = [];
         for (const g of pr.grupos) {
+          if (buscaGrp != null && !g.nome.toLowerCase().includes(buscaGrp)) {
+            continue;
+          }
           const atividades = g.atividades.filter(
             a =>
               (f.respPesCod == null || a.respPesCod === f.respPesCod) &&
-              (f.status == null || a.status === f.status),
+              (f.status == null || a.status === f.status) &&
+              (buscaAtv == null || a.nome.toLowerCase().includes(buscaAtv)) &&
+              (f.empCod == null || (a.empCod ?? null) === alvoEmp) &&
+              this.casaEvidencia(a.atpCod, f.evidencia),
           );
           if (atividades.length > 0) {
             grupos.push({ ...g, atividades });
@@ -217,8 +267,8 @@ export class AcompanhamentoComponent {
   });
 
   constructor() {
-    // Vindo de Pendências (?registrar=atpCod): abre o modal da atividade quando a estrutura
-    // estiver carregada. Só uma vez — recarregar a estrutura não deve reabrir o modal.
+    // Vindo de Pendências (?registrar=atpCod): abre o modal uma única vez quando a estrutura
+    // carrega — recarregar a estrutura não deve reabrir o modal.
     effect(() => {
       const processos = this.estruturaRes.value();
       if (!processos || this.registroAberto) {
@@ -240,26 +290,22 @@ export class AcompanhamentoComponent {
     });
   }
 
-  private atividadesDe(proc: PlanProcesso): AtividadePlanejada[] {
+  atividadesDe(proc: PlanProcesso): AtividadePlanejada[] {
     return proc.praticas.flatMap(pr => this.atividadesDePratica(pr));
   }
 
-  /** Atividades de uma prática, achatando os grupos. */
   atividadesDePratica(pr: PlanPratica): AtividadePlanejada[] {
     return pr.grupos.flatMap(g => g.atividades);
   }
 
-  /** Total de atividades exibidas no processo (reflete os filtros ativos). */
   total(proc: PlanProcesso): number {
     return this.atividadesDe(proc).length;
   }
 
-  /** Atividades concluídas exibidas no processo (numerador do cabeçalho). */
   concluidas(proc: PlanProcesso): number {
     return this.atividadesDe(proc).filter(a => a.status === 'CONCLUIDA').length;
   }
 
-  /** Percentual concluído do processo, para a mini barra. */
   progresso(proc: PlanProcesso): number {
     const t = this.total(proc);
     return t === 0 ? 0 : Math.round((this.concluidas(proc) / t) * 100);
@@ -269,7 +315,6 @@ export class AcompanhamentoComponent {
     return this.atividadesDePratica(pr).filter(a => a.status === 'CONCLUIDA').length;
   }
 
-  /** Total de atividades da prática (soma dos grupos). */
   totalPratica(pr: PlanPratica): number {
     return this.atividadesDePratica(pr).length;
   }
@@ -278,7 +323,26 @@ export class AcompanhamentoComponent {
     return g.atividades.filter(a => a.status === 'CONCLUIDA').length;
   }
 
-  /** Prazo em linguagem relativa; vazio se sem prazo ou já concluída. */
+  resumoAtividades(atvs: AtividadePlanejada[]): { status: EStatusAtividade; count: number }[] {
+    const cont = new Map<EStatusAtividade, number>();
+    for (const a of atvs) {
+      cont.set(a.status, (cont.get(a.status) ?? 0) + 1);
+    }
+    return STATUS_FILTRAVEIS.map(s => ({ status: s, count: cont.get(s) ?? 0 })).filter(x => x.count > 0);
+  }
+
+  resumoEvidencias(atvs: AtividadePlanejada[]): ContagemEvid {
+    const acc: ContagemEvid = { ...CONTAGEM_VAZIA };
+    for (const a of atvs) {
+      const c = this.contagemEvid(a.atpCod);
+      acc.validadas += c.validadas;
+      acc.pendentes += c.pendentes;
+      acc.correcao += c.correcao;
+      acc.total += c.total;
+    }
+    return acc;
+  }
+
   prazoRelativo(atv: AtividadePlanejada): string {
     if (!atv.prazo || atv.status === 'CONCLUIDA') {
       return '';
@@ -294,7 +358,6 @@ export class AcompanhamentoComponent {
     return `vence em ${dias} ${dias === 1 ? 'dia' : 'dias'}`;
   }
 
-  /** Prazo já vencido numa atividade não concluída (destaque vermelho). */
   prazoVencido(atv: AtividadePlanejada): boolean {
     if (!atv.prazo || atv.status === 'CONCLUIDA') {
       return false;

@@ -12,17 +12,12 @@ import {
   Processo,
 } from '../../../models/metodologia/metodologia.model';
 
-/**
- * Metodologia da própria incubadora (schema do tenant vem do JWT). Documento vivo, sem versionamento:
- * as abas listam e editam a metodologia direto.
- */
 @Injectable({ providedIn: 'root' })
 export class MetodologiaService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/incubadora/metodologia`;
   private readonly materializacaoBase = `${environment.apiUrl}/incubadora/materializacao-metodologia`;
 
-  /** Incrementa a cada mutação; a listagem de processos observa para recarregar. */
   readonly versao = signal(0);
   recarregar(): void {
     this.versao.update(v => v + 1);
@@ -40,12 +35,10 @@ export class MetodologiaService {
     return this.http.put<Processo>(`${this.base}/processos/${prcCod}`, dto);
   }
 
-  /** Reordena os processos (arrastar-e-soltar): envia a sequência de `prcCod`. */
   reordenarProcessos(prcCods: number[]) {
     return this.http.put<Processo[]>(`${this.base}/processos/ordem`, prcCods);
   }
 
-  /** Ativa/inativa o processo (inativo continua visível, mas fora da geração do planejamento). */
   alterarSituacaoProcesso(prcCod: number, situacao: EAtivoInativo) {
     return this.http.patch<Processo>(`${this.base}/processos/${prcCod}/situacao`, null, {
       params: { situacao },
@@ -68,13 +61,9 @@ export class MetodologiaService {
     );
   }
 
-
-  /** Reordena as práticas de um processo (arrastar-e-soltar): envia a sequência de `prtCod`. */
   reordenarPraticas(prcCod: number, prtCods: number[]) {
     return this.http.put<Processo[]>(`${this.base}/processos/${prcCod}/praticas/ordem`, prtCods);
   }
-
-  // ---- indicadores ----
 
   listarIndicadores() {
     return this.http.get<Indicador[]>(`${this.base}/indicadores`);
@@ -94,8 +83,6 @@ export class MetodologiaService {
     });
   }
 
-  // ---- agrupamentos ----
-
   listarAgrupamentos() {
     return this.http.get<Agrupamento[]>(`${this.base}/agrupamentos`);
   }
@@ -108,7 +95,6 @@ export class MetodologiaService {
     return this.http.put<Agrupamento>(`${this.base}/agrupamentos/${agrCod}`, dto);
   }
 
-  /** Reordena os agrupamentos de uma prática (arrastar-e-soltar): envia a sequência de `agrCod`. */
   reordenarAgrupamentos(prtCod: number, agrCods: number[]) {
     return this.http.put<Agrupamento[]>(`${this.base}/praticas/${prtCod}/agrupamentos/ordem`, agrCods);
   }
@@ -119,12 +105,9 @@ export class MetodologiaService {
     });
   }
 
-  /** Exclui o agrupamento (bloqueado no backend se ainda tiver atividades). */
   excluirAgrupamento(agrCod: number) {
     return this.http.delete<void>(`${this.base}/agrupamentos/${agrCod}`);
   }
-
-  // ---- atividades ----
 
   listarAtividades() {
     return this.http.get<AtividadeMetodologia[]>(`${this.base}/atividades`);
@@ -138,7 +121,6 @@ export class MetodologiaService {
     return this.http.put<AtividadeMetodologia>(`${this.base}/atividades/${ameCod}`, dto);
   }
 
-  /** Reordena as atividades de uma prática (arrastar-e-soltar): envia a sequência de `ameCod`. */
   reordenarAtividades(prtCod: number, ameCods: number[]) {
     return this.http.put<AtividadeMetodologia[]>(`${this.base}/praticas/${prtCod}/atividades/ordem`, ameCods);
   }
@@ -149,7 +131,6 @@ export class MetodologiaService {
     });
   }
 
-  /** Liga/desliga "repetir por empreendimento" na atividade. */
   alterarPorEmpreendimentoAtividade(ameCod: number, valor: boolean) {
     return this.http.patch<AtividadeMetodologia>(
       `${this.base}/atividades/${ameCod}/por-empreendimento`,
@@ -162,19 +143,14 @@ export class MetodologiaService {
     return this.http.delete<void>(`${this.base}/atividades/${ameCod}`);
   }
 
-  // ---- materializar no ciclo ("Gerar do ciclo") ----
-
-  /** Ciclo em foco que receberá a materialização (ou `null` se não houver). */
   alvoMaterializacao() {
     return this.http.get<Ciclo | null>(`${this.materializacaoBase}/alvo`);
   }
 
-  /** Incubadas ofertadas + as já selecionadas no ciclo em foco (para o diálogo de gerar). */
   opcoesGerar() {
     return this.http.get<GerarCicloOpcoes>(`${this.materializacaoBase}/empreendimentos`);
   }
 
-  /** Materializa a metodologia no ciclo em foco com as incubadas participantes (estrutura + indicadores + atividades). */
   materializarMetodologia(empCods: number[]) {
     return this.http.post<Ciclo>(this.materializacaoBase, { empCods });
   }

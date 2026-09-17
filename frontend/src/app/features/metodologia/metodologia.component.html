@@ -18,6 +18,11 @@
   }
 </div>
 
+<p class="intro">
+  A metodologia é a base reutilizável dos ciclos. Complementos de um ciclo são adicionados no
+  Planejamento (atividades) e em Indicadores e metas (indicadores).
+</p>
+
 @if (materializando()) {
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }
@@ -29,10 +34,6 @@
 }
 
 <mat-tab-group>
-  <!-- <mat-tab label="Níveis adotados">
-    <p class="placeholder">Em breve.</p>
-  </mat-tab> -->
-
   <mat-tab label="Processos e Práticas">
     <ng-template matTabContent>
       <app-processos-tab />

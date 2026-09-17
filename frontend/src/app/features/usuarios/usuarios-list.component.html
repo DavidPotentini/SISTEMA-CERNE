@@ -33,8 +33,7 @@
   <ng-container matColumnDef="acoes">
     <th mat-header-cell *matHeaderCellDef>Ações</th>
     <td mat-cell *matCellDef="let u" class="acoes">
-      <!-- <button mat-button (click)="editar(u)">Editar</button> -->
-      <button mat-stroked-button 
+      <button mat-stroked-button
       [ngClass]= "{
         'btn-reativar': u.status === 'SUSPENSO',
         'btn-suspender': u.status !== 'SUSPENSO'

@@ -1,7 +1,6 @@
 <h2 mat-dialog-title>Registrar atividade</h2>
 
 <mat-dialog-content>
-  <!-- Atividade (só leitura) -->
   <section class="atividade">
     <h3>{{ atividade().nome }}</h3>
     @if (atividade().observacoes) {
@@ -9,7 +8,6 @@
     }
   </section>
 
-  <!-- Status da atividade -->
   <section class="bloco">
     <div class="bloco-titulo">Status da atividade</div>
     <div class="status-linha">
@@ -49,7 +47,6 @@
     }
   </section>
 
-  <!-- Evidências da atividade -->
   <section class="bloco">
     <div class="bloco-titulo">Evidências</div>
 

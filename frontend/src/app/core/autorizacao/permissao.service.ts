@@ -10,11 +10,6 @@ const RANK: Record<ENivel, number> = {
   [ENivel.Total]: 3,
 };
 
-/**
- * Substitui o `roleGuard` antigo (baseado em papéis fixos ADMIN_*). Lê a matriz
- * `permissoes` do papel logado (papel × recurso) e responde se o usuário atinge o
- * nível mínimo exigido para um recurso.
- */
 @Injectable({ providedIn: 'root' })
 export class PermissaoService {
   private readonly auth = inject(AuthService);

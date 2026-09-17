@@ -4,12 +4,6 @@ import com.github.davidpotentini.enums.EStatusPlanejamento;
 
 import java.time.LocalDate;
 
-/**
- * Planejamento institucional — DTO único de saída. Reúne o cabeçalho ({@code nome}, ciclo, status,
- * período {@code inicio}/{@code fim}, responsável) e o resumo de execução usado no "Consultar
- * publicação": {@code totalAtividades}, {@code concluidas} e {@code progresso} (%). Os rótulos
- * ({@code cicloNome}, {@code responsavel}) e os derivados são montados no service.
- */
 public record PlanejamentoDTO(
         Long plnCod,
         String nome,

@@ -8,11 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-/**
- * Corta a requisição antes do controller: se o método exige permissão
- * ({@link RequerPermissao}) e o papel logado ({@link SessaoContext#papelAtual()}) não a
- * tem, lança {@link AcessoNegadoException} (→ 403, tratada em {@code comum/erro}).
- */
 @Component
 public class PermissaoInterceptor implements HandlerInterceptor {
 

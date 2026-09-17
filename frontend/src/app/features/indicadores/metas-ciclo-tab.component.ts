@@ -14,11 +14,6 @@ import {
 import { MetaIndicadorDialog } from './meta-indicador.dialog';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/**
- * Aba "Metas do ciclo": lista os indicadores do ciclo (nome, vínculo CERNE, periodicidade, unidade)
- * com o botão de meta ao lado — abre o modal para cadastrar/visualizar os períodos (meta estipulada +
- * janela de apuração) do indicador.
- */
 @Component({
   selector: 'app-metas-ciclo-tab',
   imports: [MatCardModule, MatTableModule, MatButtonModule, MatIconModule, MatDialogModule],

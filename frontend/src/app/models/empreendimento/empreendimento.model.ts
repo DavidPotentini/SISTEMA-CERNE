@@ -10,7 +10,6 @@ export type ESituacaoContrato =
   | 'FINALIZADO';
 export type ENivelMaturidade = 'IDEACAO' | 'VALIDACAO' | 'OPERACAO' | 'TRACAO' | 'ESCALA';
 
-/** Empreendimento (startup) incubado. O vínculo com o ciclo é feito à parte (CICLO_EMPREENDIMENTOS). */
 export interface Empreendimento {
   empCod: number;
   nome: string;
@@ -26,15 +25,13 @@ export interface Empreendimento {
   nivelMaturidade: ENivelMaturidade | null;
   entrada: string | null;
   saida: string | null;
+  cicCod: number | null;
 }
 
-/** Pessoa em rascunho (na criação do empreendimento, antes de existir chave). */
 export type PessoaRascunho = Pick<PessoaEmpreendimento, 'nome' | 'email' | 'telefone'>;
 
-/** Payload de criação: dados do empreendimento + pessoas iniciais opcionais (gravadas junto). */
 export type NovoEmpreendimento = Partial<Empreendimento> & { pessoas?: PessoaRascunho[] };
 
-/** Pessoa (membro da startup) de um empreendimento. {@code representanteLegal} = representante legal. */
 export interface PessoaEmpreendimento {
   pseCod: number;
   empCod: number;

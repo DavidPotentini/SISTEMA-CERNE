@@ -12,10 +12,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Prática de um {@link ProcessoModel} ({@code PRC_COD}). Aparece dentro do accordion do processo na
- * aba "Processos e Práticas". Schema do tenant.
- */
 @Entity
 @Table(name = "PRATICAS_METODOLOGIA")
 @Getter
@@ -30,7 +26,6 @@ public class PraticaModel {
     @Column(name = "PRC_COD", nullable = false)
     private Long prcCod;
 
-    /** Ordem da prática dentro do processo (sequência de exibição). */
     @Column(name = "ORDEM", nullable = false)
     private Integer ordem;
 

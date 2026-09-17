@@ -14,17 +14,11 @@ import {
   PERIODICIDADE_LABEL,
 } from '../../models/metodologia/metodologia.model';
 
-/** Item {cod, nome} distinto usado no seletor de processo. */
 interface Opcao {
   cod: number;
   nome: string | null;
 }
 
-/**
- * Modal "Definir complementar": inclui um indicador complementar no ciclo ativo. O vínculo CERNE
- * (prática da metodologia vigente) é opcional e escolhido em cascata processo → prática — mesmo
- * padrão do cadastro de evidências.
- */
 @Component({
   selector: 'app-indicador-complementar',
   imports: [
@@ -45,7 +39,6 @@ export class IndicadorComplementarDialog {
 
   readonly periodicidades = Object.entries(PERIODICIDADE_LABEL) as [EPeriodicidade, string][];
 
-  /** Equipe da incubadora — candidatos a responsável pela apuração. */
   readonly responsaveisRes = rxResource({
     stream: () => this.equipeService.listarResponsaveis(),
   });
@@ -53,7 +46,6 @@ export class IndicadorComplementarDialog {
   readonly opcoes = signal<PraticaOpcao[]>([]);
   readonly prcCod = signal<number | null>(null);
 
-  /** Processos distintos da lista. */
   readonly processos = computed<Opcao[]>(() => {
     const mapa = new Map<number, Opcao>();
     for (const o of this.opcoes()) {
@@ -62,7 +54,6 @@ export class IndicadorComplementarDialog {
     return [...mapa.values()];
   });
 
-  /** Práticas do processo selecionado. */
   readonly praticas = computed<PraticaOpcao[]>(() =>
     this.opcoes().filter(o => o.prccCod === this.prcCod()),
   );

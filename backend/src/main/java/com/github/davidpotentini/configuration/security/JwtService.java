@@ -25,12 +25,6 @@ public class JwtService {
         this.expiracaoMin = expiracaoMin;
     }
 
-    /**
-     * Gera o token a partir da identidade resolvida no login. Claims do modelo novo:
-     * a conta global ({@code ctaCod}, subject = e-mail) vive em {@code public.CONTAS};
-     * o tenant ({@code nomeSchema}) e o papel local ({@code papCod}/{@code papelNome})
-     * vêm da incubadora escolhida.
-     */
     public String gerar(UsuarioAutenticado usuario) {
         return Jwts.builder()
                 .subject(usuario.email())

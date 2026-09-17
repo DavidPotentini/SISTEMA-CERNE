@@ -7,6 +7,5 @@ import java.util.Optional;
 
 public interface PessoasRepository extends JpaRepository<PessoasModel, Long> {
 
-    /** Pessoa deste tenant vinculada à conta global (ref. fraca a public.CONTAS). */
     Optional<PessoasModel> findByCtaCod(Long ctaCod);
 }

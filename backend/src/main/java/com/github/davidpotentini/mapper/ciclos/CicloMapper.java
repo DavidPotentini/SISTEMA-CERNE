@@ -7,10 +7,6 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-/**
- * Conversão do ciclo nos dois sentidos. Na escrita, {@code cicCod} é gerado e {@code status} é
- * definido pelo service ("nasce ATIVO"), então ambos são ignorados pelo mapper.
- */
 @Mapper(componentModel = "spring")
 public interface CicloMapper {
 

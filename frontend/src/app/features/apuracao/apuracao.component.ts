@@ -29,12 +29,6 @@ import {
 import { RegistrarResultadosDialog } from './registrar-resultados.dialog';
 import { reterRecurso } from '../../shared/util/reter-recurso';
 
-/**
- * Tela "Apuração de indicadores": mesmo estilo da aba de metas, com a coluna "Apuração"
- * (apurados/total de períodos), a "Situação" (em aberto/atrasada/concluída) e a barra de filtros
- * padrão (Processo/Prática/Responsável/Situação). "Registrar Resultados" abre o modal que lança o
- * resultado de cada período.
- */
 @Component({
   selector: 'app-apuracao',
   imports: [
@@ -54,7 +48,6 @@ export class ApuracaoComponent {
   private readonly dialog = inject(MatDialog);
   private readonly route = inject(ActivatedRoute);
 
-  /** Deep-link de Pendências já tratado? (evita reabrir quando a lista recarrega). */
   private registroAberto = false;
 
   readonly colunas = ['nome', 'vinculo', 'periodicidade', 'unidade', 'apuracao', 'situacao', 'acoes'];
@@ -66,7 +59,6 @@ export class ApuracaoComponent {
 
   private readonly todos = computed<ApuracaoIndicador[]>(() => this.indicadoresRes.value() ?? []);
 
-  // ---- filtros padrão ----
   readonly filtros = signal<FiltrosState>({ ...FILTROS_VAZIO });
 
   readonly statusOpcoes: OpcaoStatus[] = (
@@ -91,7 +83,6 @@ export class ApuracaoComponent {
     return [...mapa.values()];
   });
 
-  /** Listagem já com os filtros aplicados. */
   readonly indicadores = computed<ApuracaoIndicador[]>(() => {
     const f = this.filtros();
     return this.todos().filter(i =>
@@ -105,8 +96,8 @@ export class ApuracaoComponent {
   });
 
   constructor() {
-    // Vindo de Pendências (?registrar=indCod): abre "Registrar Resultados" do indicador
-    // quando a lista carregar. Só uma vez — recarregar não deve reabrir o modal.
+    // Vindo de Pendências (?registrar=indCod): abre "Registrar Resultados" uma única vez
+    // quando a lista carrega — recarregar não deve reabrir o modal.
     effect(() => {
       const indicadores = this.indicadoresRes.value();
       if (!indicadores || this.registroAberto) {

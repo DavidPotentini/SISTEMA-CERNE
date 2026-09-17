@@ -3,7 +3,6 @@ import { inject } from '@angular/core';
 import { AuthService } from '../services/auth/auth.service';
 import { environment } from '../../../environments/environment';
 
-/** Adiciona o header X-Tenant em toda requisição ao backend quando há sessão ativa. */
 export const tenantInterceptor: HttpInterceptorFn = (req, next) => {
   if (!req.url.startsWith(environment.apiUrl)) {
     return next(req);

@@ -34,13 +34,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Painel de visão geral do ciclo em foco (schema do tenant vem do JWT). Uma tela, um endpoint: um
- * resumo agregado do andamento — atividades concluídas/total (e o % de progresso), empreendimentos
- * ativos, evidências registradas/validadas, indicadores com meta atingida/total — mais o fluxo de
- * processos com o estado de cada um (concluído/em andamento/não iniciado).
- *
- * <p>Reaproveita o mesmo escopo de Pendências (planejamento vigente + versões correntes de
- * evidência) e a regra de "meta atingida" da apuração ({@link ApuracaoService}), para não divergir.
+ * Resumo agregado do ciclo em foco. Reaproveita o escopo de Pendências (planejamento vigente + versões
+ * correntes de evidência) e a regra de "meta atingida" da apuração ({@link ApuracaoService}), para não divergir.
  */
 @Service
 public class PainelVisaoGeralService {
@@ -69,7 +64,6 @@ public class PainelVisaoGeralService {
         this.apuracaoService = apuracaoService;
     }
 
-    /** Resumo do ciclo em foco; sem ciclo em foco, tudo zerado e {@code cicloNome} nulo. */
     @Transactional(readOnly = true)
     public ResumoCicloDTO resumo() {
         CiclosModel ciclo = cicloContexto.emFoco();
@@ -77,7 +71,6 @@ public class PainelVisaoGeralService {
             return new ResumoCicloDTO(null, 0, 0, 0, 0, 0, 0, 0, 0, List.of());
         }
 
-        // Atividades do planejamento vigente do ciclo.
         List<AtividadePlanejadaModel> ativs = planejamentos
                 .findByCicCodAndStatus(ciclo.getCicCod(), EStatusPlanejamento.PUBLICADO)
                 .map(PlanejamentoModel::getPlnCod)
@@ -109,7 +102,6 @@ public class PainelVisaoGeralService {
                 ? 0
                 : (int) Math.round(atividadesConcluidas * 100.0 / atividadesTotal);
 
-        // Empreendimentos ativos (da incubadora — não são por ciclo).
         long empreendimentosAtivos = 0;
         for (EmpreendimentosModel emp : empreendimentos.findAllByOrderByNomeAsc()) {
             if (emp.getStatus() == EStatusEmpreendimento.ATIVO) {
@@ -117,7 +109,6 @@ public class PainelVisaoGeralService {
             }
         }
 
-        // Evidências: versões correntes das atividades do plano vigente.
         long evidenciasRegistradas = 0;
         long evidenciasValidadas = 0;
         for (EvidenciaModel ev : evidencias.versoesCorrentes()) {
@@ -130,7 +121,6 @@ public class PainelVisaoGeralService {
             }
         }
 
-        // Indicadores: reusa a regra de "atingido" da apuração; denominador = os que têm meta.
         long indicadoresComMeta = 0;
         long indicadoresAtingidos = 0;
         for (PainelIndicadorDTO ind : apuracaoService.painel()) {
@@ -150,7 +140,6 @@ public class PainelVisaoGeralService {
                 indicadoresAtingidos, indicadoresComMeta, fluxo);
     }
 
-    /** Fluxo de processos do ciclo: soma as atividades das práticas de cada processo e deriva o estado. */
     private List<ProcessoFluxoDTO> montarFluxo(Long cicCod, Map<Long, long[]> contagemPorPratica) {
         List<ProcessoFluxoDTO> fluxo = new ArrayList<>();
         for (ProcessoCicloModel proc : processosCiclo.findByCicCodOrderByOrdemAscPrccCodAsc(cicCod)) {

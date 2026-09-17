@@ -1,7 +1,6 @@
 <h2 mat-dialog-title>Meta do indicador</h2>
 
 <mat-dialog-content>
-  <!-- Indicador (só leitura) -->
   <section class="indicador">
     <h3>{{ indicador.nome }}</h3>
     <dl class="meta-info">
@@ -17,7 +16,6 @@
     </dl>
   </section>
 
-  <!-- Períodos -->
   <section class="periodos">
     <div class="secao-titulo">Períodos</div>
 
@@ -54,7 +52,6 @@
       </div>
     }
 
-    <!-- Cadastro / edição de período -->
     <div class="form">
       <div class="form-titulo">{{ editando ? 'Editar período' : 'Novo período' }}</div>
       <div class="grid">
@@ -65,12 +62,16 @@
 
         <mat-form-field appearance="outline">
           <mat-label>Início da apuração</mat-label>
-          <input matInput type="date" [ngModel]="inicio()" (ngModelChange)="sugerirFim($event)" />
+          <input matInput [matDatepicker]="dpInicio" [ngModel]="isoParaData(inicio())" (ngModelChange)="sugerirFim(dataParaIso($event))" />
+          <mat-datepicker-toggle matIconSuffix [for]="dpInicio"></mat-datepicker-toggle>
+          <mat-datepicker #dpInicio></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Fim da apuração</mat-label>
-          <input matInput type="date" [ngModel]="fim()" (ngModelChange)="aoMudarFim($event)" />
+          <input matInput [matDatepicker]="dpFim" [ngModel]="isoParaData(fim())" (ngModelChange)="aoMudarFim(dataParaIso($event))" />
+          <mat-datepicker-toggle matIconSuffix [for]="dpFim"></mat-datepicker-toggle>
+          <mat-datepicker #dpFim></mat-datepicker>
         </mat-form-field>
       </div>
 

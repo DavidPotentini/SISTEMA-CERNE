@@ -99,7 +99,6 @@
   margin: 0 0 12px;
 }
 
-/* Mini barra de progresso do processo. */
 .proc-progresso {
   display: flex;
   align-items: center;
@@ -118,7 +117,6 @@
   text-align: right;
 }
 
-/* Chip de status da atividade (exclusivo do acompanhamento). */
 .status-atv {
   display: inline-flex;
   align-items: center;
@@ -150,7 +148,6 @@
   color: #b02020;
 }
 
-/* Prazo vencido em atividade não concluída. */
 .atividade-prazo.atrasada {
   color: #b02020;
   font-weight: 600;
@@ -159,7 +156,6 @@
   font-weight: 600;
 }
 
-/* Chips de contagem de evidências por atividade. */
 .evid-chips {
   display: flex;
   align-items: center;
@@ -219,7 +215,29 @@
   height: 14px;
 }
 
-/* Recolher subgrupo: clique no cabeçalho inteiro alterna; as atividades somem quando recolhido. */
+.situacao-badges {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.proc-progresso + .situacao-badges,
+mat-expansion-panel-header + .situacao-badges {
+  display: flex;
+  margin: 0 0 14px;
+}
+.situacao-badges .status-atv {
+  margin-left: 0;
+}
+.situacao-badges .sb-sep {
+  width: 1px;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.15);
+}
+.grupo-titulo .situacao-badges {
+  margin-left: 6px;
+}
+
 .grupo-titulo {
   cursor: pointer;
 }

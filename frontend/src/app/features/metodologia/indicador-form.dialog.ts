@@ -14,14 +14,9 @@ import {
 } from '../../models/metodologia/metodologia.model';
 
 interface IndicadorFormData {
-  /** Presente no modo edição. */
   indicador?: Indicador;
 }
 
-/**
- * Modal de indicador: cria ou edita. O "Vínculo metodológico" é a prática, escolhida num seletor
- * agrupado por processo (carregado da metodologia).
- */
 @Component({
   selector: 'app-indicador-form',
   imports: [
@@ -43,7 +38,6 @@ export class IndicadorFormDialog {
   readonly edicao = this.data?.indicador != null;
   readonly periodicidades = Object.entries(PERIODICIDADE_LABEL) as [EPeriodicidade, string][];
 
-  /** Processos (com práticas) da metodologia, para o seletor de vínculo. */
   readonly processos = rxResource({ stream: () => this.service.listarProcessos() });
 
   readonly salvando = signal(false);

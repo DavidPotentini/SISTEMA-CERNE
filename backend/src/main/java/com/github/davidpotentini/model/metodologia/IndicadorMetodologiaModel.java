@@ -13,9 +13,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Indicador da metodologia — pertence a uma {@link PraticaModel} ({@code PRT_COD}). Schema do tenant.
- */
 @Entity
 @Table(name = "INDICADORES_METODOLOGIA")
 @Getter

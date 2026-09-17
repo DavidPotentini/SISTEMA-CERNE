@@ -3,7 +3,6 @@
 } @else if (painelRes.error()) {
   <p class="estado erro">Não foi possível carregar o painel.</p>
 } @else {
-  <!-- Cards -->
   <div class="cards">
     <div class="card">
       <span class="card-num">{{ total() }}</span>
@@ -22,14 +21,27 @@
   @if (total() === 0) {
     <p class="estado">Nenhum indicador no ciclo. Gere os indicadores na aba "Indicadores do ciclo".</p>
   } @else {
-    <!-- Listagem por indicador -->
+    <section class="consolidacao">
+      <h3>Indicadores atingidos por processo CERNE</h3>
+      @for (c of consolidacao(); track c.processo) {
+        <div class="proc-linha">
+          <div class="proc-cab">
+            <span class="proc-nome">{{ c.processo }}</span>
+            <span class="proc-frac">
+              {{ c.atingidos }} de {{ c.total }} · <strong>{{ c.percentual | number: '1.0-0' }}%</strong>
+            </span>
+          </div>
+          <mat-progress-bar mode="determinate" [value]="c.percentual"></mat-progress-bar>
+        </div>
+      }
+    </section>
+
     <div class="tabela-wrap">
       <table class="tabela">
         <thead>
           <tr>
             <th>Indicador</th>
-            <th>Processo</th>
-            <th>Prática</th>
+            <th>Vínculo CERNE</th>
             <th>Periodicidade</th>
             <th class="num">Meta</th>
             <th class="num">Atingido</th>
@@ -40,8 +52,12 @@
           @for (i of indicadores(); track i.indCod) {
             <tr [class.linha-atingida]="i.atingido">
               <td>{{ i.nome }}</td>
-              <td>{{ i.processoNome || '—' }}</td>
-              <td>{{ i.praticaNome || '—' }}</td>
+              <td>
+                <div class="vinculo">
+                  <span class="proc">{{ i.processoNome || '—' }}</span>
+                  <span class="prat">{{ i.praticaNome || '—' }}</span>
+                </div>
+              </td>
               <td>{{ periodicidadeLabel(i.periodicidade) }}</td>
               <td class="num">
                 @if (i.temMeta) {
@@ -65,21 +81,5 @@
         </tbody>
       </table>
     </div>
-
-    <!-- Consolidação por processo CERNE -->
-    <section class="consolidacao">
-      <h3>Indicadores atingidos por processo CERNE</h3>
-      @for (c of consolidacao(); track c.processo) {
-        <div class="proc-linha">
-          <div class="proc-cab">
-            <span class="proc-nome">{{ c.processo }}</span>
-            <span class="proc-frac">
-              {{ c.atingidos }} de {{ c.total }} · <strong>{{ c.percentual | number: '1.0-0' }}%</strong>
-            </span>
-          </div>
-          <mat-progress-bar mode="determinate" [value]="c.percentual"></mat-progress-bar>
-        </div>
-      }
-    </section>
   }
 }
