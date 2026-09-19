@@ -186,7 +186,7 @@ INSERT INTO INDICADORES_METODOLOGIA (PRT_COD, NOME, UNIDADE, PERIODICIDADE) VALU
 -- é um fluxo próprio; as atividades (seed seguinte) ligam-se ao agrupamento por
 -- (PRT_COD, NOME). Práticas de fluxo único têm 1 agrupamento.
 -- ----------------------------------------------------------------------------
-INSERT INTO AGRUPAMENTOS (PRT_COD, ORDEM, NOME) VALUES
+INSERT INTO AGRUPAMENTOS_METODOLOGIA (PRT_COD, ORDEM, NOME) VALUES
     -- Sensibilização
     ((SELECT PRT_COD FROM PRATICAS_METODOLOGIA WHERE NOME = 'Sensibilização'), 1, 'Participação em eventos externos'),
     ((SELECT PRT_COD FROM PRATICAS_METODOLOGIA WHERE NOME = 'Sensibilização'), 2, 'Participação em eventos internos'),

@@ -155,12 +155,22 @@ public class IndicadorService {
         return comLabels(List.of(ind)).get(0);
     }
 
-    /** {@code respPesCod} nulo desvincula o responsável. */
     @Transactional(rollbackFor = Exception.class)
-    public IndicadorCicloDTO definirResponsavel(Long indCod, Long respPesCod) {
+    public IndicadorCicloDTO editar(Long indCod, IndicadorCicloDTO dto) {
+        CiclosModel ciclo = cicloEmFocoObrigatorio();
         IndicadorModel ind = indicadores.findById(indCod)
                 .orElseThrow(() -> new NaoEncontradoException("Indicador", indCod));
-        ind.setRespPesCod(respPesCod);
+        if (!ciclo.getCicCod().equals(ind.getCicCod())) {
+            throw new RegraNegocioException("O indicador não pertence ao ciclo em foco.");
+        }
+        if (dto.prtcCod() != null) {
+            exigirPraticaCicloExiste(ciclo.getCicCod(), dto.prtcCod());
+        }
+        ind.setNome(dto.nome());
+        ind.setPrtcCod(dto.prtcCod());
+        ind.setUnidade(dto.unidade());
+        ind.setPeriodicidade(dto.periodicidade());
+        ind.setRespPesCod(dto.respPesCod());
         indicadores.save(ind);
         return comLabels(List.of(ind)).get(0);
     }

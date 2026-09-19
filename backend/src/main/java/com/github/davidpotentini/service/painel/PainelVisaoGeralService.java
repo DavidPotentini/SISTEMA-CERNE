@@ -68,7 +68,7 @@ public class PainelVisaoGeralService {
     public ResumoCicloDTO resumo() {
         CiclosModel ciclo = cicloContexto.emFoco();
         if (ciclo == null) {
-            return new ResumoCicloDTO(null, 0, 0, 0, 0, 0, 0, 0, 0, List.of());
+            return new ResumoCicloDTO(null, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,List.of());
         }
 
         List<AtividadePlanejadaModel> ativs = planejamentos
@@ -121,9 +121,11 @@ public class PainelVisaoGeralService {
             }
         }
 
+        List<PainelIndicadorDTO> painelIndicadores = apuracaoService.painel();
+        long indicadoresTotal = painelIndicadores.size();
         long indicadoresComMeta = 0;
         long indicadoresAtingidos = 0;
-        for (PainelIndicadorDTO ind : apuracaoService.painel()) {
+        for (PainelIndicadorDTO ind : painelIndicadores) {
             if (!ind.temMeta()) {
                 continue;
             }
@@ -137,7 +139,7 @@ public class PainelVisaoGeralService {
 
         return new ResumoCicloDTO(ciclo.getNome(), atividadesConcluidas, atividadesTotal, progresso,
                 empreendimentosAtivos, evidenciasRegistradas, evidenciasValidadas,
-                indicadoresAtingidos, indicadoresComMeta, fluxo);
+                indicadoresAtingidos, indicadoresComMeta, indicadoresTotal, fluxo);
     }
 
     private List<ProcessoFluxoDTO> montarFluxo(Long cicCod, Map<Long, long[]> contagemPorPratica) {

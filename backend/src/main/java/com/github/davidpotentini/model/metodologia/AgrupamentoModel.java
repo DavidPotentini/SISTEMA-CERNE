@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "AGRUPAMENTOS")
+@Table(name = "AGRUPAMENTOS_METODOLOGIA")
 @Getter
 @Setter
 public class AgrupamentoModel {

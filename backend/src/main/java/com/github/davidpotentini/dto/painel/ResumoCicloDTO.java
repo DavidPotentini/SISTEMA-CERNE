@@ -12,5 +12,6 @@ public record ResumoCicloDTO(
         long evidenciasValidadas,
         long indicadoresAtingidos,
         long indicadoresComMeta,
+        long indicadoresTotal,
         List<ProcessoFluxoDTO> fluxo) {
 }

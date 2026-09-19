@@ -201,10 +201,21 @@ export class EmpreendimentosApoiadosComponent {
   }
 
   periodo(e: Empreendimento): string {
-    if (e.entrada && e.saida) return `${this.fmtData(e.entrada)} – ${this.fmtData(e.saida)}`;
-    if (e.entrada) return `${this.fmtData(e.entrada)} – atual`;
-    if (e.saida) return `até ${this.fmtData(e.saida)}`;
+    if (e.inicioContrato && e.fimContrato) return `${this.fmtData(e.inicioContrato)} – ${this.fmtData(e.fimContrato)}`;
+    if (e.inicioContrato) return `${this.fmtData(e.inicioContrato)} – atual`;
+    if (e.fimContrato) return `até ${this.fmtData(e.fimContrato)}`;
     return '—';
+  }
+
+  contratoAlerta(e: Empreendimento): { estado: 'a_vencer' | 'vencido'; dias: number } | null {
+    if (e.status !== 'ATIVO' || !e.fimContrato) return null;
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const fim = new Date(`${e.fimContrato}T00:00:00`);
+    const dias = Math.round((fim.getTime() - hoje.getTime()) / 86400000);
+    if (dias < 0) return { estado: 'vencido', dias: -dias };
+    if (dias <= 30) return { estado: 'a_vencer', dias };
+    return null;
   }
 
   siteUrl(s: string): string {

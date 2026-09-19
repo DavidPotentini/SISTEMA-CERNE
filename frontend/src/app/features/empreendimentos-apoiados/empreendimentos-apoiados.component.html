@@ -54,7 +54,19 @@
 
       <ng-container matColumnDef="contrato">
         <th mat-header-cell *matHeaderCellDef>Contrato</th>
-        <td mat-cell *matCellDef="let e">{{ contratoLabel(e.situacaoContrato) }}</td>
+        <td mat-cell *matCellDef="let e">
+          <div class="contrato-cel">
+            <span>{{ contratoLabel(e.situacaoContrato) }}</span>
+            @let al = contratoAlerta(e);
+            @if (al) {
+              <span class="contrato-alerta" [class.vencido]="al.estado === 'vencido'"
+                    [matTooltip]="'Fim do contrato: ' + fmtData(e.fimContrato)">
+                <mat-icon>{{ al.estado === 'vencido' ? 'assignment_late' : 'schedule' }}</mat-icon>
+                {{ al.estado === 'vencido' ? 'Vencido há ' + al.dias + 'd' : 'Vence em ' + al.dias + 'd' }}
+              </span>
+            }
+          </div>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="status">

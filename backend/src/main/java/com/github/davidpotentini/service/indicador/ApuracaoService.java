@@ -95,10 +95,6 @@ public class ApuracaoService {
         return lista;
     }
 
-    /**
-     * Painel do ciclo: uma linha por indicador com meta e resultado somados; "atingido" = resultado >=
-     * meta (com meta > 0), "pendente" = há período encerrado sem resultado.
-     */
     @Transactional(readOnly = true)
     public List<PainelIndicadorDTO> painel() {
         List<IndicadorCicloDTO> base = indicadorService.listar();

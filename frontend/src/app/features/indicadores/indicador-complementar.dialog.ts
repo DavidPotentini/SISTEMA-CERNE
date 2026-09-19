@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -36,6 +36,8 @@ export class IndicadorComplementarDialog {
   private readonly service = inject(IndicadorService);
   private readonly equipeService = inject(EquipeService);
   private readonly ref = inject(MatDialogRef<IndicadorComplementarDialog>);
+  readonly dados = inject<IndicadorCiclo | null>(MAT_DIALOG_DATA);
+  readonly editando = this.dados != null;
 
   readonly periodicidades = Object.entries(PERIODICIDADE_LABEL) as [EPeriodicidade, string][];
 
@@ -58,11 +60,11 @@ export class IndicadorComplementarDialog {
     this.opcoes().filter(o => o.prccCod === this.prcCod()),
   );
 
-  readonly nome = signal('');
-  readonly prtCod = signal<number | null>(null);
-  readonly unidade = signal('');
-  readonly periodicidade = signal<EPeriodicidade>('TRIMESTRAL');
-  readonly respPesCod = signal<number | null>(null);
+  readonly nome = signal(this.dados?.nome ?? '');
+  readonly prtCod = signal<number | null>(this.dados?.prtcCod ?? null);
+  readonly unidade = signal(this.dados?.unidade ?? '');
+  readonly periodicidade = signal<EPeriodicidade>(this.dados?.periodicidade ?? 'TRIMESTRAL');
+  readonly respPesCod = signal<number | null>(this.dados?.respPesCod ?? null);
 
   processoAlterado(): void {
     this.prtCod.set(null);
@@ -73,7 +75,14 @@ export class IndicadorComplementarDialog {
 
   constructor() {
     this.service.vinculos().subscribe({
-      next: lista => this.opcoes.set(lista),
+      next: lista => {
+        this.opcoes.set(lista);
+        const prtcCod = this.dados?.prtcCod;
+        if (prtcCod != null) {
+          const opcao = lista.find(o => o.prtcCod === prtcCod);
+          if (opcao) this.prcCod.set(opcao.prccCod);
+        }
+      },
     });
   }
 
@@ -88,14 +97,17 @@ export class IndicadorComplementarDialog {
       periodicidade: this.periodicidade(),
       respPesCod: this.respPesCod(),
     };
-    this.service.definirComplementar(dto).subscribe({
+    const requisicao = this.editando
+      ? this.service.editar(this.dados!.indCod, dto)
+      : this.service.definirComplementar(dto);
+    requisicao.subscribe({
       next: () => {
         this.service.recarregar();
         this.ref.close(true);
       },
       error: e => {
         this.salvando.set(false);
-        this.erro.set(e?.error?.mensagem ?? 'Falha ao definir o indicador complementar.');
+        this.erro.set(e?.error?.mensagem ?? 'Falha ao salvar o indicador.');
       },
     });
   }

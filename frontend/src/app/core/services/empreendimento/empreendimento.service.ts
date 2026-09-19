@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
+import { Arquivo } from '../../../models/evidencia/evidencia.model';
 import { Ciclo } from '../../../models/ciclo/ciclo.model';
 import {
   Empreendimento,
@@ -36,6 +37,20 @@ export class EmpreendimentoService {
 
   listarCiclos(empCod: number) {
     return this.http.get<Ciclo[]>(`${this.base}/${empCod}/ciclos`);
+  }
+
+  listarDocumentos(empCod: number) {
+    return this.http.get<Arquivo[]>(`${this.base}/${empCod}/documentos`);
+  }
+
+  anexarDocumento(empCod: number, arquivo: File) {
+    const form = new FormData();
+    form.append('arquivo', arquivo);
+    return this.http.post<Arquivo>(`${this.base}/${empCod}/documentos`, form);
+  }
+
+  removerDocumento(empCod: number, arqCod: number) {
+    return this.http.delete<void>(`${this.base}/${empCod}/documentos/${arqCod}`);
   }
 
   listarPessoas(empCod: number) {

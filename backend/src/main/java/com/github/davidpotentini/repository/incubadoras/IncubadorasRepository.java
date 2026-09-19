@@ -7,8 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IncubadorasRepository extends JpaRepository<IncubadorasModel, Long> {
+
+    Optional<IncubadorasModel> findFirstByNome(String nome);
 
     /** Colunas (mapeadas posicionalmente no service): INC_COD, NOME, MANTENEDORA, responsável, qtd. usuários, STATUS. */
     @Query(value = """

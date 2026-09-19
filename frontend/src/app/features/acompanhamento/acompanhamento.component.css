@@ -234,6 +234,14 @@ mat-expansion-panel-header + .situacao-badges {
   height: 14px;
   background: rgba(0, 0, 0, 0.15);
 }
+.situacao-badges .sb-rot {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.55);
+}
+.situacao-badges .sb-rot:not(:first-child) {
+  margin-left: 6px;
+}
 .grupo-titulo .situacao-badges {
   margin-left: 6px;
 }

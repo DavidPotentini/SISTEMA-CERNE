@@ -37,5 +37,7 @@ public interface AtividadePlanejadaRepository extends JpaRepository<AtividadePla
 
     boolean existsByPlnCodAndEmpCodAndStatusNot(Long plnCod, Long empCod, EStatusAtividade status);
 
+    boolean existsByPlnCodAndEmpCod(Long plnCod, Long empCod);
+
     boolean existsByAgrcCod(Long agrcCod);
 }

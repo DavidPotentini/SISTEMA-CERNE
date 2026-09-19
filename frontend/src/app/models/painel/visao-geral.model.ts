@@ -19,6 +19,7 @@ export interface ResumoCiclo {
   evidenciasValidadas: number;
   indicadoresAtingidos: number;
   indicadoresComMeta: number;
+  indicadoresTotal: number;
   fluxo: ProcessoFluxo[];
 }
 

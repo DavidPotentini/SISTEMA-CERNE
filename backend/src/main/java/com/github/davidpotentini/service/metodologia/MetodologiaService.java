@@ -267,19 +267,23 @@ public class MetodologiaService {
     @Transactional(readOnly = true)
     public List<IndicadorDTO> listarIndicadores() {
         List<Long> prcCods = new ArrayList<>();
+        Map<Long, String> nomeProcesso = new HashMap<>();
         for (ProcessoModel processo : processos.findAllByOrderByOrdemAscPrcCodAsc()) {
             prcCods.add(processo.getPrcCod());
+            nomeProcesso.put(processo.getPrcCod(), processo.getNome());
         }
         if (prcCods.isEmpty()) {
             return List.of();
         }
         Map<Long, String> nomePorPratica = new HashMap<>();
+        Map<Long, String> processoPorPratica = new HashMap<>();
         for (PraticaModel pratica : praticas.findByPrcCodIn(prcCods)) {
             nomePorPratica.put(pratica.getPrtCod(), pratica.getNome());
+            processoPorPratica.put(pratica.getPrtCod(), nomeProcesso.get(pratica.getPrcCod()));
         }
         List<IndicadorDTO> lista = new ArrayList<>();
         for (IndicadorMetodologiaModel ind : indicadores.findByPrtCodInOrderByNomeAsc(nomePorPratica.keySet())) {
-            lista.add(mapper.toDTO(ind, nomePorPratica.get(ind.getPrtCod())));
+            lista.add(mapper.toDTO(ind, processoPorPratica.get(ind.getPrtCod()), nomePorPratica.get(ind.getPrtCod())));
         }
         return lista;
     }
@@ -290,7 +294,7 @@ public class MetodologiaService {
         IndicadorMetodologiaModel indicador = mapper.toModel(dto);
         indicador.setSituacao(EAtivoInativo.ATIVO);
         indicadores.save(indicador);
-        return mapper.toDTO(indicador, pratica.getNome());
+        return mapper.toDTO(indicador, nomeProcessoDaPratica(pratica), pratica.getNome());
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -299,7 +303,7 @@ public class MetodologiaService {
         PraticaModel pratica = buscarPraticaPorId(dto.prtCod());
         mapper.atualizar(dto, indicador);
         indicadores.save(indicador);
-        return mapper.toDTO(indicador, pratica.getNome());
+        return mapper.toDTO(indicador, nomeProcessoDaPratica(pratica), pratica.getNome());
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -307,8 +311,8 @@ public class MetodologiaService {
         IndicadorMetodologiaModel indicador = buscarIndicador(inmCod);
         indicador.setSituacao(situacao);
         indicadores.save(indicador);
-        String vinculo = buscarPraticaPorId(indicador.getPrtCod()).getNome();
-        return mapper.toDTO(indicador, vinculo);
+        PraticaModel pratica = buscarPraticaPorId(indicador.getPrtCod());
+        return mapper.toDTO(indicador, nomeProcessoDaPratica(pratica), pratica.getNome());
     }
 
 
@@ -422,6 +426,10 @@ public class MetodologiaService {
     private PraticaModel buscarPraticaPorId(Long prtCod) {
         return praticas.findById(prtCod)
                 .orElseThrow(() -> new NaoEncontradoException("Prática", prtCod));
+    }
+
+    private String nomeProcessoDaPratica(PraticaModel pratica) {
+        return processos.findById(pratica.getPrcCod()).map(ProcessoModel::getNome).orElse(null);
     }
 
     private IndicadorMetodologiaModel buscarIndicador(Long inmCod) {

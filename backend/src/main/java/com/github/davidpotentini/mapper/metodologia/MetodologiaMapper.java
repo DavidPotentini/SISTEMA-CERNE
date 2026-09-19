@@ -64,7 +64,9 @@ public interface MetodologiaMapper {
     @Mapping(target = "situacao", ignore = true)
     void atualizar(AgrupamentoDTO dto, @MappingTarget AgrupamentoModel agrupamento);
 
-    IndicadorDTO toDTO(IndicadorMetodologiaModel indicador, String vinculoMetodologico);
+    @Mapping(target = "processoNome", source = "processoNome")
+    @Mapping(target = "praticaNome", source = "praticaNome")
+    IndicadorDTO toDTO(IndicadorMetodologiaModel indicador, String processoNome, String praticaNome);
 
     @Mapping(target = "inmCod", ignore = true)
     @Mapping(target = "situacao", ignore = true)

@@ -9,8 +9,24 @@
 }
 
 .pessoas,
-.ciclos {
+.ciclos,
+.documentos {
   margin-top: 12px;
+}
+.doc-acoes {
+  margin-bottom: 12px;
+}
+
+.ciclos-acoes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.ciclos-acoes .dica {
+  font-size: 0.82rem;
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .ciclos-lista {

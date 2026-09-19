@@ -52,7 +52,7 @@ export class IndicadoresCicloTabComponent {
   private readonly equipeService = inject(EquipeService);
   private readonly dialog = inject(MatDialog);
 
-  readonly colunas = ['nome', 'origem', 'vinculo', 'unidade', 'periodicidade', 'responsavel', 'situacao'];
+  readonly colunas = ['nome', 'origem', 'vinculo', 'unidade', 'periodicidade', 'responsavel', 'situacao', 'acoes'];
 
   readonly erroAcao = signal<string | null>(null);
 
@@ -112,11 +112,11 @@ export class IndicadoresCicloTabComponent {
     return PERIODICIDADE_LABEL[p];
   }
 
-  definirResponsavel(indCod: number, respPesCod: number | null): void {
-    this.erroAcao.set(null);
-    this.service.definirResponsavel(indCod, respPesCod).subscribe({
-      next: () => this.service.recarregar(),
-      error: e => this.erroAcao.set(e?.error?.mensagem ?? 'Não foi possível definir o responsável.'),
+  editar(indicador: IndicadorCiclo): void {
+    this.dialog.open(IndicadorComplementarDialog, {
+      data: indicador,
+      width: '90vw',
+      maxWidth: '1200px',
     });
   }
 

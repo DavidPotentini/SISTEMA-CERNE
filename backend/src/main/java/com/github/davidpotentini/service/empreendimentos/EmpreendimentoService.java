@@ -3,6 +3,7 @@ package com.github.davidpotentini.service.empreendimentos;
 import com.github.davidpotentini.comum.ciclo.CicloContexto;
 import com.github.davidpotentini.comum.erro.NaoEncontradoException;
 import com.github.davidpotentini.comum.erro.RegraNegocioException;
+import com.github.davidpotentini.dto.arquivo.ArquivoDTO;
 import com.github.davidpotentini.dto.ciclos.CicloDTO;
 import com.github.davidpotentini.dto.empreendimentos.EmpreendimentoDTO;
 import com.github.davidpotentini.dto.empreendimentos.PessoaEmpreendimentoDTO;
@@ -10,15 +11,19 @@ import com.github.davidpotentini.mapper.ciclos.CicloMapper;
 import com.github.davidpotentini.mapper.empreendimentos.EmpreendimentoMapper;
 import com.github.davidpotentini.model.ciclos.CicloEmpreendimentoModel;
 import com.github.davidpotentini.model.ciclos.CiclosModel;
+import com.github.davidpotentini.model.empreendimentos.DocumentoEmpreendimentoModel;
 import com.github.davidpotentini.model.empreendimentos.EmpreendimentosModel;
 import com.github.davidpotentini.model.empreendimentos.PessoaEmpreendimentoModel;
 import com.github.davidpotentini.repository.ciclos.CicloEmpreendimentoRepository;
 import com.github.davidpotentini.repository.ciclos.CiclosRepository;
+import com.github.davidpotentini.repository.empreendimentos.DocumentoEmpreendimentoRepository;
 import com.github.davidpotentini.repository.empreendimentos.EmpreendimentosRepository;
 import com.github.davidpotentini.repository.empreendimentos.PessoaEmpreendimentoRepository;
+import com.github.davidpotentini.service.arquivo.ArquivoService;
 import com.github.davidpotentini.service.planejamento.PlanejamentoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,6 +39,8 @@ public class EmpreendimentoService {
     private final CicloEmpreendimentoRepository cicloEmpreendimentos;
     private final CiclosRepository ciclos;
     private final PlanejamentoService planejamento;
+    private final DocumentoEmpreendimentoRepository documentos;
+    private final ArquivoService arquivoService;
     private final EmpreendimentoMapper mapper;
     private final CicloMapper cicloMapper;
 
@@ -43,6 +50,8 @@ public class EmpreendimentoService {
                                  CicloEmpreendimentoRepository cicloEmpreendimentos,
                                  CiclosRepository ciclos,
                                  PlanejamentoService planejamento,
+                                 DocumentoEmpreendimentoRepository documentos,
+                                 ArquivoService arquivoService,
                                  EmpreendimentoMapper mapper,
                                  CicloMapper cicloMapper) {
         this.empreendimentos = empreendimentos;
@@ -51,6 +60,8 @@ public class EmpreendimentoService {
         this.cicloEmpreendimentos = cicloEmpreendimentos;
         this.ciclos = ciclos;
         this.planejamento = planejamento;
+        this.documentos = documentos;
+        this.arquivoService = arquivoService;
         this.mapper = mapper;
         this.cicloMapper = cicloMapper;
     }
@@ -188,6 +199,33 @@ public class EmpreendimentoService {
         pessoa.setRepresentanteLegal(true);
         pessoasEmp.save(pessoa);
         return mapper.toDTO(pessoa);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ArquivoDTO> listarDocumentos(Long empCod) {
+        buscar(empCod);
+        List<ArquivoDTO> lista = new ArrayList<>();
+        for (DocumentoEmpreendimentoModel doc : documentos.findByEmpCod(empCod)) {
+            lista.add(arquivoService.buscar(doc.getArqCod()));
+        }
+        return lista;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public ArquivoDTO anexarDocumento(Long empCod, MultipartFile arquivo) {
+        buscar(empCod);
+        ArquivoDTO dto = arquivoService.upload(arquivo);
+        DocumentoEmpreendimentoModel doc = new DocumentoEmpreendimentoModel();
+        doc.setEmpCod(empCod);
+        doc.setArqCod(dto.arqCod());
+        documentos.save(doc);
+        return dto;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void removerDocumento(Long empCod, Long arqCod) {
+        buscar(empCod);
+        documentos.deleteByEmpCodAndArqCod(empCod, arqCod);
     }
 
     private EmpreendimentosModel buscar(Long empCod) {

@@ -1,11 +1,13 @@
 package com.github.davidpotentini.controller.empreendimentos;
 
+import com.github.davidpotentini.dto.arquivo.ArquivoDTO;
 import com.github.davidpotentini.dto.ciclos.CicloDTO;
 import com.github.davidpotentini.dto.empreendimentos.EmpreendimentoDTO;
 import com.github.davidpotentini.dto.empreendimentos.PessoaEmpreendimentoDTO;
 import com.github.davidpotentini.service.empreendimentos.EmpreendimentoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,8 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -53,6 +57,24 @@ public class EmpreendimentoController {
     @GetMapping("/{empCod}/ciclos")
     public List<CicloDTO> listarCiclos(@PathVariable Long empCod) {
         return service.listarCiclos(empCod);
+    }
+
+    @GetMapping("/{empCod}/documentos")
+    public List<ArquivoDTO> listarDocumentos(@PathVariable Long empCod) {
+        return service.listarDocumentos(empCod);
+    }
+
+    @PostMapping("/{empCod}/documentos")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ArquivoDTO anexarDocumento(@PathVariable Long empCod,
+                                      @RequestParam("arquivo") MultipartFile arquivo) {
+        return service.anexarDocumento(empCod, arquivo);
+    }
+
+    @DeleteMapping("/{empCod}/documentos/{arqCod}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removerDocumento(@PathVariable Long empCod, @PathVariable Long arqCod) {
+        service.removerDocumento(empCod, arqCod);
     }
 
     @GetMapping("/{empCod}/pessoas")

@@ -80,8 +80,8 @@ export class EmpreendimentosListComponent {
   }
 
   periodo(e: Empreendimento): string {
-    if (!e.entrada && !e.saida) return '—';
-    return `${this.fmtData(e.entrada)} — ${this.fmtData(e.saida)}`;
+    if (!e.inicioContrato && !e.fimContrato) return '—';
+    return `${this.fmtData(e.inicioContrato)} — ${this.fmtData(e.fimContrato)}`;
   }
 
   siteUrl(site: string): string {

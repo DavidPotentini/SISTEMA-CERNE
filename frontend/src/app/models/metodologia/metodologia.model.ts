@@ -46,7 +46,8 @@ export const PERIODICIDADE_LABEL: Record<EPeriodicidade, string> = {
 export interface Indicador {
   inmCod: number;
   prtCod: number;
-  vinculoMetodologico: string | null;
+  processoNome: string | null;
+  praticaNome: string | null;
   nome: string;
   unidade: string | null;
   periodicidade: EPeriodicidade;

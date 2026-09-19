@@ -31,12 +31,14 @@ logging:
 
 storage:
   endpoint: http://localhost:9000
-  bucket: cerne2-documentos
+  bucket: cerne-documentos
   access-key: minioadmin
   secret-key: minioadmin123
   region: us-east-1
 
 app:
+  seed:
+    enabled: true
   jwt:
     # Em prod, sobrescrever via env var JWT_SECRET com uma chave Base64 de >= 256 bits.
     secret: ${JWT_SECRET:Y2VybmUyLWRldi1zZWNyZXQta2V5LXRyb2N1ZS1lbS1wcm9kLW1pbi0zMi1ieXRlcw==}

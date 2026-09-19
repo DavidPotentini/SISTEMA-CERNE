@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -43,12 +43,33 @@ export class IndicadorFormDialog {
   readonly salvando = signal(false);
   readonly erro = signal<string | null>(null);
 
+  readonly prcCod = signal<number | null>(null);
   readonly prtCod = signal<number | null>(this.data?.indicador?.prtCod ?? null);
+
+  readonly praticasDoProcesso = computed(() => {
+    const proc = (this.processos.value() ?? []).find(p => p.prcCod === this.prcCod());
+    return proc?.praticas ?? [];
+  });
+
   readonly nome = signal(this.data?.indicador?.nome ?? '');
   readonly unidade = signal(this.data?.indicador?.unidade ?? '');
   readonly periodicidade = signal<EPeriodicidade>(
     this.data?.indicador?.periodicidade ?? 'NAO_SE_APLICA',
   );
+
+  constructor() {
+    effect(() => {
+      const lista = this.processos.value();
+      const prt = this.prtCod();
+      if (!lista || this.prcCod() != null || prt == null) return;
+      const proc = lista.find(p => p.praticas.some(x => x.prtCod === prt));
+      if (proc) this.prcCod.set(proc.prcCod);
+    });
+  }
+
+  mudarProcesso(): void {
+    this.prtCod.set(null);
+  }
 
   salvar(): void {
     const prtCod = this.prtCod();

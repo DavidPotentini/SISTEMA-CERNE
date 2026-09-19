@@ -2,7 +2,9 @@ export type ETipoPendencia =
   | 'EVIDENCIA_CORRECAO'
   | 'META_VENCIDA'
   | 'ATIVIDADE_ATRASADA'
-  | 'ATIVIDADE_ABERTA';
+  | 'ATIVIDADE_ABERTA'
+  | 'CONTRATO_A_VENCER'
+  | 'CONTRATO_VENCIDO';
 
 export interface Pendencia {
   tipo: ETipoPendencia;
@@ -20,14 +22,18 @@ export const TIPO_PENDENCIA_LABEL: Record<ETipoPendencia, string> = {
   EVIDENCIA_CORRECAO: 'Evidências com correção solicitada',
   META_VENCIDA: 'Metas de indicadores vencidas',
   ATIVIDADE_ATRASADA: 'Atividades atrasadas',
-  ATIVIDADE_ABERTA: 'Atividades em aberto'
+  ATIVIDADE_ABERTA: 'Atividades em aberto',
+  CONTRATO_A_VENCER: 'Contratos a vencer',
+  CONTRATO_VENCIDO: 'Contratos vencidos'
 };
 
 export const TIPO_PENDENCIA_ICONE: Record<ETipoPendencia, string> = {
   EVIDENCIA_CORRECAO: 'edit_note',
   META_VENCIDA: 'event_busy',
   ATIVIDADE_ATRASADA: 'warning',
-  ATIVIDADE_ABERTA: 'pending_actions'
+  ATIVIDADE_ABERTA: 'pending_actions',
+  CONTRATO_A_VENCER: 'schedule',
+  CONTRATO_VENCIDO: 'assignment_late'
 };
 
 export const TIPO_PENDENCIA_ROTA: Record<ETipoPendencia, string> = {
@@ -35,6 +41,8 @@ export const TIPO_PENDENCIA_ROTA: Record<ETipoPendencia, string> = {
   META_VENCIDA: '/incubadora/apuracao',
   ATIVIDADE_ATRASADA: '/incubadora/acompanhamento',
   ATIVIDADE_ABERTA: '/incubadora/acompanhamento',
+  CONTRATO_A_VENCER: '/incubadora/empreendimentos-apoiados',
+  CONTRATO_VENCIDO: '/incubadora/empreendimentos-apoiados',
 };
 
 export const TIPOS_PENDENCIA: readonly ETipoPendencia[] = [
@@ -42,4 +50,6 @@ export const TIPOS_PENDENCIA: readonly ETipoPendencia[] = [
   'META_VENCIDA',
   'ATIVIDADE_ATRASADA',
   'ATIVIDADE_ABERTA',
+  'CONTRATO_A_VENCER',
+  'CONTRATO_VENCIDO',
 ];

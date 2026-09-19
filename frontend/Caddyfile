@@ -1,0 +1,18 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	handle_path /api/* {
+		reverse_proxy backend:8080
+	}
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+{$STORAGE_DOMAIN} {
+	reverse_proxy minio:9000
+}

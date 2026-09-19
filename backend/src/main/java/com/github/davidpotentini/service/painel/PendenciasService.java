@@ -3,10 +3,12 @@ package com.github.davidpotentini.service.painel;
 import com.github.davidpotentini.dto.indicador.IndicadorCicloDTO;
 import com.github.davidpotentini.dto.painel.PendenciaDTO;
 import com.github.davidpotentini.enums.EStatusAtividade;
+import com.github.davidpotentini.enums.EStatusEmpreendimento;
 import com.github.davidpotentini.enums.EStatusEvidencia;
 import com.github.davidpotentini.enums.EStatusPlanejamento;
 import com.github.davidpotentini.enums.ETipoPendencia;
 import com.github.davidpotentini.comum.ciclo.CicloContexto;
+import com.github.davidpotentini.model.ciclos.CicloEmpreendimentoModel;
 import com.github.davidpotentini.model.ciclos.CiclosModel;
 import com.github.davidpotentini.model.empreendimentos.EmpreendimentosModel;
 import com.github.davidpotentini.model.estruturaciclo.PraticaCicloModel;
@@ -16,6 +18,7 @@ import com.github.davidpotentini.model.indicador.MetaModel;
 import com.github.davidpotentini.model.indicador.ResultadoModel;
 import com.github.davidpotentini.model.planejamento.AtividadePlanejadaModel;
 import com.github.davidpotentini.model.planejamento.PlanejamentoModel;
+import com.github.davidpotentini.repository.ciclos.CicloEmpreendimentoRepository;
 import com.github.davidpotentini.repository.empreendimentos.EmpreendimentosRepository;
 import com.github.davidpotentini.repository.estruturaciclo.PraticaCicloRepository;
 import com.github.davidpotentini.repository.estruturaciclo.ProcessoCicloRepository;
@@ -49,6 +52,7 @@ public class PendenciasService {
     private final PraticaCicloRepository praticasCiclo;
     private final ProcessoCicloRepository processosCiclo;
     private final EmpreendimentosRepository empreendimentos;
+    private final CicloEmpreendimentoRepository cicloEmpreendimentos;
     private final EvidenciaRepository evidencias;
     private final IndicadorService indicadorService;
     private final MetaRepository metas;
@@ -59,6 +63,7 @@ public class PendenciasService {
                                     PraticaCicloRepository praticasCiclo,
                                     ProcessoCicloRepository processosCiclo,
                                     EmpreendimentosRepository empreendimentos,
+                                    CicloEmpreendimentoRepository cicloEmpreendimentos,
                                     EvidenciaRepository evidencias, IndicadorService indicadorService,
                                     MetaRepository metas, ResultadoRepository resultados) {
         this.cicloContexto = cicloContexto;
@@ -67,6 +72,7 @@ public class PendenciasService {
         this.praticasCiclo = praticasCiclo;
         this.processosCiclo = processosCiclo;
         this.empreendimentos = empreendimentos;
+        this.cicloEmpreendimentos = cicloEmpreendimentos;
         this.evidencias = evidencias;
         this.indicadorService = indicadorService;
         this.metas = metas;
@@ -110,6 +116,7 @@ public class PendenciasService {
         pendenciasDeAtividades(ativs, praticaNomePorPrt, prcPorPrt, processoNomePorPrc, pendencias);
         pendenciasDeEvidencias(prtPorAtp, praticaNomePorPrt, prcPorPrt, processoNomePorPrc, pendencias);
         pendenciasDeMetas(pendencias);
+        pendenciasDeContratos(ciclo, pendencias);
         return pendencias;
     }
 
@@ -121,7 +128,9 @@ public class PendenciasService {
     public long impedimentosDeEncerramento() {
         long total = 0;
         for (PendenciaDTO p : pendencias()) {
-            if (p.tipo() != ETipoPendencia.META_VENCIDA) {
+            if (p.tipo() != ETipoPendencia.META_VENCIDA
+                    && p.tipo() != ETipoPendencia.CONTRATO_A_VENCER
+                    && p.tipo() != ETipoPendencia.CONTRATO_VENCIDO) {
                 total++;
             }
         }
@@ -256,6 +265,34 @@ public class PendenciasService {
         }
     }
 
+
+    private void pendenciasDeContratos(CiclosModel ciclo, List<PendenciaDTO> pendencias) {
+        Set<Long> membros = new HashSet<>();
+        for (CicloEmpreendimentoModel ce : cicloEmpreendimentos.findByCicCod(ciclo.getCicCod())) {
+            membros.add(ce.getEmpCod());
+        }
+        if (membros.isEmpty()) {
+            return;
+        }
+        LocalDate hoje = LocalDate.now();
+        LocalDate limite = hoje.plusDays(30);
+        for (EmpreendimentosModel emp : empreendimentos.findAllById(membros)) {
+            LocalDate fim = emp.getFimContrato();
+            if (emp.getStatus() != EStatusEmpreendimento.ATIVO || fim == null) {
+                continue;
+            }
+            ETipoPendencia tipo;
+            if (fim.isBefore(hoje)) {
+                tipo = ETipoPendencia.CONTRATO_VENCIDO;
+            } else if (!fim.isAfter(limite)) {
+                tipo = ETipoPendencia.CONTRATO_A_VENCER;
+            } else {
+                continue;
+            }
+            pendencias.add(new PendenciaDTO(
+                    tipo, emp.getEmpCod(), emp.getNome(), null, null, null, fim, null));
+        }
+    }
 
     private String processoNome(Long prtCod, Map<Long, Long> prcPorPrt,
                                 Map<Long, String> processoNomePorPrc) {

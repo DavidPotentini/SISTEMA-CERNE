@@ -25,6 +25,7 @@ import com.github.davidpotentini.model.metodologia.AtividadeMetodologiaModel;
 import com.github.davidpotentini.model.pessoas.PessoasModel;
 import com.github.davidpotentini.model.planejamento.AtividadePlanejadaModel;
 import com.github.davidpotentini.model.planejamento.PlanejamentoModel;
+import com.github.davidpotentini.repository.ciclos.CicloEmpreendimentoRepository;
 import com.github.davidpotentini.repository.ciclos.CiclosRepository;
 import com.github.davidpotentini.repository.contas.ContasRepository;
 import com.github.davidpotentini.repository.empreendimentos.EmpreendimentosRepository;
@@ -63,6 +64,7 @@ public class PlanejamentoService {
     private final ProcessoCicloRepository processosCiclo;
     private final PraticaCicloRepository praticasCiclo;
     private final AgrupamentoCicloRepository agrupamentosCiclo;
+    private final CicloEmpreendimentoRepository cicloEmpreendimentos;
     private final EvidenciaRepository evidencias;
     private final PessoasRepository pessoas;
     private final ContasRepository contas;
@@ -74,7 +76,9 @@ public class PlanejamentoService {
                                AtividadeMetodologiaRepository atividadesMetodologia,
                                EmpreendimentosRepository empreendimentos,
                                ProcessoCicloRepository processosCiclo, PraticaCicloRepository praticasCiclo,
-                               AgrupamentoCicloRepository agrupamentosCiclo, EvidenciaRepository evidencias,
+                               AgrupamentoCicloRepository agrupamentosCiclo,
+                               CicloEmpreendimentoRepository cicloEmpreendimentos,
+                               EvidenciaRepository evidencias,
                                PessoasRepository pessoas, ContasRepository contas,
                                PlanejamentoMapper mapper) {
         this.planejamentos = planejamentos;
@@ -86,6 +90,7 @@ public class PlanejamentoService {
         this.processosCiclo = processosCiclo;
         this.praticasCiclo = praticasCiclo;
         this.agrupamentosCiclo = agrupamentosCiclo;
+        this.cicloEmpreendimentos = cicloEmpreendimentos;
         this.evidencias = evidencias;
         this.pessoas = pessoas;
         this.contas = contas;
@@ -199,6 +204,52 @@ public class PlanejamentoService {
         atv.setObservacoes(base.getObservacoes());
         atv.setStatus(EStatusAtividade.PLANEJADA);
         atividades.save(atv);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public PlanejamentoDTO gerarAtividadesEmpreendimento(Long empCod) {
+        CiclosModel ciclo = cicloContexto.emFoco();
+        if (ciclo == null) {
+            throw new RegraNegocioException("Não há ciclo ativo.");
+        }
+        PlanejamentoModel plano = planejamentoVigente(ciclo.getCicCod())
+                .orElseThrow(() -> new RegraNegocioException(
+                        "Publique a metodologia para o ciclo antes de gerar as atividades por empreendimento."));
+        if (!cicloEmpreendimentos.existsByCicCodAndEmpCod(ciclo.getCicCod(), empCod)) {
+            throw new RegraNegocioException("O empreendimento não está vinculado a este ciclo.");
+        }
+        if (atividades.existsByPlnCodAndEmpCod(plano.getPlnCod(), empCod)) {
+            throw new RegraNegocioException(
+                    "Este empreendimento já tem atividades por empreendimento neste ciclo.");
+        }
+        EmpreendimentosModel emp = empreendimentos.findById(empCod)
+                .orElseThrow(() -> new NaoEncontradoException("Empreendimento", empCod));
+
+        Map<Long, Long> prtcPorPrt = new HashMap<>();
+        for (PraticaCicloModel pr : praticasCiclo.findByCicCodOrderByPrtcCodAsc(ciclo.getCicCod())) {
+            if (pr.getPrtCodOrigem() != null) {
+                prtcPorPrt.put(pr.getPrtCodOrigem(), pr.getPrtcCod());
+            }
+        }
+
+        int ordemGrupo = 1000;
+        for (AgrupamentoCicloModel g : agrupamentosCiclo.findByCicCodOrderByAgrcCodAsc(ciclo.getCicCod())) {
+            if (g.getEmpCod() != null && g.getOrdem() >= ordemGrupo) {
+                ordemGrupo = g.getOrdem() + 1;
+            }
+        }
+
+        for (AtividadeMetodologiaModel base
+                : atividadesMetodologia.findByPrtCodInOrderByOrdemAscNomeAsc(prtcPorPrt.keySet())) {
+            if (base.getSituacao() != EAtivoInativo.ATIVO || !base.isPorEmpreendimento()) {
+                continue;
+            }
+            Long prtcCod = prtcPorPrt.get(base.getPrtCod());
+            Long agrcCod = garantirGrupoEmpreendimento(ciclo.getCicCod(), prtcCod, empCod,
+                    emp.getNome(), ordemGrupo);
+            salvarCopiaAtividade(plano, base, prtcCod, agrcCod, empCod);
+        }
+        return toDTO(plano);
     }
 
     /** Grupo dinâmico da incubada (find-or-create por {@code (cicCod, prtcCod, empCod)}); sem origem no template. */

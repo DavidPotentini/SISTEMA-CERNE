@@ -68,6 +68,34 @@
   color: rgba(0, 0, 0, 0.4);
 }
 
+.contrato-cel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+.contrato-alerta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(191, 128, 0, 0.14);
+  color: #7a5200;
+}
+.contrato-alerta.vencido {
+  background: rgba(176, 32, 32, 0.14);
+  color: #b02020;
+}
+.contrato-alerta mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
 .linha-detalhe {
   display: none;
 }

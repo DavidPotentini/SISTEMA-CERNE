@@ -1,6 +1,6 @@
 <mat-sidenav-container class="shell">
   <mat-sidenav mode="side" opened class="side">
-    <div class="side-content" [class.recolhido]="recolhido()" (transitionend)="ajustarMargens()">
+    <div #sideContent class="side-content" [class.recolhido]="recolhido()" (transitionend)="ajustarMargens()">
       <div class="topo-side">
         <span class="brand-txt">Incubadora</span>
         <button mat-icon-button class="toggle" (click)="recolhido.set(!recolhido())"

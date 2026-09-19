@@ -22,8 +22,8 @@ public record EmpreendimentoDTO(
         EEstagioIncubacao estagio,
         EStatusEmpreendimento status,
         ENivelMaturidade nivelMaturidade,
-        LocalDate entrada,
-        LocalDate saida,
+        LocalDate inicioContrato,
+        LocalDate fimContrato,
         List<PessoaEmpreendimentoDTO> pessoas,
         Long cicCod
 ) {

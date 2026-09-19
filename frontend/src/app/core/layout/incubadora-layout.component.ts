@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
@@ -53,6 +53,16 @@ export class IncubadoraLayoutComponent {
   readonly recolhido = signal(false);
 
   private readonly container = viewChild.required(MatSidenavContainer);
+  private readonly sideContent = viewChild.required<ElementRef<HTMLElement>>('sideContent');
+  private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    afterNextRender(() => {
+      const observer = new ResizeObserver(() => this.container().updateContentMargins());
+      observer.observe(this.sideContent().nativeElement);
+      this.destroyRef.onDestroy(() => observer.disconnect());
+    });
+  }
 
   ajustarMargens(): void {
     this.container().updateContentMargins();

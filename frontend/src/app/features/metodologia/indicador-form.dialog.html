@@ -1,15 +1,20 @@
 <h2 mat-dialog-title>{{ edicao ? 'Editar indicador' : 'Novo indicador' }}</h2>
 <mat-dialog-content>
   <div class="grid">
-    <mat-form-field appearance="outline" class="col-2">
-      <mat-label>Vínculo metodológico (prática)</mat-label>
-      <mat-select [ngModel]="prtCod()" (ngModelChange)="prtCod.set($event)" required>
+    <mat-form-field appearance="outline">
+      <mat-label>Processo (vínculo CERNE)</mat-label>
+      <mat-select [ngModel]="prcCod()" (ngModelChange)="prcCod.set($event); mudarProcesso()" required>
         @for (proc of processos.value() ?? []; track proc.prcCod) {
-          <mat-optgroup [label]="proc.ordem + '. ' + proc.nome">
-            @for (pr of proc.praticas; track pr.prtCod) {
-              <mat-option [value]="pr.prtCod">{{ pr.nome }}</mat-option>
-            }
-          </mat-optgroup>
+          <mat-option [value]="proc.prcCod">{{ proc.ordem }}. {{ proc.nome }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Prática</mat-label>
+      <mat-select [ngModel]="prtCod()" (ngModelChange)="prtCod.set($event)" [disabled]="prcCod() == null" required>
+        @for (pr of praticasDoProcesso(); track pr.prtCod) {
+          <mat-option [value]="pr.prtCod">{{ pr.nome }}</mat-option>
         }
       </mat-select>
     </mat-form-field>

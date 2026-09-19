@@ -65,9 +65,9 @@ public class EmpreendimentosModel {
     @Column(name = "NIVEL_MATURIDADE")
     private ENivelMaturidade nivelMaturidade;
 
-    @Column(name = "ENTRADA")
-    private LocalDate entrada;
+    @Column(name = "INICIO_CONTRATO")
+    private LocalDate inicioContrato;
 
-    @Column(name = "SAIDA")
-    private LocalDate saida;
+    @Column(name = "FIM_CONTRATO")
+    private LocalDate fimContrato;
 }

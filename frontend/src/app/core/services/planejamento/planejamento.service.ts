@@ -48,4 +48,8 @@ export class PlanejamentoService {
   excluirAgrupamento(agrcCod: number) {
     return this.http.delete<void>(`${this.base}/agrupamentos/${agrcCod}`);
   }
+
+  gerarAtividadesEmpreendimento(empCod: number) {
+    return this.http.post<void>(`${this.base}/empreendimentos/${empCod}/atividades`, {});
+  }
 }

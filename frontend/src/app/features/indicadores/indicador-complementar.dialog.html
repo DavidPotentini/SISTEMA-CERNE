@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Definir indicador complementar</h2>
+<h2 mat-dialog-title>{{ editando ? 'Editar indicador' : 'Definir indicador complementar' }}</h2>
 <mat-dialog-content>
   <div class="grid">
     <mat-form-field appearance="outline" class="col-2">
@@ -7,9 +7,8 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Processo (vínculo CERNE) — opcional</mat-label>
-      <mat-select [ngModel]="prcCod()" (ngModelChange)="prcCod.set($event); processoAlterado()">
-        <mat-option [value]="null">— Sem vínculo —</mat-option>
+      <mat-label>Processo (vínculo CERNE)</mat-label>
+      <mat-select [ngModel]="prcCod()" (ngModelChange)="prcCod.set($event); processoAlterado()" required>
         @for (p of processos(); track p.cod) {
           <mat-option [value]="p.cod">{{ p.nome }}</mat-option>
         }
@@ -22,6 +21,7 @@
         [ngModel]="prtCod()"
         (ngModelChange)="prtCod.set($event)"
         [disabled]="prcCod() == null"
+        required
       >
         @for (pr of praticas(); track pr.prtcCod) {
           <mat-option [value]="pr.prtcCod">{{ pr.praticaNome }}</mat-option>
@@ -64,8 +64,8 @@
     mat-flat-button
     color="primary"
     (click)="salvar()"
-    [disabled]="salvando() || !nome().trim()"
+    [disabled]="salvando() || !nome().trim() || prtCod() == null"
   >
-    Definir
+    {{ editando ? 'Salvar' : 'Definir' }}
   </button>
 </mat-dialog-actions>

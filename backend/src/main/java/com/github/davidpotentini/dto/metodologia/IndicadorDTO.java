@@ -8,7 +8,8 @@ import jakarta.validation.constraints.NotNull;
 public record IndicadorDTO(
         Long inmCod,
         @NotNull Long prtCod,
-        String vinculoMetodologico,
+        String processoNome,
+        String praticaNome,
         @NotBlank String nome,
         String unidade,
         EPeriodicidade periodicidade,

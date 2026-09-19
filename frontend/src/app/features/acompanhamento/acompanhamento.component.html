@@ -92,23 +92,27 @@
             </div>
 
             @let atvsProc = atividadesDe(proc);
+            @let resumoProc = resumoAtividades(atvsProc);
+            @let evProc = resumoEvidencias(atvsProc);
             <div class="situacao-badges">
-              @for (r of resumoAtividades(atvsProc); track r.status) {
-                <span class="status-atv" [attr.data-status]="r.status">
-                  <mat-icon>{{ statusIcone[r.status] }}</mat-icon>{{ statusLabel[r.status] }}: {{ r.count }}
-                </span>
+              @if (resumoProc.length > 0) {
+                <span class="sb-rot">Atividades:</span>
+                @for (r of resumoProc; track r.status) {
+                  <span class="status-atv" [attr.data-status]="r.status">
+                    <mat-icon>{{ statusIcone[r.status] }}</mat-icon>{{ statusLabel[r.status] }}: {{ r.count }}
+                  </span>
+                }
               }
-              @let evProc = resumoEvidencias(atvsProc);
               @if (evProc.total > 0) {
-                <span class="sb-sep"></span>
+                <span class="sb-rot">Evidências:</span>
                 @if (evProc.validadas) {
-                  <span class="evid-chip validada"><mat-icon>check_circle</mat-icon>{{ evProc.validadas }}</span>
+                  <span class="evid-chip validada"><mat-icon>check_circle</mat-icon>Validadas: {{ evProc.validadas }}</span>
                 }
                 @if (evProc.pendentes) {
-                  <span class="evid-chip pendente"><mat-icon>hourglass_empty</mat-icon>{{ evProc.pendentes }}</span>
+                  <span class="evid-chip pendente"><mat-icon>hourglass_empty</mat-icon>Pendentes: {{ evProc.pendentes }}</span>
                 }
                 @if (evProc.correcao) {
-                  <span class="evid-chip correcao"><mat-icon>report_problem</mat-icon>{{ evProc.correcao }}</span>
+                  <span class="evid-chip correcao"><mat-icon>report_problem</mat-icon>Em correção: {{ evProc.correcao }}</span>
                 }
               }
             </div>
@@ -126,23 +130,27 @@
                   </mat-expansion-panel-header>
 
                   @let atvsPrat = atividadesDePratica(pr);
+                  @let resumoPrat = resumoAtividades(atvsPrat);
+                  @let evPrat = resumoEvidencias(atvsPrat);
                   <div class="situacao-badges">
-                    @for (r of resumoAtividades(atvsPrat); track r.status) {
-                      <span class="status-atv" [attr.data-status]="r.status">
-                        <mat-icon>{{ statusIcone[r.status] }}</mat-icon>{{ statusLabel[r.status] }}: {{ r.count }}
-                      </span>
+                    @if (resumoPrat.length > 0) {
+                      <span class="sb-rot">Atividades:</span>
+                      @for (r of resumoPrat; track r.status) {
+                        <span class="status-atv" [attr.data-status]="r.status">
+                          <mat-icon>{{ statusIcone[r.status] }}</mat-icon>{{ statusLabel[r.status] }}: {{ r.count }}
+                        </span>
+                      }
                     }
-                    @let evPrat = resumoEvidencias(atvsPrat);
                     @if (evPrat.total > 0) {
-                      <span class="sb-sep"></span>
+                      <span class="sb-rot">Evidências:</span>
                       @if (evPrat.validadas) {
-                        <span class="evid-chip validada"><mat-icon>check_circle</mat-icon>{{ evPrat.validadas }}</span>
+                        <span class="evid-chip validada"><mat-icon>check_circle</mat-icon>Validadas: {{ evPrat.validadas }}</span>
                       }
                       @if (evPrat.pendentes) {
-                        <span class="evid-chip pendente"><mat-icon>hourglass_empty</mat-icon>{{ evPrat.pendentes }}</span>
+                        <span class="evid-chip pendente"><mat-icon>hourglass_empty</mat-icon>Pendentes: {{ evPrat.pendentes }}</span>
                       }
                       @if (evPrat.correcao) {
-                        <span class="evid-chip correcao"><mat-icon>report_problem</mat-icon>{{ evPrat.correcao }}</span>
+                        <span class="evid-chip correcao"><mat-icon>report_problem</mat-icon>Em correção: {{ evPrat.correcao }}</span>
                       }
                     }
                   </div>
@@ -156,23 +164,27 @@
                         <mat-icon>{{ g.empCod != null ? 'business' : 'segment' }}</mat-icon>
                         <span class="grupo-nome">{{ g.nome }}</span>
                         <span class="grupo-cont">{{ concluidasGrupo(g) }}/{{ g.atividades.length }}</span>
+                        @let resumoGrupo = resumoAtividades(g.atividades);
+                        @let evGrupo = resumoEvidencias(g.atividades);
                         <span class="situacao-badges">
-                          @for (r of resumoAtividades(g.atividades); track r.status) {
-                            <span class="status-atv" [attr.data-status]="r.status">
-                              <mat-icon>{{ statusIcone[r.status] }}</mat-icon>{{ r.count }}
-                            </span>
+                          @if (resumoGrupo.length > 0) {
+                            <span class="sb-rot">Atividades:</span>
+                            @for (r of resumoGrupo; track r.status) {
+                              <span class="status-atv" [attr.data-status]="r.status">
+                                <mat-icon>{{ statusIcone[r.status] }}</mat-icon>{{ statusLabel[r.status] }}: {{ r.count }}
+                              </span>
+                            }
                           }
-                          @let evGrupo = resumoEvidencias(g.atividades);
                           @if (evGrupo.total > 0) {
-                            <span class="sb-sep"></span>
+                            <span class="sb-rot">Evidências:</span>
                             @if (evGrupo.validadas) {
-                              <span class="evid-chip validada"><mat-icon>check_circle</mat-icon>{{ evGrupo.validadas }}</span>
+                              <span class="evid-chip validada"><mat-icon>check_circle</mat-icon>Validadas: {{ evGrupo.validadas }}</span>
                             }
                             @if (evGrupo.pendentes) {
-                              <span class="evid-chip pendente"><mat-icon>hourglass_empty</mat-icon>{{ evGrupo.pendentes }}</span>
+                              <span class="evid-chip pendente"><mat-icon>hourglass_empty</mat-icon>Pendentes: {{ evGrupo.pendentes }}</span>
                             }
                             @if (evGrupo.correcao) {
-                              <span class="evid-chip correcao"><mat-icon>report_problem</mat-icon>{{ evGrupo.correcao }}</span>
+                              <span class="evid-chip correcao"><mat-icon>report_problem</mat-icon>Em correção: {{ evGrupo.correcao }}</span>
                             }
                           }
                         </span>

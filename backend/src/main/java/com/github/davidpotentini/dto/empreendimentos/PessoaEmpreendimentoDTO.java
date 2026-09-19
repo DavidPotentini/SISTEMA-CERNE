@@ -6,7 +6,7 @@ public record PessoaEmpreendimentoDTO(
         Long pseCod,
         Long empCod,
         @NotBlank String nome,
-        boolean representanteLegal,
+        Boolean representanteLegal,
         String email,
         String telefone
 ) {

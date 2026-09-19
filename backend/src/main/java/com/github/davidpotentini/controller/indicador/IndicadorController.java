@@ -45,9 +45,9 @@ public class IndicadorController {
         return service.definirComplementar(dto);
     }
 
-    @PutMapping("/{indCod}/responsavel")
-    public IndicadorCicloDTO definirResponsavel(@PathVariable Long indCod,
-                                                @RequestParam(required = false) Long respPesCod) {
-        return service.definirResponsavel(indCod, respPesCod);
+    @PutMapping("/{indCod}")
+    public IndicadorCicloDTO editar(@PathVariable Long indCod,
+                                    @Valid @RequestBody IndicadorCicloDTO dto) {
+        return service.editar(indCod, dto);
     }
 }

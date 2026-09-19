@@ -4,6 +4,7 @@ import com.github.davidpotentini.comum.ciclo.EscopoCiclo;
 import com.github.davidpotentini.dto.planejamento.AtividadePlanejadaDTO;
 import com.github.davidpotentini.dto.planejamento.PlanProcessoDTO;
 import com.github.davidpotentini.dto.planejamento.PlanejamentoAtualDTO;
+import com.github.davidpotentini.dto.planejamento.PlanejamentoDTO;
 import com.github.davidpotentini.service.planejamento.PlanejamentoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -63,6 +64,11 @@ public class PlanejamentoController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluirAgrupamento(@PathVariable Long agrcCod) {
         service.excluirAgrupamento(agrcCod);
+    }
+
+    @PostMapping("/empreendimentos/{empCod}/atividades")
+    public PlanejamentoDTO gerarAtividadesEmpreendimento(@PathVariable Long empCod) {
+        return service.gerarAtividadesEmpreendimento(empCod);
     }
 
     @PutMapping("/atividades/{atpCod}")

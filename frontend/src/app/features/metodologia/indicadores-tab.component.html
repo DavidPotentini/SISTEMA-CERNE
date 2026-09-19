@@ -21,8 +21,13 @@
       </ng-container>
 
       <ng-container matColumnDef="vinculo">
-        <th mat-header-cell *matHeaderCellDef>Vínculo metodológico</th>
-        <td mat-cell *matCellDef="let i">{{ i.vinculoMetodologico || '—' }}</td>
+        <th mat-header-cell *matHeaderCellDef>Vínculo CERNE</th>
+        <td mat-cell *matCellDef="let i">
+          <div class="vinculo">
+            <span class="proc">{{ i.processoNome || '—' }}</span>
+            <span class="prat">{{ i.praticaNome || '—' }}</span>
+          </div>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="unidade">

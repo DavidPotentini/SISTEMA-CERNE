@@ -14,6 +14,7 @@ import { of } from 'rxjs';
 import { CicloService } from '../../core/services/ciclo/ciclo.service';
 import { Ciclo, STATUS_CICLO_LABEL } from '../../models/ciclo/ciclo.model';
 import { EmpreendimentoService } from '../../core/services/empreendimento/empreendimento.service';
+import { PlanejamentoService } from '../../core/services/planejamento/planejamento.service';
 import { dataParaIso, isoParaData } from '../../shared/util/data';
 import {
   EEstagioIncubacao,
@@ -49,9 +50,13 @@ import {
 export class EmpreendimentoGerenciarDialog {
   private readonly service = inject(EmpreendimentoService);
   private readonly cicloService = inject(CicloService);
+  private readonly planejamentoService = inject(PlanejamentoService);
   private readonly ref = inject(MatDialogRef<EmpreendimentoGerenciarDialog>);
   readonly empreendimento = inject<Empreendimento | null>(MAT_DIALOG_DATA);
   readonly novo = this.empreendimento === null;
+
+  readonly gerandoAtividades = signal(false);
+  readonly podePublicarAtividades = computed(() => !this.novo && this.empreendimento?.cicCod != null);
 
   private readonly ciclosRes = rxResource({
     params: () => ({}),
@@ -97,8 +102,8 @@ export class EmpreendimentoGerenciarDialog {
   readonly nivelMaturidade = signal<ENivelMaturidade | null>(
     this.empreendimento?.nivelMaturidade ?? null,
   );
-  readonly entrada = signal(this.empreendimento?.entrada ?? '');
-  readonly saida = signal(this.empreendimento?.saida ?? '');
+  readonly inicioContrato = signal(this.empreendimento?.inicioContrato ?? '');
+  readonly fimContrato = signal(this.empreendimento?.fimContrato ?? '');
 
   private readonly pessoasVersao = signal(0);
   readonly pessoas = rxResource({
@@ -119,8 +124,61 @@ export class EmpreendimentoGerenciarDialog {
       params.empCod == null ? of<Ciclo[]>([]) : this.service.listarCiclos(params.empCod),
   });
 
+  readonly colunasDoc = ['nome', 'acoes'];
+  readonly enviandoDoc = signal(false);
+  private readonly documentosVersao = signal(0);
+  readonly documentos = rxResource({
+    params: () => ({ empCod: this.empreendimento?.empCod, v: this.documentosVersao() }),
+    stream: ({ params }) =>
+      params.empCod == null ? of([]) : this.service.listarDocumentos(params.empCod),
+  });
+
   fmtCiclo(d: string | null): string {
     return d ? d.split('-').reverse().join('/') : '—';
+  }
+
+  aoSelecionarArquivo(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || this.empreendimento == null) return;
+    this.enviandoDoc.set(true);
+    this.service.anexarDocumento(this.empreendimento.empCod, file).subscribe({
+      next: () => {
+        this.enviandoDoc.set(false);
+        this.documentosVersao.update(v => v + 1);
+      },
+      error: e => {
+        this.enviandoDoc.set(false);
+        window.alert(e?.error?.mensagem ?? 'Falha ao anexar o documento.');
+      },
+    });
+  }
+
+  removerDocumento(arqCod: number): void {
+    if (this.empreendimento == null) return;
+    if (!window.confirm('Remover este documento?')) return;
+    this.service.removerDocumento(this.empreendimento.empCod, arqCod).subscribe({
+      next: () => this.documentosVersao.update(v => v + 1),
+      error: e => window.alert(e?.error?.mensagem ?? 'Falha ao remover o documento.'),
+    });
+  }
+
+  publicarAtividades(): void {
+    const empCod = this.empreendimento?.empCod;
+    if (empCod == null) return;
+    this.gerandoAtividades.set(true);
+    this.planejamentoService.gerarAtividadesEmpreendimento(empCod).subscribe({
+      next: () => {
+        this.gerandoAtividades.set(false);
+        this.planejamentoService.recarregar();
+        window.alert('Atividades por empreendimento geradas no ciclo.');
+      },
+      error: e => {
+        this.gerandoAtividades.set(false);
+        window.alert(e?.error?.mensagem ?? 'Falha ao gerar as atividades.');
+      },
+    });
   }
 
   readonly cadastrando = signal(false);
@@ -144,8 +202,8 @@ export class EmpreendimentoGerenciarDialog {
       estagio: this.estagio(),
       status: this.status(),
       nivelMaturidade: this.nivelMaturidade(),
-      entrada: this.entrada() || null,
-      saida: this.saida() || null,
+      inicioContrato: this.inicioContrato() || null,
+      fimContrato: this.fimContrato() || null,
       cicCod: this.cicCod(),
     };
     const requisicao = this.novo

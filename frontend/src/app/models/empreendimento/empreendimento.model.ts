@@ -23,8 +23,8 @@ export interface Empreendimento {
   estagio: EEstagioIncubacao | null;
   status: EStatusEmpreendimento;
   nivelMaturidade: ENivelMaturidade | null;
-  entrada: string | null;
-  saida: string | null;
+  inicioContrato: string | null;
+  fimContrato: string | null;
   cicCod: number | null;
 }
 
